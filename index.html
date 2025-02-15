@@ -74,13 +74,46 @@
             max-width: 800px;
             line-height: 1.6;
         }
+
+        .profile-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .profile-left {
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+
+        .profile-email {
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .profile-right {
+            padding: 20px;
+            line-height: 1.8;
+        }
+
+        .profile-intro {
+            white-space: pre-line;
+            font-size: 1.1em;
+        }
     </style>
 </head>
 <body>
     <nav class="sidebar">
         <ul class="sidebar-nav">
             <li><a href="#" class="active" onclick="showSection('home')">主页</a></li>
-            <!-- <li><a href="#" onclick="showSection('avatar')">头像</a></li> -->
             <li><a href="#" onclick="showSection('profile')">简介</a></li>
             <li><a href="#" onclick="showSection('demo')">作品展示</a></li>
         </ul>
@@ -90,21 +123,26 @@
         <section id="home" class="content-section active">
             <h1>欢迎来到我的个人主页</h1>
             <div class="introduction">
-                <p>这里是我的个人主页，您可以通过左侧导航栏浏览不同的内容。</p>
+                <p>这是我的个人主页，不过还没有什么内容</p>
             </div>
         </section>
-
-        <!-- <section id="avatar" class="content-section"> -->
-            <!-- <h2>头像</h2> -->
-            <!-- <div class="avatar-container"> -->
-                <!-- 这里可以放置头像 -->
-            <!-- </div> -->
-        <!-- </section> -->
 
         <section id="profile" class="content-section">
             <h2>个人简介</h2>
             <div class="profile-content">
-                <!-- 这里可以添加个人简介内容 -->
+                <div class="profile-left">
+                    <img src="avatar.jpg" alt="个人头像" class="profile-avatar">
+                    <div class="profile-email">
+                        <p>liruijieas@gmail.com</p>
+                        <!-- <p>liruijieas@163.com</p> -->
+                    </div>
+                </div>
+                <div class="profile-right">
+                    <div class="profile-intro">
+                        Gamer, game developer, C++/Python developer.
+                        Anime watcher, ぼっち・ざ・ろっく！ のアニメ続編見たい
+                    </div>
+                </div>
             </div>
         </section>
 
