@@ -198,3 +198,98 @@ body {
     color: #856404;
     border-radius: 0 4px 4px 0;
 }
+
+/* 开发进度样式 */
+.development-status {
+    margin-top: 25px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.development-status h3 {
+    font-size: 1.3em;
+    margin-bottom: 15px;
+    color: #2c3e50;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.feature-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    transition: transform 0.2s ease;
+}
+
+.feature-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+.feature-section h4 {
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    color: #2c3e50;
+}
+
+.status-icon {
+    margin-right: 8px;
+    font-size: 1.2em;
+}
+
+.status-icon.complete {
+    color: #2ecc71;
+}
+
+.status-icon.pending {
+    color: #f39c12;
+}
+
+.feature-list {
+    list-style: none;
+    margin-left: 10px;
+}
+
+.feature-list li {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid #3498db;
+    transition: background-color 0.2s ease;
+}
+
+.feature-list li:hover {
+    background-color: #e9ecef;
+}
+
+.feature-name {
+    font-weight: 600;
+    color: #34495e;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.feature-desc {
+    font-size: 0.95em;
+    color: #7f8c8d;
+    margin-left: 5px;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .feature-section {
+        padding: 12px;
+    }
+    
+    .feature-list li {
+        padding: 8px;
+    }
+}
