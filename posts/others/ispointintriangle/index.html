@@ -10,53 +10,6 @@
 <meta name="description" content="
 可以使用叉乘的方法判断一个点是否在三角形内部。当三角形中所有边的对点和点P都位于该边的一侧时，就说明P在三角形内部，而判断是否位于一侧可以使用叉乘的符号是否相等来判断。
 
-
-
- 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-
-
 #include &lt;iostream&gt;
 
 struct Point {
@@ -100,12 +53,10 @@ int main() {
   }
   return 0;
 }
-
-
 ">
 <meta name="author" content="李睿杰">
 <link rel="canonical" href="https://wstfdxfh.github.io/posts/others/ispointintriangle/">
-<link crossorigin="anonymous" href="/assets/css/stylesheet.6da9a63d25a9608bca2f7f907a030e887a7dd3c3f3918e4cc113129361414bda.css" integrity="sha256-bammPSWpYIvKL3&#43;QegMOiHp908PzkY5MwRMSk2FBS9o=" rel="preload stylesheet" as="style">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://wstfdxfh.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://wstfdxfh.github.io/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="https://wstfdxfh.github.io/favicon-32x32.png">
@@ -153,7 +104,7 @@ int main() {
 </noscript><meta property="og:url" content="https://wstfdxfh.github.io/posts/others/ispointintriangle/">
   <meta property="og:site_name" content="李睿杰的博客">
   <meta property="og:title" content="IsPointInTriangle">
-  <meta property="og:description" content=" 可以使用叉乘的方法判断一个点是否在三角形内部。当三角形中所有边的对点和点P都位于该边的一侧时，就说明P在三角形内部，而判断是否位于一侧可以使用叉乘的符号是否相等来判断。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 #include &lt;iostream&gt; struct Point { double x, y; }; // 向量叉积：计算向量a × 向量b的值 double crossProduct(const Point&amp; a, const Point&amp; b) { return a.x * b.y - a.y * b.x; } // 检查点p1和p2是否在边a-b的同一侧（包含边上的点） bool isSameSide(const Point&amp; p1, const Point&amp; p2, const Point&amp; a, const Point&amp; b) { Point ab = {b.x - a.x, b.y - a.y}; // 边a→b的向量 Point ap1 = {p1.x - a.x, p1.y - a.y}; Point ap2 = {p2.x - a.x, p2.y - a.y}; double cp1 = crossProduct(ab, ap1); // 计算叉积AB × AP1 double cp2 = crossProduct(ab, ap2); // 计算叉积AB × AP2 return (cp1 * cp2) &gt;= 0; // 符号相同或其中一个为0（点在线段上） } // 判断点P是否在三角形ABC内 bool isInsideTriangle(const Point&amp; A, const Point&amp; B, const Point&amp; C, const Point&amp; P) { return isSameSide(P, C, A, B) &amp;&amp; // P和C在AB同侧 isSameSide(P, A, B, C) &amp;&amp; // P和A在BC同侧 isSameSide(P, B, C, A); // P和B在CA同侧 } int main() { Point A = {0, 0}; Point B = {3, 0}; Point C = {1.5, 2.5}; Point P = {1.5, 10}; // 待检测点 if (isInsideTriangle(A, B, C, P)) { std::cout &lt;&lt; &#34;点P在三角形内部&#34; &lt;&lt; std::endl; } else { std::cout &lt;&lt; &#34;点P在三角形外部&#34; &lt;&lt; std::endl; } return 0; } ">
+  <meta property="og:description" content=" 可以使用叉乘的方法判断一个点是否在三角形内部。当三角形中所有边的对点和点P都位于该边的一侧时，就说明P在三角形内部，而判断是否位于一侧可以使用叉乘的符号是否相等来判断。 #include &lt;iostream&gt; struct Point { double x, y; }; // 向量叉积：计算向量a × 向量b的值 double crossProduct(const Point&amp; a, const Point&amp; b) { return a.x * b.y - a.y * b.x; } // 检查点p1和p2是否在边a-b的同一侧（包含边上的点） bool isSameSide(const Point&amp; p1, const Point&amp; p2, const Point&amp; a, const Point&amp; b) { Point ab = {b.x - a.x, b.y - a.y}; // 边a→b的向量 Point ap1 = {p1.x - a.x, p1.y - a.y}; Point ap2 = {p2.x - a.x, p2.y - a.y}; double cp1 = crossProduct(ab, ap1); // 计算叉积AB × AP1 double cp2 = crossProduct(ab, ap2); // 计算叉积AB × AP2 return (cp1 * cp2) &gt;= 0; // 符号相同或其中一个为0（点在线段上） } // 判断点P是否在三角形ABC内 bool isInsideTriangle(const Point&amp; A, const Point&amp; B, const Point&amp; C, const Point&amp; P) { return isSameSide(P, C, A, B) &amp;&amp; // P和C在AB同侧 isSameSide(P, A, B, C) &amp;&amp; // P和A在BC同侧 isSameSide(P, B, C, A); // P和B在CA同侧 } int main() { Point A = {0, 0}; Point B = {3, 0}; Point C = {1.5, 2.5}; Point P = {1.5, 10}; // 待检测点 if (isInsideTriangle(A, B, C, P)) { std::cout &lt;&lt; &#34;点P在三角形内部&#34; &lt;&lt; std::endl; } else { std::cout &lt;&lt; &#34;点P在三角形外部&#34; &lt;&lt; std::endl; } return 0; } ">
   <meta property="og:locale" content="zh-CN">
   <meta property="og:type" content="article">
     <meta property="article:section" content="posts">
@@ -163,53 +114,6 @@ int main() {
 <meta name="twitter:title" content="IsPointInTriangle">
 <meta name="twitter:description" content="
 可以使用叉乘的方法判断一个点是否在三角形内部。当三角形中所有边的对点和点P都位于该边的一侧时，就说明P在三角形内部，而判断是否位于一侧可以使用叉乘的符号是否相等来判断。
-
-
-
- 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-
 
 #include &lt;iostream&gt;
 
@@ -254,8 +158,6 @@ int main() {
   }
   return 0;
 }
-
-
 ">
 
 
@@ -291,12 +193,12 @@ int main() {
   "@type": "BlogPosting",
   "headline": "IsPointInTriangle",
   "name": "IsPointInTriangle",
-  "description": " 可以使用叉乘的方法判断一个点是否在三角形内部。当三角形中所有边的对点和点P都位于该边的一侧时，就说明P在三角形内部，而判断是否位于一侧可以使用叉乘的符号是否相等来判断。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 #include \u0026lt;iostream\u0026gt; struct Point { double x, y; }; // 向量叉积：计算向量a × 向量b的值 double crossProduct(const Point\u0026amp; a, const Point\u0026amp; b) { return a.x * b.y - a.y * b.x; } // 检查点p1和p2是否在边a-b的同一侧（包含边上的点） bool isSameSide(const Point\u0026amp; p1, const Point\u0026amp; p2, const Point\u0026amp; a, const Point\u0026amp; b) { Point ab = {b.x - a.x, b.y - a.y}; // 边a→b的向量 Point ap1 = {p1.x - a.x, p1.y - a.y}; Point ap2 = {p2.x - a.x, p2.y - a.y}; double cp1 = crossProduct(ab, ap1); // 计算叉积AB × AP1 double cp2 = crossProduct(ab, ap2); // 计算叉积AB × AP2 return (cp1 * cp2) \u0026gt;= 0; // 符号相同或其中一个为0（点在线段上） } // 判断点P是否在三角形ABC内 bool isInsideTriangle(const Point\u0026amp; A, const Point\u0026amp; B, const Point\u0026amp; C, const Point\u0026amp; P) { return isSameSide(P, C, A, B) \u0026amp;\u0026amp; // P和C在AB同侧 isSameSide(P, A, B, C) \u0026amp;\u0026amp; // P和A在BC同侧 isSameSide(P, B, C, A); // P和B在CA同侧 } int main() { Point A = {0, 0}; Point B = {3, 0}; Point C = {1.5, 2.5}; Point P = {1.5, 10}; // 待检测点 if (isInsideTriangle(A, B, C, P)) { std::cout \u0026lt;\u0026lt; \u0026#34;点P在三角形内部\u0026#34; \u0026lt;\u0026lt; std::endl; } else { std::cout \u0026lt;\u0026lt; \u0026#34;点P在三角形外部\u0026#34; \u0026lt;\u0026lt; std::endl; } return 0; } ",
+  "description": " 可以使用叉乘的方法判断一个点是否在三角形内部。当三角形中所有边的对点和点P都位于该边的一侧时，就说明P在三角形内部，而判断是否位于一侧可以使用叉乘的符号是否相等来判断。 #include \u0026lt;iostream\u0026gt; struct Point { double x, y; }; // 向量叉积：计算向量a × 向量b的值 double crossProduct(const Point\u0026amp; a, const Point\u0026amp; b) { return a.x * b.y - a.y * b.x; } // 检查点p1和p2是否在边a-b的同一侧（包含边上的点） bool isSameSide(const Point\u0026amp; p1, const Point\u0026amp; p2, const Point\u0026amp; a, const Point\u0026amp; b) { Point ab = {b.x - a.x, b.y - a.y}; // 边a→b的向量 Point ap1 = {p1.x - a.x, p1.y - a.y}; Point ap2 = {p2.x - a.x, p2.y - a.y}; double cp1 = crossProduct(ab, ap1); // 计算叉积AB × AP1 double cp2 = crossProduct(ab, ap2); // 计算叉积AB × AP2 return (cp1 * cp2) \u0026gt;= 0; // 符号相同或其中一个为0（点在线段上） } // 判断点P是否在三角形ABC内 bool isInsideTriangle(const Point\u0026amp; A, const Point\u0026amp; B, const Point\u0026amp; C, const Point\u0026amp; P) { return isSameSide(P, C, A, B) \u0026amp;\u0026amp; // P和C在AB同侧 isSameSide(P, A, B, C) \u0026amp;\u0026amp; // P和A在BC同侧 isSameSide(P, B, C, A); // P和B在CA同侧 } int main() { Point A = {0, 0}; Point B = {3, 0}; Point C = {1.5, 2.5}; Point P = {1.5, 10}; // 待检测点 if (isInsideTriangle(A, B, C, P)) { std::cout \u0026lt;\u0026lt; \u0026#34;点P在三角形内部\u0026#34; \u0026lt;\u0026lt; std::endl; } else { std::cout \u0026lt;\u0026lt; \u0026#34;点P在三角形外部\u0026#34; \u0026lt;\u0026lt; std::endl; } return 0; } ",
   "keywords": [
     
   ],
-  "articleBody": " 可以使用叉乘的方法判断一个点是否在三角形内部。当三角形中所有边的对点和点P都位于该边的一侧时，就说明P在三角形内部，而判断是否位于一侧可以使用叉乘的符号是否相等来判断。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 #include struct Point { double x, y; }; // 向量叉积：计算向量a × 向量b的值 double crossProduct(const Point\u0026 a, const Point\u0026 b) { return a.x * b.y - a.y * b.x; } // 检查点p1和p2是否在边a-b的同一侧（包含边上的点） bool isSameSide(const Point\u0026 p1, const Point\u0026 p2, const Point\u0026 a, const Point\u0026 b) { Point ab = {b.x - a.x, b.y - a.y}; // 边a→b的向量 Point ap1 = {p1.x - a.x, p1.y - a.y}; Point ap2 = {p2.x - a.x, p2.y - a.y}; double cp1 = crossProduct(ab, ap1); // 计算叉积AB × AP1 double cp2 = crossProduct(ab, ap2); // 计算叉积AB × AP2 return (cp1 * cp2) \u003e= 0; // 符号相同或其中一个为0（点在线段上） } // 判断点P是否在三角形ABC内 bool isInsideTriangle(const Point\u0026 A, const Point\u0026 B, const Point\u0026 C, const Point\u0026 P) { return isSameSide(P, C, A, B) \u0026\u0026 // P和C在AB同侧 isSameSide(P, A, B, C) \u0026\u0026 // P和A在BC同侧 isSameSide(P, B, C, A); // P和B在CA同侧 } int main() { Point A = {0, 0}; Point B = {3, 0}; Point C = {1.5, 2.5}; Point P = {1.5, 10}; // 待检测点 if (isInsideTriangle(A, B, C, P)) { std::cout \u003c\u003c \"点P在三角形内部\" \u003c\u003c std::endl; } else { std::cout \u003c\u003c \"点P在三角形外部\" \u003c\u003c std::endl; } return 0; } ",
-  "wordCount" : "232",
+  "articleBody": " 可以使用叉乘的方法判断一个点是否在三角形内部。当三角形中所有边的对点和点P都位于该边的一侧时，就说明P在三角形内部，而判断是否位于一侧可以使用叉乘的符号是否相等来判断。 #include struct Point { double x, y; }; // 向量叉积：计算向量a × 向量b的值 double crossProduct(const Point\u0026 a, const Point\u0026 b) { return a.x * b.y - a.y * b.x; } // 检查点p1和p2是否在边a-b的同一侧（包含边上的点） bool isSameSide(const Point\u0026 p1, const Point\u0026 p2, const Point\u0026 a, const Point\u0026 b) { Point ab = {b.x - a.x, b.y - a.y}; // 边a→b的向量 Point ap1 = {p1.x - a.x, p1.y - a.y}; Point ap2 = {p2.x - a.x, p2.y - a.y}; double cp1 = crossProduct(ab, ap1); // 计算叉积AB × AP1 double cp2 = crossProduct(ab, ap2); // 计算叉积AB × AP2 return (cp1 * cp2) \u003e= 0; // 符号相同或其中一个为0（点在线段上） } // 判断点P是否在三角形ABC内 bool isInsideTriangle(const Point\u0026 A, const Point\u0026 B, const Point\u0026 C, const Point\u0026 P) { return isSameSide(P, C, A, B) \u0026\u0026 // P和C在AB同侧 isSameSide(P, A, B, C) \u0026\u0026 // P和A在BC同侧 isSameSide(P, B, C, A); // P和B在CA同侧 } int main() { Point A = {0, 0}; Point B = {3, 0}; Point C = {1.5, 2.5}; Point P = {1.5, 10}; // 待检测点 if (isInsideTriangle(A, B, C, P)) { std::cout \u003c\u003c \"点P在三角形内部\" \u003c\u003c std::endl; } else { std::cout \u003c\u003c \"点P在三角形外部\" \u003c\u003c std::endl; } return 0; } ",
+  "wordCount" : "189",
   "inLanguage": "en",
   "datePublished": "2025-03-23T21:11:21+08:00",
   "dateModified": "2025-03-23T21:11:21+08:00",
@@ -388,54 +290,7 @@ int main() {
   <div class="post-content"><ul>
 <li>可以使用叉乘的方法判断一个点是否在三角形内部。当三角形中所有边的对点和点P都位于该边的一侧时，就说明P在三角形内部，而判断是否位于一侧可以使用叉乘的符号是否相等来判断。</li>
 </ul>
-<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">42
-</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">43
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Point</span> {
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">double</span> x, y;
@@ -478,9 +333,7 @@ int main() {
 </span></span><span style="display:flex;"><span>  }
 </span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></td></tr></table>
-</div>
-</div>
+</span></span></code></pre></div>
 
   </div>
 
