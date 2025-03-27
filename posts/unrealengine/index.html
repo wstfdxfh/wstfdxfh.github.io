@@ -151,6 +151,26 @@
     Contains posts related to UnrealEngine
   </div>
 </header>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>date: ‘2025-03-25T22:20:27&#43;08:00’ draft: false title: ‘Converting Blueprint to C&#43;&#43;’
+UE4: 将蓝图转换为C&#43;&#43; 教程https://dev.epicgames.com/community/learning/courses/KJ/unreal-engine-converting-blueprint-to-c/kjB/unreal-engine-introduction-to-blueprint-vs-c的笔记
+创建C&#43;&#43;基类 注意点：
+可以使用蓝图继承C&#43;&#43;，反之不行 C&#43;&#43;可以在运行时调用蓝图的function，称之为Runtime Calls，调用的时候C&#43;&#43;调用一个C&#43;&#43;的声明函数，并且由蓝图函数实现 如果要使用蓝图继承C&#43;&#43;类，必须在C&#43;&#43;类头文件的的UCLASS宏中设置Blueprintable，注意这个关键词(Keyword)是可继承的，比如AActor中已经进行了标注了关键词(Keyword)的话，继承它的类就不需要再进行标注 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable) class BLUEPRINTSTOCPP_API UGrabber : public USceneComponent { // ... }; 需要对Visual Studio中的配置管理器设置为&#34;Development Editor&#34;, 方案平台设置为&#34;Win64&#34;，随后进行生成 进行生成后，点击VS的“开始执行（不调试）”，即可重启UE 如果发生错误，可以尝试删除项目中的&#34;Binaries&#34;文件夹以及&#34;Intermediate&#34;文件夹后右键.uproject生成VS项目 生命周期方法 对于AActor类和SceneComponent类来说，它们都有各自的构造函数、Beginplay函数以及Tick（或者是TickComponent）函数，可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。
+打印的格式如下：
+UE_LOG(LogTemp, Warning, TEXT(&#34;Grabber Constructed&#34;)); 在以上函数中都加入类似的日志打印以后生成，会发现构造函数在打开编辑器以及开始游戏时各调用一次；Beginplay在开始游戏时（在构造函数后）调用一次；Tick会在之后每帧调用，通过
+PrimaryComponentTick.bCanEverTick = false; 可以禁用Tick函数的调用，节约CPU，但是这个设置会被继承的蓝图覆盖。
+Actor 与 Components 比较 Actors Components Can be placed in levels √ ✘ Can have components √ ✘ Modularity 低 高 Inheritance √ √ Default variable values √ √ Maintainability 低 高 Composable _ √ 我们一般倾向于将Components接在Actor上，而Actor本身不去实现太多功能。
+...</p>
+  </div>
+  <footer class="entry-footer">李睿杰</footer>
+  <a class="entry-link" aria-label="post link to " href="https://wstfdxfh.github.io/posts/unrealengine/converting-blueprint-to-c&#43;&#43;/"></a>
+</article>
     </main>
     
 <footer class="footer">
