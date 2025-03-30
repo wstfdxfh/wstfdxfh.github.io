@@ -6,16 +6,14 @@
     <description>Recent content in UnrealEngine on 李睿杰的博客</description>
     <generator>Hugo -- 0.145.0</generator>
     <language>zh-CN</language>
+    <lastBuildDate>Tue, 25 Mar 2025 22:20:27 +0800</lastBuildDate>
     <atom:link href="https://wstfdxfh.github.io/posts/unrealengine/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title></title>
+      <title>Converting Blueprint to C&#43;&#43;</title>
       <link>https://wstfdxfh.github.io/posts/unrealengine/converting-blueprint-to-c&#43;&#43;/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 25 Mar 2025 22:20:27 +0800</pubDate>
       <guid>https://wstfdxfh.github.io/posts/unrealengine/converting-blueprint-to-c&#43;&#43;/</guid>
-      <description>&lt;p&gt;date: &amp;lsquo;2025-03-25T22:20:27+08:00&amp;rsquo;
-draft: false
-title: &amp;lsquo;Converting Blueprint to C++&amp;rsquo;&lt;/p&gt;
-&lt;h1 id=&#34;ue4-将蓝图转换为c&#34;&gt;UE4: 将蓝图转换为C++&lt;/h1&gt;
+      <description>&lt;h1 id=&#34;ue4-将蓝图转换为c&#34;&gt;UE4: 将蓝图转换为C++&lt;/h1&gt;
 &lt;p&gt;教程&lt;a href=&#34;https://dev.epicgames.com/community/learning/courses/KJ/unreal-engine-converting-blueprint-to-c/kjB/unreal-engine-introduction-to-blueprint-vs-c&#34;&gt;https://dev.epicgames.com/community/learning/courses/KJ/unreal-engine-converting-blueprint-to-c/kjB/unreal-engine-introduction-to-blueprint-vs-c&lt;/a&gt;的笔记&lt;/p&gt;
 &lt;h2 id=&#34;创建c基类&#34;&gt;创建C++基类&lt;/h2&gt;
 &lt;p&gt;注意点：&lt;/p&gt;
