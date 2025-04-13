@@ -6,8 +6,87 @@
     <description>Recent content in UnrealEngine on 李睿杰的博客</description>
     <generator>Hugo -- 0.145.0</generator>
     <language>zh-CN</language>
-    <lastBuildDate>Tue, 25 Mar 2025 22:20:27 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 06 Apr 2025 19:45:39 +0800</lastBuildDate>
     <atom:link href="https://wstfdxfh.github.io/posts/unrealengine/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Unreal Notes</title>
+      <link>https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/</link>
+      <pubDate>Sun, 06 Apr 2025 19:45:39 +0800</pubDate>
+      <guid>https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/</guid>
+      <description>&lt;p&gt;[TOC]&lt;/p&gt;
+&lt;h2 id=&#34;常见技巧&#34;&gt;常见技巧&lt;/h2&gt;
+&lt;h3 id=&#34;防止速度过快导致的平台位置偏移&#34;&gt;防止速度过快导致的平台位置偏移&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c++&#34; data-lang=&#34;c++&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; AMovingPlatform&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;Tick(&lt;span style=&#34;color:#66d9ef&#34;&gt;float&lt;/span&gt; DeltaTime){
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	Super&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;Tick(DeltaTime);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    FVector CurrentLocation &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; GetActorLocation();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    CurrentLocation &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; CurrentLocation &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; (PlatformVelocity&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;DeltaTime);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    SetActorLocation(CurrentLocation);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;float&lt;/span&gt; DistanceMoved &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; FVector&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;Dist(StartLocation, CurrentLocation);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt;(DistanceMoved &lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; MoveDistance){
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#75715e&#34;&gt;// 获得速度的单位向量
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;        FVector MoveDirection &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; PlatformVelocty.GetSafeNormal();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        StartLocation &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; StartLocation&lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; MoveDirection&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;MoveDistance;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        SetActorLocation(StartLocation);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        PlatformVelocty &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;PlatformVelocty;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;解决被方块撞击时人物视角的问题&#34;&gt;解决被方块撞击时人物视角的问题&lt;/h3&gt;
+&lt;p&gt;这是因为只有角色默认只有在移动时才会检查碰撞&lt;/p&gt;
+&lt;p&gt;解决方法：使用蓝图中的&lt;code&gt;MoveUpdatedComponent&lt;/code&gt;，在每一帧都移动一个小距离再反向移动&lt;/p&gt;
+&lt;p&gt;可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。&lt;/p&gt;
+&lt;h2 id=&#34;ue_log&#34;&gt;UE_LOG&lt;/h2&gt;
+&lt;p&gt;打印的格式如下：&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;UE_LOG(LogTemp, Warning, TEXT(&amp;#34;Grabber Constructed&amp;#34;));
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果使用&lt;code&gt;FString&lt;/code&gt;格式如下&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;FString Name = GetName();
+UE_LOG(LogTemp, Warning, TEXT(&amp;#34;%s&amp;#34;), *Name);
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;旋转平台&#34;&gt;旋转平台&lt;/h2&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;AddActorRotation(RotationVelocity*DeltaT)
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;不同的灯光类型&#34;&gt;不同的灯光类型&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;名称&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;解释&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Point Light&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;从一个点向外发射的光源&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Spot Light&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;聚光灯，有方向性地发出光线&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Rect Light&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;方形的有方向性光源&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Directional Light&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;太阳光（只有方向，没有位置的光）&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Sky Light&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;将远处的场景作为光源&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;将scenecomponent添加到角色后的旋转差异&#34;&gt;将SceneComponent添加到角色后的旋转差异&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c++&#34; data-lang=&#34;c++&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; UGrabber&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;TickComponent(&lt;span style=&#34;color:#66d9ef&#34;&gt;float&lt;/span&gt; DeltaTime, ELevelTick TickType, FActorComponentTickFunction&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; ThisTickFunction)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	Super&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;TickComponent(DeltaTime, TickType, ThisTickFunction);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#66d9ef&#34;&gt;auto&lt;/span&gt; Rotator &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; GetOwner()&lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;GetActorRotation();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#66d9ef&#34;&gt;auto&lt;/span&gt; MyRotation &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; GetComponentRotation();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#66d9ef&#34;&gt;auto&lt;/span&gt; RotatorString &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; Rotator.ToCompactString();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#66d9ef&#34;&gt;auto&lt;/span&gt; MyRotationString &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; MyRotation.ToCompactString();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#75715e&#34;&gt;// LogTemp: Display: Owner Rotation: R(Y=-107.75), Component Rotation: R(P=-4.78, Y=-107.75)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;	&lt;span style=&#34;color:#75715e&#34;&gt;// 可以注意到，使用Owner Rotation得到的只有Yaw方向的旋转，而Component Rotation包含Pitch和Yaw旋转
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;	UE_LOG(LogTemp, Display, TEXT(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Owner Rotation: %s, Component Rotation: %s&amp;#34;&lt;/span&gt;), &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;RotatorString, &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;MyRotationString);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;其中，Pitch是俯仰角，Yaw是偏航角，除此之外还有一个滚转角Roll。&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Converting Blueprint to C&#43;&#43;</title>
       <link>https://wstfdxfh.github.io/posts/unrealengine/converting-blueprint-to-c&#43;&#43;/</link>

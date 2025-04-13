@@ -154,6 +154,25 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">Unreal Notes
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>[TOC]
+常见技巧 防止速度过快导致的平台位置偏移 void AMovingPlatform::Tick(float DeltaTime){ Super::Tick(DeltaTime); FVector CurrentLocation = GetActorLocation(); CurrentLocation = CurrentLocation &#43; (PlatformVelocity*DeltaTime); SetActorLocation(CurrentLocation); float DistanceMoved = FVector::Dist(StartLocation, CurrentLocation); if(DistanceMoved &gt; MoveDistance){ // 获得速度的单位向量 FVector MoveDirection = PlatformVelocty.GetSafeNormal(); StartLocation = StartLocation&#43; MoveDirection*MoveDistance; SetActorLocation(StartLocation); PlatformVelocty = -PlatformVelocty; } } 解决被方块撞击时人物视角的问题 这是因为只有角色默认只有在移动时才会检查碰撞
+解决方法：使用蓝图中的MoveUpdatedComponent，在每一帧都移动一个小距离再反向移动
+可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。
+UE_LOG 打印的格式如下：
+UE_LOG(LogTemp, Warning, TEXT(&#34;Grabber Constructed&#34;)); 如果使用FString格式如下
+FString Name = GetName(); UE_LOG(LogTemp, Warning, TEXT(&#34;%s&#34;), *Name); 旋转平台 AddActorRotation(RotationVelocity*DeltaT) 不同的灯光类型 名称 解释 Point Light 从一个点向外发射的光源 Spot Light 聚光灯，有方向性地发出光线 Rect Light 方形的有方向性光源 Directional Light 太阳光（只有方向，没有位置的光） Sky Light 将远处的场景作为光源 将SceneComponent添加到角色后的旋转差异 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) { Super::TickComponent(DeltaTime, TickType, ThisTickFunction); auto Rotator = GetOwner()-&gt;GetActorRotation(); auto MyRotation = GetComponentRotation(); auto RotatorString = Rotator.ToCompactString(); auto MyRotationString = MyRotation.ToCompactString(); // LogTemp: Display: Owner Rotation: R(Y=-107.75), Component Rotation: R(P=-4.78, Y=-107.75) // 可以注意到，使用Owner Rotation得到的只有Yaw方向的旋转，而Component Rotation包含Pitch和Yaw旋转 UE_LOG(LogTemp, Display, TEXT(&#34;Owner Rotation: %s, Component Rotation: %s&#34;), *RotatorString, *MyRotationString); } 其中，Pitch是俯仰角，Yaw是偏航角，除此之外还有一个滚转角Roll。
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-04-06 19:45:39 +0800 CST'>April 6, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <a class="entry-link" aria-label="post link to Unreal Notes" href="https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">Converting Blueprint to C&#43;&#43;
     </h2>
   </header>
