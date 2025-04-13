@@ -13,7 +13,8 @@
       <link>https://wstfdxfh.github.io/posts/unrealengine/converting-blueprint-to-c&#43;&#43;/</link>
       <pubDate>Tue, 25 Mar 2025 22:20:27 +0800</pubDate>
       <guid>https://wstfdxfh.github.io/posts/unrealengine/converting-blueprint-to-c&#43;&#43;/</guid>
-      <description>&lt;h1 id=&#34;ue4-将蓝图转换为c&#34;&gt;UE4: 将蓝图转换为C++&lt;/h1&gt;
+      <description>&lt;p&gt;[TOC]&lt;/p&gt;
+&lt;h1 id=&#34;ue4-将蓝图转换为c&#34;&gt;UE4: 将蓝图转换为C++&lt;/h1&gt;
 &lt;p&gt;教程&lt;a href=&#34;https://dev.epicgames.com/community/learning/courses/KJ/unreal-engine-converting-blueprint-to-c/kjB/unreal-engine-introduction-to-blueprint-vs-c&#34;&gt;https://dev.epicgames.com/community/learning/courses/KJ/unreal-engine-converting-blueprint-to-c/kjB/unreal-engine-introduction-to-blueprint-vs-c&lt;/a&gt;的笔记&lt;/p&gt;
 &lt;h2 id=&#34;创建c基类&#34;&gt;创建C++基类&lt;/h2&gt;
 &lt;p&gt;注意点：&lt;/p&gt;

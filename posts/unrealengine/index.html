@@ -158,7 +158,8 @@
     </h2>
   </header>
   <div class="entry-content">
-    <p>UE4: 将蓝图转换为C&#43;&#43; 教程https://dev.epicgames.com/community/learning/courses/KJ/unreal-engine-converting-blueprint-to-c/kjB/unreal-engine-introduction-to-blueprint-vs-c的笔记
+    <p>[TOC]
+UE4: 将蓝图转换为C&#43;&#43; 教程https://dev.epicgames.com/community/learning/courses/KJ/unreal-engine-converting-blueprint-to-c/kjB/unreal-engine-introduction-to-blueprint-vs-c的笔记
 创建C&#43;&#43;基类 注意点：
 可以使用蓝图继承C&#43;&#43;，反之不行 C&#43;&#43;可以在运行时调用蓝图的function，称之为Runtime Calls，调用的时候C&#43;&#43;调用一个C&#43;&#43;的声明函数，并且由蓝图函数实现 如果要使用蓝图继承C&#43;&#43;类，必须在C&#43;&#43;类头文件的的UCLASS宏中设置Blueprintable，注意这个关键词(Keyword)是可继承的，比如AActor中已经进行了标注了关键词(Keyword)的话，继承它的类就不需要再进行标注 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable) class BLUEPRINTSTOCPP_API UGrabber : public USceneComponent { // ... }; 需要对Visual Studio中的配置管理器设置为&#34;Development Editor&#34;, 方案平台设置为&#34;Win64&#34;，随后进行生成 进行生成后，点击VS的“开始执行（不调试）”，即可重启UE 如果发生错误，可以尝试删除项目中的&#34;Binaries&#34;文件夹以及&#34;Intermediate&#34;文件夹后右键.uproject生成VS项目 生命周期方法 对于AActor类和SceneComponent类来说，它们都有各自的构造函数、Beginplay函数以及Tick（或者是TickComponent）函数，可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。
 打印的格式如下：
