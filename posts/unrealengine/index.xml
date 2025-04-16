@@ -30,19 +30,31 @@
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        PlatformVelocty &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;-&lt;/span&gt;PlatformVelocty;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    }
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;解决被方块撞击时人物视角的问题&#34;&gt;解决被方块撞击时人物视角的问题&lt;/h3&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;解决被方块撞击时人物视角异常的问题&#34;&gt;解决被方块撞击时人物视角异常的问题&lt;/h3&gt;
 &lt;p&gt;这是因为只有角色默认只有在移动时才会检查碰撞&lt;/p&gt;
 &lt;p&gt;解决方法：使用蓝图中的&lt;code&gt;MoveUpdatedComponent&lt;/code&gt;，在每一帧都移动一个小距离再反向移动&lt;/p&gt;
 &lt;p&gt;可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。&lt;/p&gt;
-&lt;h2 id=&#34;ue_log&#34;&gt;UE_LOG&lt;/h2&gt;
+&lt;h3 id=&#34;背对光源时场景过暗的问题&#34;&gt;背对光源时场景过暗的问题&lt;/h3&gt;
+&lt;p&gt;在场景中加入&lt;code&gt;PostProcessVolume&lt;/code&gt;，在&lt;code&gt;Lens-Exposure-Metering Mode&lt;/code&gt;中，将选项改为&lt;code&gt;Auto Exposure Basic&lt;/code&gt;，然后修改&lt;code&gt;Brush&lt;/code&gt;中的x,y,z，令其覆盖整个场景。&lt;/p&gt;
+&lt;h2 id=&#34;调试方法&#34;&gt;调试方法&lt;/h2&gt;
+&lt;h3 id=&#34;ue_log&#34;&gt;UE_LOG&lt;/h3&gt;
 &lt;p&gt;打印的格式如下：&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;UE_LOG(LogTemp, Warning, TEXT(&amp;#34;Grabber Constructed&amp;#34;));
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果使用&lt;code&gt;FString&lt;/code&gt;格式如下&lt;/p&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;FString Name = GetName();
 UE_LOG(LogTemp, Warning, TEXT(&amp;#34;%s&amp;#34;), *Name);
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;旋转平台&#34;&gt;旋转平台&lt;/h2&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;绘制调试射线球&#34;&gt;绘制调试射线、球&lt;/h3&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;#include &amp;#34;Engine/World.h&amp;#34;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;引入该头文件获得UWorld&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;#include &amp;#34;DrawDebugHelpers.h&amp;#34;
+
+DrawDebugLine(GetWorld(), Start, End, FColor::Red);
+DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5);
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;移动actor&#34;&gt;移动Actor&lt;/h2&gt;
+&lt;h3 id=&#34;旋转平台&#34;&gt;旋转平台&lt;/h3&gt;
 &lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;AddActorRotation(RotationVelocity*DeltaT)
-&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;不同的灯光类型&#34;&gt;不同的灯光类型&lt;/h2&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;通过c创建scenecomponent移动物品&#34;&gt;通过C++创建SceneComponent移动物品&lt;/h3&gt;
+&lt;h2 id=&#34;不同的灯光类型&#34;&gt;不同的灯光类型&lt;/h2&gt;
 &lt;table&gt;
   &lt;thead&gt;
       &lt;tr&gt;
@@ -73,7 +85,7 @@ UE_LOG(LogTemp, Warning, TEXT(&amp;#34;%s&amp;#34;), *Name);
       &lt;/tr&gt;
   &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;h2 id=&#34;将scenecomponent添加到角色后的旋转差异&#34;&gt;将SceneComponent添加到角色后的旋转差异&lt;/h2&gt;
+&lt;h2 id=&#34;将scenecomponent添加到角色后角色旋转和组件旋转的差异&#34;&gt;将SceneComponent添加到角色后，角色旋转和组件旋转的差异&lt;/h2&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c++&#34; data-lang=&#34;c++&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; UGrabber&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;TickComponent(&lt;span style=&#34;color:#66d9ef&#34;&gt;float&lt;/span&gt; DeltaTime, ELevelTick TickType, FActorComponentTickFunction&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; ThisTickFunction)
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	Super&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;TickComponent(DeltaTime, TickType, ThisTickFunction);
