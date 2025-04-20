@@ -9,6 +9,24 @@
 <meta name="keywords" content="">
 <meta name="description" content="常见技巧
 防止速度过快导致的平台位置偏移
+
+
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+
+
 void AMovingPlatform::Tick(float DeltaTime){
 	Super::Tick(DeltaTime);
     FVector CurrentLocation = GetActorLocation();
@@ -23,6 +41,8 @@ void AMovingPlatform::Tick(float DeltaTime){
         PlatformVelocty = -PlatformVelocty;
     }
 }
+
+
 解决被方块撞击时人物视角异常的问题
 这是因为只有角色默认只有在移动时才会检查碰撞
 解决方法：使用蓝图中的MoveUpdatedComponent，在每一帧都移动一个小距离再反向移动
@@ -32,65 +52,35 @@ void AMovingPlatform::Tick(float DeltaTime){
 调试方法
 UE_LOG
 打印的格式如下：
+
+
+1
+
+
 UE_LOG(LogTemp, Warning, TEXT(&#34;Grabber Constructed&#34;));
+
+
 如果使用FString格式如下
+
+
+1
+2
+
+
 FString Name = GetName();
 UE_LOG(LogTemp, Warning, TEXT(&#34;%s&#34;), *Name);
+
+
 绘制调试射线、球
+
+
+1
+
+
 #include &#34;Engine/World.h&#34;
-引入该头文件获得UWorld
-#include &#34;DrawDebugHelpers.h&#34;
 
-DrawDebugLine(GetWorld(), Start, End, FColor::Red);
-DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5);
-移动Actor
-旋转平台
-AddActorRotation(RotationVelocity*DeltaT)
-通过C&#43;&#43;创建SceneComponent移动物品
-不同的灯光类型
 
-  
-      
-          名称
-          解释
-      
-  
-  
-      
-          Point Light
-          从一个点向外发射的光源
-      
-      
-          Spot Light
-          聚光灯，有方向性地发出光线
-      
-      
-          Rect Light
-          方形的有方向性光源
-      
-      
-          Directional Light
-          太阳光（只有方向，没有位置的光）
-      
-      
-          Sky Light
-          将远处的场景作为光源
-      
-  
-
-将SceneComponent添加到角色后，角色旋转和组件旋转的差异
-void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	auto Rotator = GetOwner()-&gt;GetActorRotation();
-	auto MyRotation = GetComponentRotation();
-	auto RotatorString = Rotator.ToCompactString();
-	auto MyRotationString = MyRotation.ToCompactString();
-	// LogTemp: Display: Owner Rotation: R(Y=-107.75), Component Rotation: R(P=-4.78, Y=-107.75)
-	// 可以注意到，使用Owner Rotation得到的只有Yaw方向的旋转，而Component Rotation包含Pitch和Yaw旋转
-	UE_LOG(LogTemp, Display, TEXT(&#34;Owner Rotation: %s, Component Rotation: %s&#34;), *RotatorString, *MyRotationString);
-}
-其中，Pitch是俯仰角，Yaw是偏航角，除此之外还有一个滚转角Roll。">
+引入该头文件获得UWorld">
 <meta name="author" content="李睿杰">
 <link rel="canonical" href="https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
@@ -141,14 +131,13 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 </noscript><meta property="og:url" content="https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/">
   <meta property="og:site_name" content="李睿杰的博客">
   <meta property="og:title" content="Unreal Notes">
-  <meta property="og:description" content="常见技巧 防止速度过快导致的平台位置偏移 void AMovingPlatform::Tick(float DeltaTime){ Super::Tick(DeltaTime); FVector CurrentLocation = GetActorLocation(); CurrentLocation = CurrentLocation &#43; (PlatformVelocity*DeltaTime); SetActorLocation(CurrentLocation); float DistanceMoved = FVector::Dist(StartLocation, CurrentLocation); if(DistanceMoved &gt; MoveDistance){ // 获得速度的单位向量 FVector MoveDirection = PlatformVelocty.GetSafeNormal(); StartLocation = StartLocation&#43; MoveDirection*MoveDistance; SetActorLocation(StartLocation); PlatformVelocty = -PlatformVelocty; } } 解决被方块撞击时人物视角异常的问题 这是因为只有角色默认只有在移动时才会检查碰撞
+  <meta property="og:description" content="常见技巧 防止速度过快导致的平台位置偏移 1 2 3 4 5 6 7 8 9 10 11 12 13 14 void AMovingPlatform::Tick(float DeltaTime){ Super::Tick(DeltaTime); FVector CurrentLocation = GetActorLocation(); CurrentLocation = CurrentLocation &#43; (PlatformVelocity*DeltaTime); SetActorLocation(CurrentLocation); float DistanceMoved = FVector::Dist(StartLocation, CurrentLocation); if(DistanceMoved &gt; MoveDistance){ // 获得速度的单位向量 FVector MoveDirection = PlatformVelocty.GetSafeNormal(); StartLocation = StartLocation&#43; MoveDirection*MoveDistance; SetActorLocation(StartLocation); PlatformVelocty = -PlatformVelocty; } } 解决被方块撞击时人物视角异常的问题 这是因为只有角色默认只有在移动时才会检查碰撞
 解决方法：使用蓝图中的MoveUpdatedComponent，在每一帧都移动一个小距离再反向移动
 可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。
 背对光源时场景过暗的问题 在场景中加入PostProcessVolume，在Lens-Exposure-Metering Mode中，将选项改为Auto Exposure Basic，然后修改Brush中的x,y,z，令其覆盖整个场景。
 调试方法 UE_LOG 打印的格式如下：
-UE_LOG(LogTemp, Warning, TEXT(&#34;Grabber Constructed&#34;)); 如果使用FString格式如下
-FString Name = GetName(); UE_LOG(LogTemp, Warning, TEXT(&#34;%s&#34;), *Name); 绘制调试射线、球 #include &#34;Engine/World.h&#34; 引入该头文件获得UWorld
-#include &#34;DrawDebugHelpers.h&#34; DrawDebugLine(GetWorld(), Start, End, FColor::Red); DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5); 移动Actor 旋转平台 AddActorRotation(RotationVelocity*DeltaT) 通过C&#43;&#43;创建SceneComponent移动物品 不同的灯光类型 名称 解释 Point Light 从一个点向外发射的光源 Spot Light 聚光灯，有方向性地发出光线 Rect Light 方形的有方向性光源 Directional Light 太阳光（只有方向，没有位置的光） Sky Light 将远处的场景作为光源 将SceneComponent添加到角色后，角色旋转和组件旋转的差异 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) { Super::TickComponent(DeltaTime, TickType, ThisTickFunction); auto Rotator = GetOwner()-&gt;GetActorRotation(); auto MyRotation = GetComponentRotation(); auto RotatorString = Rotator.ToCompactString(); auto MyRotationString = MyRotation.ToCompactString(); // LogTemp: Display: Owner Rotation: R(Y=-107.75), Component Rotation: R(P=-4.78, Y=-107.75) // 可以注意到，使用Owner Rotation得到的只有Yaw方向的旋转，而Component Rotation包含Pitch和Yaw旋转 UE_LOG(LogTemp, Display, TEXT(&#34;Owner Rotation: %s, Component Rotation: %s&#34;), *RotatorString, *MyRotationString); } 其中，Pitch是俯仰角，Yaw是偏航角，除此之外还有一个滚转角Roll。">
+1 UE_LOG(LogTemp, Warning, TEXT(&#34;Grabber Constructed&#34;)); 如果使用FString格式如下
+1 2 FString Name = GetName(); UE_LOG(LogTemp, Warning, TEXT(&#34;%s&#34;), *Name); 绘制调试射线、球 1 #include &#34;Engine/World.h&#34; 引入该头文件获得UWorld">
   <meta property="og:locale" content="zh-CN">
   <meta property="og:type" content="article">
     <meta property="article:section" content="posts">
@@ -158,6 +147,24 @@ FString Name = GetName(); UE_LOG(LogTemp, Warning, TEXT(&#34;%s&#34;), *Name); �
 <meta name="twitter:title" content="Unreal Notes">
 <meta name="twitter:description" content="常见技巧
 防止速度过快导致的平台位置偏移
+
+
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+
+
 void AMovingPlatform::Tick(float DeltaTime){
 	Super::Tick(DeltaTime);
     FVector CurrentLocation = GetActorLocation();
@@ -172,6 +179,8 @@ void AMovingPlatform::Tick(float DeltaTime){
         PlatformVelocty = -PlatformVelocty;
     }
 }
+
+
 解决被方块撞击时人物视角异常的问题
 这是因为只有角色默认只有在移动时才会检查碰撞
 解决方法：使用蓝图中的MoveUpdatedComponent，在每一帧都移动一个小距离再反向移动
@@ -181,65 +190,35 @@ void AMovingPlatform::Tick(float DeltaTime){
 调试方法
 UE_LOG
 打印的格式如下：
+
+
+1
+
+
 UE_LOG(LogTemp, Warning, TEXT(&#34;Grabber Constructed&#34;));
+
+
 如果使用FString格式如下
+
+
+1
+2
+
+
 FString Name = GetName();
 UE_LOG(LogTemp, Warning, TEXT(&#34;%s&#34;), *Name);
+
+
 绘制调试射线、球
+
+
+1
+
+
 #include &#34;Engine/World.h&#34;
-引入该头文件获得UWorld
-#include &#34;DrawDebugHelpers.h&#34;
 
-DrawDebugLine(GetWorld(), Start, End, FColor::Red);
-DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5);
-移动Actor
-旋转平台
-AddActorRotation(RotationVelocity*DeltaT)
-通过C&#43;&#43;创建SceneComponent移动物品
-不同的灯光类型
 
-  
-      
-          名称
-          解释
-      
-  
-  
-      
-          Point Light
-          从一个点向外发射的光源
-      
-      
-          Spot Light
-          聚光灯，有方向性地发出光线
-      
-      
-          Rect Light
-          方形的有方向性光源
-      
-      
-          Directional Light
-          太阳光（只有方向，没有位置的光）
-      
-      
-          Sky Light
-          将远处的场景作为光源
-      
-  
-
-将SceneComponent添加到角色后，角色旋转和组件旋转的差异
-void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	auto Rotator = GetOwner()-&gt;GetActorRotation();
-	auto MyRotation = GetComponentRotation();
-	auto RotatorString = Rotator.ToCompactString();
-	auto MyRotationString = MyRotation.ToCompactString();
-	// LogTemp: Display: Owner Rotation: R(Y=-107.75), Component Rotation: R(P=-4.78, Y=-107.75)
-	// 可以注意到，使用Owner Rotation得到的只有Yaw方向的旋转，而Component Rotation包含Pitch和Yaw旋转
-	UE_LOG(LogTemp, Display, TEXT(&#34;Owner Rotation: %s, Component Rotation: %s&#34;), *RotatorString, *MyRotationString);
-}
-其中，Pitch是俯仰角，Yaw是偏航角，除此之外还有一个滚转角Roll。">
+引入该头文件获得UWorld">
 
 
 <script type="application/ld+json">
@@ -274,12 +253,12 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
   "@type": "BlogPosting",
   "headline": "Unreal Notes",
   "name": "Unreal Notes",
-  "description": "常见技巧 防止速度过快导致的平台位置偏移 void AMovingPlatform::Tick(float DeltaTime){ Super::Tick(DeltaTime); FVector CurrentLocation = GetActorLocation(); CurrentLocation = CurrentLocation + (PlatformVelocity*DeltaTime); SetActorLocation(CurrentLocation); float DistanceMoved = FVector::Dist(StartLocation, CurrentLocation); if(DistanceMoved \u0026gt; MoveDistance){ // 获得速度的单位向量 FVector MoveDirection = PlatformVelocty.GetSafeNormal(); StartLocation = StartLocation+ MoveDirection*MoveDistance; SetActorLocation(StartLocation); PlatformVelocty = -PlatformVelocty; } } 解决被方块撞击时人物视角异常的问题 这是因为只有角色默认只有在移动时才会检查碰撞\n解决方法：使用蓝图中的MoveUpdatedComponent，在每一帧都移动一个小距离再反向移动\n可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。\n背对光源时场景过暗的问题 在场景中加入PostProcessVolume，在Lens-Exposure-Metering Mode中，将选项改为Auto Exposure Basic，然后修改Brush中的x,y,z，令其覆盖整个场景。\n调试方法 UE_LOG 打印的格式如下：\nUE_LOG(LogTemp, Warning, TEXT(\u0026#34;Grabber Constructed\u0026#34;)); 如果使用FString格式如下\nFString Name = GetName(); UE_LOG(LogTemp, Warning, TEXT(\u0026#34;%s\u0026#34;), *Name); 绘制调试射线、球 #include \u0026#34;Engine/World.h\u0026#34; 引入该头文件获得UWorld\n#include \u0026#34;DrawDebugHelpers.h\u0026#34; DrawDebugLine(GetWorld(), Start, End, FColor::Red); DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5); 移动Actor 旋转平台 AddActorRotation(RotationVelocity*DeltaT) 通过C++创建SceneComponent移动物品 不同的灯光类型 名称 解释 Point Light 从一个点向外发射的光源 Spot Light 聚光灯，有方向性地发出光线 Rect Light 方形的有方向性光源 Directional Light 太阳光（只有方向，没有位置的光） Sky Light 将远处的场景作为光源 将SceneComponent添加到角色后，角色旋转和组件旋转的差异 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) { Super::TickComponent(DeltaTime, TickType, ThisTickFunction); auto Rotator = GetOwner()-\u0026gt;GetActorRotation(); auto MyRotation = GetComponentRotation(); auto RotatorString = Rotator.ToCompactString(); auto MyRotationString = MyRotation.ToCompactString(); // LogTemp: Display: Owner Rotation: R(Y=-107.75), Component Rotation: R(P=-4.78, Y=-107.75) // 可以注意到，使用Owner Rotation得到的只有Yaw方向的旋转，而Component Rotation包含Pitch和Yaw旋转 UE_LOG(LogTemp, Display, TEXT(\u0026#34;Owner Rotation: %s, Component Rotation: %s\u0026#34;), *RotatorString, *MyRotationString); } 其中，Pitch是俯仰角，Yaw是偏航角，除此之外还有一个滚转角Roll。\n",
+  "description": "常见技巧 防止速度过快导致的平台位置偏移 1 2 3 4 5 6 7 8 9 10 11 12 13 14 void AMovingPlatform::Tick(float DeltaTime){ Super::Tick(DeltaTime); FVector CurrentLocation = GetActorLocation(); CurrentLocation = CurrentLocation + (PlatformVelocity*DeltaTime); SetActorLocation(CurrentLocation); float DistanceMoved = FVector::Dist(StartLocation, CurrentLocation); if(DistanceMoved \u0026gt; MoveDistance){ // 获得速度的单位向量 FVector MoveDirection = PlatformVelocty.GetSafeNormal(); StartLocation = StartLocation+ MoveDirection*MoveDistance; SetActorLocation(StartLocation); PlatformVelocty = -PlatformVelocty; } } 解决被方块撞击时人物视角异常的问题 这是因为只有角色默认只有在移动时才会检查碰撞\n解决方法：使用蓝图中的MoveUpdatedComponent，在每一帧都移动一个小距离再反向移动\n可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。\n背对光源时场景过暗的问题 在场景中加入PostProcessVolume，在Lens-Exposure-Metering Mode中，将选项改为Auto Exposure Basic，然后修改Brush中的x,y,z，令其覆盖整个场景。\n调试方法 UE_LOG 打印的格式如下：\n1 UE_LOG(LogTemp, Warning, TEXT(\u0026#34;Grabber Constructed\u0026#34;)); 如果使用FString格式如下\n1 2 FString Name = GetName(); UE_LOG(LogTemp, Warning, TEXT(\u0026#34;%s\u0026#34;), *Name); 绘制调试射线、球 1 #include \u0026#34;Engine/World.h\u0026#34; 引入该头文件获得UWorld\n",
   "keywords": [
     
   ],
-  "articleBody": "常见技巧 防止速度过快导致的平台位置偏移 void AMovingPlatform::Tick(float DeltaTime){ Super::Tick(DeltaTime); FVector CurrentLocation = GetActorLocation(); CurrentLocation = CurrentLocation + (PlatformVelocity*DeltaTime); SetActorLocation(CurrentLocation); float DistanceMoved = FVector::Dist(StartLocation, CurrentLocation); if(DistanceMoved \u003e MoveDistance){ // 获得速度的单位向量 FVector MoveDirection = PlatformVelocty.GetSafeNormal(); StartLocation = StartLocation+ MoveDirection*MoveDistance; SetActorLocation(StartLocation); PlatformVelocty = -PlatformVelocty; } } 解决被方块撞击时人物视角异常的问题 这是因为只有角色默认只有在移动时才会检查碰撞\n解决方法：使用蓝图中的MoveUpdatedComponent，在每一帧都移动一个小距离再反向移动\n可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。\n背对光源时场景过暗的问题 在场景中加入PostProcessVolume，在Lens-Exposure-Metering Mode中，将选项改为Auto Exposure Basic，然后修改Brush中的x,y,z，令其覆盖整个场景。\n调试方法 UE_LOG 打印的格式如下：\nUE_LOG(LogTemp, Warning, TEXT(\"Grabber Constructed\")); 如果使用FString格式如下\nFString Name = GetName(); UE_LOG(LogTemp, Warning, TEXT(\"%s\"), *Name); 绘制调试射线、球 #include \"Engine/World.h\" 引入该头文件获得UWorld\n#include \"DrawDebugHelpers.h\" DrawDebugLine(GetWorld(), Start, End, FColor::Red); DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5); 移动Actor 旋转平台 AddActorRotation(RotationVelocity*DeltaT) 通过C++创建SceneComponent移动物品 不同的灯光类型 名称 解释 Point Light 从一个点向外发射的光源 Spot Light 聚光灯，有方向性地发出光线 Rect Light 方形的有方向性光源 Directional Light 太阳光（只有方向，没有位置的光） Sky Light 将远处的场景作为光源 将SceneComponent添加到角色后，角色旋转和组件旋转的差异 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) { Super::TickComponent(DeltaTime, TickType, ThisTickFunction); auto Rotator = GetOwner()-\u003eGetActorRotation(); auto MyRotation = GetComponentRotation(); auto RotatorString = Rotator.ToCompactString(); auto MyRotationString = MyRotation.ToCompactString(); // LogTemp: Display: Owner Rotation: R(Y=-107.75), Component Rotation: R(P=-4.78, Y=-107.75) // 可以注意到，使用Owner Rotation得到的只有Yaw方向的旋转，而Component Rotation包含Pitch和Yaw旋转 UE_LOG(LogTemp, Display, TEXT(\"Owner Rotation: %s, Component Rotation: %s\"), *RotatorString, *MyRotationString); } 其中，Pitch是俯仰角，Yaw是偏航角，除此之外还有一个滚转角Roll。\n如何创建一个摄像头投射并且和特定物品交互 首先新建一个Trace Channel\n前往Project Settings-Engine-Collision在Trace Channels中新建Channel，取名叫做Grabber，默认ignore。重启编辑器\nbool UGrabber::GetGrabableInReach(FHitResult\u0026 OutHitResult) const { FVector Start = GetComponentLocation(); FVector End = Start + GetForwardVector()*MaxGrabDistance; DrawDebugLine(GetWorld(), Start, End, FColor::Red); FCollisionShape Sphere = FCollisionShape::MakeSphere(GrabRadius); bool HasHit = GetWorld()-\u003eSweepSingleByChannel( OutHitResult, Start, End,FQuat::Identity, ECC_GameTraceChannel2,Sphere); return HasHit; } 这里的ECC_GameTraceChannel2就是Grabber通道，具体需要在项目目录下的/config/DefaultEngine.ini查看\nvoid UGrabber::Grab() { UPhysicsHandleComponent *PhysicsHandle = GetPhysicsHandle(); FHitResult HitResult; bool HasHit = GetGrabableInReach(HitResult); if(PhysicsHandle \u0026\u0026 HasHit) { AActor *HitActor = HitResult.GetActor(); HitActor-\u003eTags.Add(\"Grabbed\"); UE_LOG(LogTemp, Warning, TEXT(\"The raycast has hit %s\"), *HitActor-\u003eGetActorNameOrLabel()); UPrimitiveComponent * HitComponent = HitResult.GetComponent(); HitComponent-\u003eWakeAllRigidBodies(); PhysicsHandle-\u003eGrabComponentAtLocationWithRotation( HitComponent, NAME_None, HitResult.ImpactPoint, GetComponentRotation() ); } } 其中，HitComponent-\u003eWakeAllRigidBodies();的目的是为了防止部分静止时间较长的物体不在模拟物理效果，而手动进行唤醒\n要放开物品的时候代码如下：\nvoid UGrabber::Release() { UPhysicsHandleComponent* PhysicsHandle = GetPhysicsHandle(); if(PhysicsHandle \u0026\u0026 PhysicsHandle-\u003eGetGrabbedComponent()!=nullptr) { AActor* GrabbedActor = PhysicsHandle-\u003eGetGrabbedComponent()-\u003eGetOwner(); GrabbedActor-\u003eTags.Remove(\"Grabbed\"); PhysicsHandle-\u003eGetGrabbedComponent()-\u003eWakeAllRigidBodies(); PhysicsHandle-\u003eReleaseComponent(); } } 物体碰撞关系 两个物体之间的碰撞关系依赖于两者的collision的组合：\nIgnore Overlap Block Ignore Ignore Ignore Ignore Overlap Ignore Overlap Overlap Block Ignore Overlap Block 除此以外，还需要在碰撞双方的选项中启用Generate overlap events\n依赖注入 使用场景：自己希望调用一个组件，但是自己找不到该组件（object）\n实现方式：\nUFUNCTION(BlueprintCallable) void SetMover(UMover * Mover); void UTriggerComponent::SetMover(UMover* NewMover) { Mover = NewMover; } 随后在蓝图中将Mover接到函数中\n强制转换与组件接触 Unreal中，UPrimitiveComponent是包含了物理性质的组件，而USceneComponent是其父组件，为了可以获取Actor的可能的UPrimitiveComponent，可以使用指针强制类型转换。完整强制转换与组件接触代码如下：\nUPrimitiveComponent* Component = Cast\u003cUPrimitiveComponent\u003e(Actor-\u003eGetRootComponent()); if(Component!=nullptr) { Component-\u003eSetSimulatePhysics(false); } Actor-\u003eAttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform); Mover-\u003eSetShouldMove(true); USceneComponent 1. USceneComponent Transform: 具有变换（位置、旋转、缩放）功能。 Attachment: 可以附加到其他组件上。 视觉内容: 没有视觉内容，主要用于场景中的逻辑组织。 2. UCapsuleComponent 继承自: USceneComponent 作用: 主要用于处理碰撞检测。 3. UStaticMeshComponent 继承自: USceneComponent 作用: 主要用于视觉展示，可以加载静态网格体。 4. Actor 及其子类 包括: Pawn, Character 等。 RootComponent: 类型为 USceneComponent*，是 Actor 的根组件。 修改 RootComponent: 可以通过修改 RootComponent 来改变其类型，例如将其设置为 UCapsuleComponent。 前向声明 Include only what you use in .cpp We should include as little as possible in .h We don’t need the header to declare a pointer We do need the header to construct an object We do need the header to access members We do need the header for inheritance ",
-  "wordCount" : "405",
+  "articleBody": "常见技巧 防止速度过快导致的平台位置偏移 1 2 3 4 5 6 7 8 9 10 11 12 13 14 void AMovingPlatform::Tick(float DeltaTime){ Super::Tick(DeltaTime); FVector CurrentLocation = GetActorLocation(); CurrentLocation = CurrentLocation + (PlatformVelocity*DeltaTime); SetActorLocation(CurrentLocation); float DistanceMoved = FVector::Dist(StartLocation, CurrentLocation); if(DistanceMoved \u003e MoveDistance){ // 获得速度的单位向量 FVector MoveDirection = PlatformVelocty.GetSafeNormal(); StartLocation = StartLocation+ MoveDirection*MoveDistance; SetActorLocation(StartLocation); PlatformVelocty = -PlatformVelocty; } } 解决被方块撞击时人物视角异常的问题 这是因为只有角色默认只有在移动时才会检查碰撞\n解决方法：使用蓝图中的MoveUpdatedComponent，在每一帧都移动一个小距离再反向移动\n可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。\n背对光源时场景过暗的问题 在场景中加入PostProcessVolume，在Lens-Exposure-Metering Mode中，将选项改为Auto Exposure Basic，然后修改Brush中的x,y,z，令其覆盖整个场景。\n调试方法 UE_LOG 打印的格式如下：\n1 UE_LOG(LogTemp, Warning, TEXT(\"Grabber Constructed\")); 如果使用FString格式如下\n1 2 FString Name = GetName(); UE_LOG(LogTemp, Warning, TEXT(\"%s\"), *Name); 绘制调试射线、球 1 #include \"Engine/World.h\" 引入该头文件获得UWorld\n1 2 3 4 #include \"DrawDebugHelpers.h\" DrawDebugLine(GetWorld(), Start, End, FColor::Red); DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5); 移动Actor 旋转平台 1 AddActorRotation(RotationVelocity*DeltaT) 通过C++创建SceneComponent移动物品 不同的灯光类型 名称 解释 Point Light 从一个点向外发射的光源 Spot Light 聚光灯，有方向性地发出光线 Rect Light 方形的有方向性光源 Directional Light 太阳光（只有方向，没有位置的光） Sky Light 将远处的场景作为光源 将SceneComponent添加到角色后，角色旋转和组件旋转的差异 1 2 3 4 5 6 7 8 9 10 11 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) { Super::TickComponent(DeltaTime, TickType, ThisTickFunction); auto Rotator = GetOwner()-\u003eGetActorRotation(); auto MyRotation = GetComponentRotation(); auto RotatorString = Rotator.ToCompactString(); auto MyRotationString = MyRotation.ToCompactString(); // LogTemp: Display: Owner Rotation: R(Y=-107.75), Component Rotation: R(P=-4.78, Y=-107.75) // 可以注意到，使用Owner Rotation得到的只有Yaw方向的旋转，而Component Rotation包含Pitch和Yaw旋转 UE_LOG(LogTemp, Display, TEXT(\"Owner Rotation: %s, Component Rotation: %s\"), *RotatorString, *MyRotationString); } 其中，Pitch是俯仰角，Yaw是偏航角，除此之外还有一个滚转角Roll。\n如何创建一个摄像头投射并且和特定物品交互 首先新建一个Trace Channel\n前往Project Settings-Engine-Collision在Trace Channels中新建Channel，取名叫做Grabber，默认ignore。重启编辑器\n1 2 3 4 5 6 7 8 9 10 bool UGrabber::GetGrabableInReach(FHitResult\u0026 OutHitResult) const { FVector Start = GetComponentLocation(); FVector End = Start + GetForwardVector()*MaxGrabDistance; DrawDebugLine(GetWorld(), Start, End, FColor::Red); FCollisionShape Sphere = FCollisionShape::MakeSphere(GrabRadius); bool HasHit = GetWorld()-\u003eSweepSingleByChannel( OutHitResult, Start, End,FQuat::Identity, ECC_GameTraceChannel2,Sphere); return HasHit; } 这里的ECC_GameTraceChannel2就是Grabber通道，具体需要在项目目录下的/config/DefaultEngine.ini查看\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 void UGrabber::Grab() { UPhysicsHandleComponent *PhysicsHandle = GetPhysicsHandle(); FHitResult HitResult; bool HasHit = GetGrabableInReach(HitResult); if(PhysicsHandle \u0026\u0026 HasHit) { AActor *HitActor = HitResult.GetActor(); HitActor-\u003eTags.Add(\"Grabbed\"); UE_LOG(LogTemp, Warning, TEXT(\"The raycast has hit %s\"), *HitActor-\u003eGetActorNameOrLabel()); UPrimitiveComponent * HitComponent = HitResult.GetComponent(); HitComponent-\u003eWakeAllRigidBodies(); PhysicsHandle-\u003eGrabComponentAtLocationWithRotation( HitComponent, NAME_None, HitResult.ImpactPoint, GetComponentRotation() ); } } 其中，HitComponent-\u003eWakeAllRigidBodies();的目的是为了防止部分静止时间较长的物体不在模拟物理效果，而手动进行唤醒\n要放开物品的时候代码如下：\n1 2 3 4 5 6 7 8 9 10 11 12 void UGrabber::Release() { UPhysicsHandleComponent* PhysicsHandle = GetPhysicsHandle(); if(PhysicsHandle \u0026\u0026 PhysicsHandle-\u003eGetGrabbedComponent()!=nullptr) { AActor* GrabbedActor = PhysicsHandle-\u003eGetGrabbedComponent()-\u003eGetOwner(); GrabbedActor-\u003eTags.Remove(\"Grabbed\"); PhysicsHandle-\u003eGetGrabbedComponent()-\u003eWakeAllRigidBodies(); PhysicsHandle-\u003eReleaseComponent(); } } 物体碰撞关系 两个物体之间的碰撞关系依赖于两者的collision的组合：\nIgnore Overlap Block Ignore Ignore Ignore Ignore Overlap Ignore Overlap Overlap Block Ignore Overlap Block 除此以外，还需要在碰撞双方的选项中启用Generate overlap events\n依赖注入 使用场景：自己希望调用一个组件，但是自己找不到该组件（object）\n实现方式：\n1 2 3 4 5 6 7 UFUNCTION(BlueprintCallable) void SetMover(UMover * Mover); void UTriggerComponent::SetMover(UMover* NewMover) { Mover = NewMover; } 随后在蓝图中将Mover接到函数中\n强制转换与组件接触 Unreal中，UPrimitiveComponent是包含了物理性质的组件，而USceneComponent是其父组件，为了可以获取Actor的可能的UPrimitiveComponent，可以使用指针强制类型转换。完整强制转换与组件接触代码如下：\n1 2 3 4 5 6 7 UPrimitiveComponent* Component = Cast\u003cUPrimitiveComponent\u003e(Actor-\u003eGetRootComponent()); if(Component!=nullptr) { Component-\u003eSetSimulatePhysics(false); } Actor-\u003eAttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform); Mover-\u003eSetShouldMove(true); 角色常用组件以及相关类简介 1. USceneComponent Transform: 具有变换（位置、旋转、缩放）功能。 Attachment: 可以附加到其他组件上。 视觉内容: 没有视觉内容，主要用于场景中的逻辑组织。 2. UCapsuleComponent 继承自: USceneComponent 作用: 主要用于处理碰撞检测。 3. UStaticMeshComponent 继承自: USceneComponent 作用: 主要用于视觉展示，可以加载静态网格体。 4. Actor 及其子类 包括: Pawn, Character 等。 RootComponent: 类型为 USceneComponent*，是 Actor 的根组件。 修改 RootComponent: 可以通过修改 RootComponent 来改变其类型，例如将其设置为 UCapsuleComponent。 5.USpringArmComponent 作为摄像机的支架（“弹簧臂”），用于设置摄像机与角色或物体之间的距离与角度；自动处理摄像机的碰撞检测和视野遮挡问题。 6.UCameraComponent 提供游戏视角，定义玩家视野范围、视野角度（FOV）及视图旋转等参数。通常配合USpringArmComponent使用，实现第三人称视角。 通常在第三人称游戏中，将USpringArmComponent的bUsePawnControlRotation设为true，同时将UCameraComponent的同名属性设为false，以便更灵活地调整视野。 前向声明 Include only what you use in .cpp We should include as little as possible in .h We don’t need the header to declare a pointer We do need the header to construct an object We do need the header to access members We do need the header for inheritance 摄像机 ",
+  "wordCount" : "502",
   "inLanguage": "en",
   "datePublished": "2025-04-06T19:45:39+08:00",
   "dateModified": "2025-04-06T19:45:39+08:00",
@@ -413,7 +392,7 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
                 <li>
                     <a href="#%e5%bc%ba%e5%88%b6%e8%bd%ac%e6%8d%a2%e4%b8%8e%e7%bb%84%e4%bb%b6%e6%8e%a5%e8%a7%a6" aria-label="强制转换与组件接触">强制转换与组件接触</a></li>
                 <li>
-                    <a href="#uscenecomponent" aria-label="USceneComponent">USceneComponent</a><ul>
+                    <a href="#%e8%a7%92%e8%89%b2%e5%b8%b8%e7%94%a8%e7%bb%84%e4%bb%b6%e4%bb%a5%e5%8f%8a%e7%9b%b8%e5%85%b3%e7%b1%bb%e7%ae%80%e4%bb%8b" aria-label="角色常用组件以及相关类简介">角色常用组件以及相关类简介</a><ul>
                         
                 <li>
                     <a href="#1-uscenecomponent" aria-label="1. USceneComponent">1. USceneComponent</a></li>
@@ -422,10 +401,16 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
                 <li>
                     <a href="#3-ustaticmeshcomponent" aria-label="3. UStaticMeshComponent">3. UStaticMeshComponent</a></li>
                 <li>
-                    <a href="#4-actor-%e5%8f%8a%e5%85%b6%e5%ad%90%e7%b1%bb" aria-label="4. Actor 及其子类">4. Actor 及其子类</a></li></ul>
+                    <a href="#4-actor-%e5%8f%8a%e5%85%b6%e5%ad%90%e7%b1%bb" aria-label="4. Actor 及其子类">4. Actor 及其子类</a></li>
+                <li>
+                    <a href="#5uspringarmcomponent" aria-label="5.USpringArmComponent">5.USpringArmComponent</a></li>
+                <li>
+                    <a href="#6ucameracomponent" aria-label="6.UCameraComponent">6.UCameraComponent</a></li></ul>
                 </li>
                 <li>
-                    <a href="#%e5%89%8d%e5%90%91%e5%a3%b0%e6%98%8e" aria-label="前向声明">前向声明</a>
+                    <a href="#%e5%89%8d%e5%90%91%e5%a3%b0%e6%98%8e" aria-label="前向声明">前向声明</a></li>
+                <li>
+                    <a href="#%e6%91%84%e5%83%8f%e6%9c%ba" aria-label="摄像机">摄像机</a>
                 </li>
             </ul>
         </div>
@@ -434,21 +419,41 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
   <div class="post-content"><h2 id="常见技巧">常见技巧<a hidden class="anchor" aria-hidden="true" href="#常见技巧">#</a></h2>
 <h3 id="防止速度过快导致的平台位置偏移">防止速度过快导致的平台位置偏移<a hidden class="anchor" aria-hidden="true" href="#防止速度过快导致的平台位置偏移">#</a></h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> AMovingPlatform<span style="color:#f92672">::</span>Tick(<span style="color:#66d9ef">float</span> DeltaTime){
-</span></span><span style="display:flex;"><span>	Super<span style="color:#f92672">::</span>Tick(DeltaTime);
-</span></span><span style="display:flex;"><span>    FVector CurrentLocation <span style="color:#f92672">=</span> GetActorLocation();
-</span></span><span style="display:flex;"><span>    CurrentLocation <span style="color:#f92672">=</span> CurrentLocation <span style="color:#f92672">+</span> (PlatformVelocity<span style="color:#f92672">*</span>DeltaTime);
-</span></span><span style="display:flex;"><span>    SetActorLocation(CurrentLocation);
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">float</span> DistanceMoved <span style="color:#f92672">=</span> FVector<span style="color:#f92672">::</span>Dist(StartLocation, CurrentLocation);
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span>(DistanceMoved <span style="color:#f92672">&gt;</span> MoveDistance){
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 获得速度的单位向量
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        FVector MoveDirection <span style="color:#f92672">=</span> PlatformVelocty.GetSafeNormal();
-</span></span><span style="display:flex;"><span>        StartLocation <span style="color:#f92672">=</span> StartLocation<span style="color:#f92672">+</span> MoveDirection<span style="color:#f92672">*</span>MoveDistance;
-</span></span><span style="display:flex;"><span>        SetActorLocation(StartLocation);
-</span></span><span style="display:flex;"><span>        PlatformVelocty <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>PlatformVelocty;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="解决被方块撞击时人物视角异常的问题">解决被方块撞击时人物视角异常的问题<a hidden class="anchor" aria-hidden="true" href="#解决被方块撞击时人物视角异常的问题">#</a></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">AMovingPlatform</span><span class="o">::</span><span class="n">Tick</span><span class="p">(</span><span class="kt">float</span> <span class="n">DeltaTime</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">	<span class="n">Super</span><span class="o">::</span><span class="n">Tick</span><span class="p">(</span><span class="n">DeltaTime</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">FVector</span> <span class="n">CurrentLocation</span> <span class="o">=</span> <span class="n">GetActorLocation</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CurrentLocation</span> <span class="o">=</span> <span class="n">CurrentLocation</span> <span class="o">+</span> <span class="p">(</span><span class="n">PlatformVelocity</span><span class="o">*</span><span class="n">DeltaTime</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SetActorLocation</span><span class="p">(</span><span class="n">CurrentLocation</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">float</span> <span class="n">DistanceMoved</span> <span class="o">=</span> <span class="n">FVector</span><span class="o">::</span><span class="n">Dist</span><span class="p">(</span><span class="n">StartLocation</span><span class="p">,</span> <span class="n">CurrentLocation</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">DistanceMoved</span> <span class="o">&gt;</span> <span class="n">MoveDistance</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 获得速度的单位向量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">FVector</span> <span class="n">MoveDirection</span> <span class="o">=</span> <span class="n">PlatformVelocty</span><span class="p">.</span><span class="n">GetSafeNormal</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">StartLocation</span> <span class="o">=</span> <span class="n">StartLocation</span><span class="o">+</span> <span class="n">MoveDirection</span><span class="o">*</span><span class="n">MoveDistance</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">SetActorLocation</span><span class="p">(</span><span class="n">StartLocation</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">PlatformVelocty</span> <span class="o">=</span> <span class="o">-</span><span class="n">PlatformVelocty</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="解决被方块撞击时人物视角异常的问题">解决被方块撞击时人物视角异常的问题<a hidden class="anchor" aria-hidden="true" href="#解决被方块撞击时人物视角异常的问题">#</a></h3>
 <p>这是因为只有角色默认只有在移动时才会检查碰撞</p>
 <p>解决方法：使用蓝图中的<code>MoveUpdatedComponent</code>，在每一帧都移动一个小距离再反向移动</p>
 <p>可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。</p>
@@ -457,21 +462,60 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 <h2 id="调试方法">调试方法<a hidden class="anchor" aria-hidden="true" href="#调试方法">#</a></h2>
 <h3 id="ue_log">UE_LOG<a hidden class="anchor" aria-hidden="true" href="#ue_log">#</a></h3>
 <p>打印的格式如下：</p>
-<pre tabindex="0"><code>UE_LOG(LogTemp, Warning, TEXT(&#34;Grabber Constructed&#34;));
-</code></pre><p>如果使用<code>FString</code>格式如下</p>
-<pre tabindex="0"><code>FString Name = GetName();
-UE_LOG(LogTemp, Warning, TEXT(&#34;%s&#34;), *Name);
-</code></pre><h3 id="绘制调试射线球">绘制调试射线、球<a hidden class="anchor" aria-hidden="true" href="#绘制调试射线球">#</a></h3>
-<pre tabindex="0"><code>#include &#34;Engine/World.h&#34;
-</code></pre><p>引入该头文件获得UWorld</p>
-<pre tabindex="0"><code>#include &#34;DrawDebugHelpers.h&#34;
-
-DrawDebugLine(GetWorld(), Start, End, FColor::Red);
-DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5);
-</code></pre><h2 id="移动actor">移动Actor<a hidden class="anchor" aria-hidden="true" href="#移动actor">#</a></h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">UE_LOG(LogTemp, Warning, TEXT(&#34;Grabber Constructed&#34;));
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>如果使用<code>FString</code>格式如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">FString Name = GetName();
+</span></span><span class="line"><span class="cl">UE_LOG(LogTemp, Warning, TEXT(&#34;%s&#34;), *Name);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="绘制调试射线球">绘制调试射线、球<a hidden class="anchor" aria-hidden="true" href="#绘制调试射线球">#</a></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">#include &#34;Engine/World.h&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>引入该头文件获得UWorld</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">#include &#34;DrawDebugHelpers.h&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">DrawDebugLine(GetWorld(), Start, End, FColor::Red);
+</span></span><span class="line"><span class="cl">DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="移动actor">移动Actor<a hidden class="anchor" aria-hidden="true" href="#移动actor">#</a></h2>
 <h3 id="旋转平台">旋转平台<a hidden class="anchor" aria-hidden="true" href="#旋转平台">#</a></h3>
-<pre tabindex="0"><code>AddActorRotation(RotationVelocity*DeltaT)
-</code></pre><h3 id="通过c创建scenecomponent移动物品">通过C++创建SceneComponent移动物品<a hidden class="anchor" aria-hidden="true" href="#通过c创建scenecomponent移动物品">#</a></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">AddActorRotation(RotationVelocity*DeltaT)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="通过c创建scenecomponent移动物品">通过C++创建SceneComponent移动物品<a hidden class="anchor" aria-hidden="true" href="#通过c创建scenecomponent移动物品">#</a></h3>
 <h2 id="不同的灯光类型">不同的灯光类型<a hidden class="anchor" aria-hidden="true" href="#不同的灯光类型">#</a></h2>
 <table>
   <thead>
@@ -504,68 +548,146 @@ DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5);
   </tbody>
 </table>
 <h2 id="将scenecomponent添加到角色后角色旋转和组件旋转的差异">将SceneComponent添加到角色后，角色旋转和组件旋转的差异<a hidden class="anchor" aria-hidden="true" href="#将scenecomponent添加到角色后角色旋转和组件旋转的差异">#</a></h2>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> UGrabber<span style="color:#f92672">::</span>TickComponent(<span style="color:#66d9ef">float</span> DeltaTime, ELevelTick TickType, FActorComponentTickFunction<span style="color:#f92672">*</span> ThisTickFunction)
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>	Super<span style="color:#f92672">::</span>TickComponent(DeltaTime, TickType, ThisTickFunction);
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">auto</span> Rotator <span style="color:#f92672">=</span> GetOwner()<span style="color:#f92672">-&gt;</span>GetActorRotation();
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">auto</span> MyRotation <span style="color:#f92672">=</span> GetComponentRotation();
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">auto</span> RotatorString <span style="color:#f92672">=</span> Rotator.ToCompactString();
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">auto</span> MyRotationString <span style="color:#f92672">=</span> MyRotation.ToCompactString();
-</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// LogTemp: Display: Owner Rotation: R(Y=-107.75), Component Rotation: R(P=-4.78, Y=-107.75)
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#75715e">// 可以注意到，使用Owner Rotation得到的只有Yaw方向的旋转，而Component Rotation包含Pitch和Yaw旋转
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	UE_LOG(LogTemp, Display, TEXT(<span style="color:#e6db74">&#34;Owner Rotation: %s, Component Rotation: %s&#34;</span>), <span style="color:#f92672">*</span>RotatorString, <span style="color:#f92672">*</span>MyRotationString);
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>其中，Pitch是俯仰角，Yaw是偏航角，除此之外还有一个滚转角Roll。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">UGrabber</span><span class="o">::</span><span class="n">TickComponent</span><span class="p">(</span><span class="kt">float</span> <span class="n">DeltaTime</span><span class="p">,</span> <span class="n">ELevelTick</span> <span class="n">TickType</span><span class="p">,</span> <span class="n">FActorComponentTickFunction</span><span class="o">*</span> <span class="n">ThisTickFunction</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">Super</span><span class="o">::</span><span class="n">TickComponent</span><span class="p">(</span><span class="n">DeltaTime</span><span class="p">,</span> <span class="n">TickType</span><span class="p">,</span> <span class="n">ThisTickFunction</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">auto</span> <span class="n">Rotator</span> <span class="o">=</span> <span class="n">GetOwner</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetActorRotation</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">auto</span> <span class="n">MyRotation</span> <span class="o">=</span> <span class="n">GetComponentRotation</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">auto</span> <span class="n">RotatorString</span> <span class="o">=</span> <span class="n">Rotator</span><span class="p">.</span><span class="n">ToCompactString</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">auto</span> <span class="n">MyRotationString</span> <span class="o">=</span> <span class="n">MyRotation</span><span class="p">.</span><span class="n">ToCompactString</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// LogTemp: Display: Owner Rotation: R(Y=-107.75), Component Rotation: R(P=-4.78, Y=-107.75)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// 可以注意到，使用Owner Rotation得到的只有Yaw方向的旋转，而Component Rotation包含Pitch和Yaw旋转
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Display</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;Owner Rotation: %s, Component Rotation: %s&#34;</span><span class="p">),</span> <span class="o">*</span><span class="n">RotatorString</span><span class="p">,</span> <span class="o">*</span><span class="n">MyRotationString</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>其中，Pitch是俯仰角，Yaw是偏航角，除此之外还有一个滚转角Roll。</p>
 <h2 id="如何创建一个摄像头投射并且和特定物品交互">如何创建一个摄像头投射并且和特定物品交互<a hidden class="anchor" aria-hidden="true" href="#如何创建一个摄像头投射并且和特定物品交互">#</a></h2>
 <p>首先新建一个Trace Channel</p>
 <p>前往<code>Project Settings-Engine-Collision</code>在Trace Channels中新建Channel，取名叫做Grabber，默认ignore。重启编辑器</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#66d9ef">bool</span> UGrabber<span style="color:#f92672">::</span>GetGrabableInReach(FHitResult<span style="color:#f92672">&amp;</span> OutHitResult) <span style="color:#66d9ef">const</span>
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>	FVector Start <span style="color:#f92672">=</span> GetComponentLocation();
-</span></span><span style="display:flex;"><span>	FVector End <span style="color:#f92672">=</span> Start <span style="color:#f92672">+</span> GetForwardVector()<span style="color:#f92672">*</span>MaxGrabDistance;
-</span></span><span style="display:flex;"><span>	DrawDebugLine(GetWorld(), Start, End, FColor<span style="color:#f92672">::</span>Red);
-</span></span><span style="display:flex;"><span>	FCollisionShape Sphere <span style="color:#f92672">=</span> FCollisionShape<span style="color:#f92672">::</span>MakeSphere(GrabRadius);
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">bool</span> HasHit <span style="color:#f92672">=</span> GetWorld()<span style="color:#f92672">-&gt;</span>SweepSingleByChannel(
-</span></span><span style="display:flex;"><span>		OutHitResult, Start, End,FQuat<span style="color:#f92672">::</span>Identity, ECC_GameTraceChannel2,Sphere);
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> HasHit;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>这里的<code>ECC_GameTraceChannel2</code>就是Grabber通道，具体需要在项目目录下的<code>/config/DefaultEngine.ini</code>查看</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> UGrabber<span style="color:#f92672">::</span>Grab()
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>	UPhysicsHandleComponent <span style="color:#f92672">*</span>PhysicsHandle <span style="color:#f92672">=</span> GetPhysicsHandle();
-</span></span><span style="display:flex;"><span>	FHitResult HitResult;
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">bool</span> HasHit <span style="color:#f92672">=</span> GetGrabableInReach(HitResult);
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span>(PhysicsHandle <span style="color:#f92672">&amp;&amp;</span> HasHit)
-</span></span><span style="display:flex;"><span>	{
-</span></span><span style="display:flex;"><span>		AActor <span style="color:#f92672">*</span>HitActor <span style="color:#f92672">=</span> HitResult.GetActor();
-</span></span><span style="display:flex;"><span>		HitActor<span style="color:#f92672">-&gt;</span>Tags.Add(<span style="color:#e6db74">&#34;Grabbed&#34;</span>);
-</span></span><span style="display:flex;"><span>		UE_LOG(LogTemp, Warning, TEXT(<span style="color:#e6db74">&#34;The raycast has hit %s&#34;</span>), <span style="color:#f92672">*</span>HitActor<span style="color:#f92672">-&gt;</span>GetActorNameOrLabel());
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>		UPrimitiveComponent <span style="color:#f92672">*</span> HitComponent <span style="color:#f92672">=</span> HitResult.GetComponent();
-</span></span><span style="display:flex;"><span>		HitComponent<span style="color:#f92672">-&gt;</span>WakeAllRigidBodies();
-</span></span><span style="display:flex;"><span>		PhysicsHandle<span style="color:#f92672">-&gt;</span>GrabComponentAtLocationWithRotation(
-</span></span><span style="display:flex;"><span>			HitComponent,
-</span></span><span style="display:flex;"><span>			NAME_None,
-</span></span><span style="display:flex;"><span>			HitResult.ImpactPoint,
-</span></span><span style="display:flex;"><span>			GetComponentRotation()
-</span></span><span style="display:flex;"><span>		);
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>其中，<code>HitComponent-&gt;WakeAllRigidBodies();</code>的目的是为了防止部分静止时间较长的物体不在模拟物理效果，而手动进行唤醒</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="kt">bool</span> <span class="n">UGrabber</span><span class="o">::</span><span class="n">GetGrabableInReach</span><span class="p">(</span><span class="n">FHitResult</span><span class="o">&amp;</span> <span class="n">OutHitResult</span><span class="p">)</span> <span class="k">const</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">FVector</span> <span class="n">Start</span> <span class="o">=</span> <span class="n">GetComponentLocation</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">FVector</span> <span class="n">End</span> <span class="o">=</span> <span class="n">Start</span> <span class="o">+</span> <span class="n">GetForwardVector</span><span class="p">()</span><span class="o">*</span><span class="n">MaxGrabDistance</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">DrawDebugLine</span><span class="p">(</span><span class="n">GetWorld</span><span class="p">(),</span> <span class="n">Start</span><span class="p">,</span> <span class="n">End</span><span class="p">,</span> <span class="n">FColor</span><span class="o">::</span><span class="n">Red</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">FCollisionShape</span> <span class="n">Sphere</span> <span class="o">=</span> <span class="n">FCollisionShape</span><span class="o">::</span><span class="n">MakeSphere</span><span class="p">(</span><span class="n">GrabRadius</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">bool</span> <span class="n">HasHit</span> <span class="o">=</span> <span class="n">GetWorld</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">SweepSingleByChannel</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">		<span class="n">OutHitResult</span><span class="p">,</span> <span class="n">Start</span><span class="p">,</span> <span class="n">End</span><span class="p">,</span><span class="n">FQuat</span><span class="o">::</span><span class="n">Identity</span><span class="p">,</span> <span class="n">ECC_GameTraceChannel2</span><span class="p">,</span><span class="n">Sphere</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">HasHit</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里的<code>ECC_GameTraceChannel2</code>就是Grabber通道，具体需要在项目目录下的<code>/config/DefaultEngine.ini</code>查看</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">UGrabber</span><span class="o">::</span><span class="n">Grab</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">UPhysicsHandleComponent</span> <span class="o">*</span><span class="n">PhysicsHandle</span> <span class="o">=</span> <span class="n">GetPhysicsHandle</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">FHitResult</span> <span class="n">HitResult</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">bool</span> <span class="n">HasHit</span> <span class="o">=</span> <span class="n">GetGrabableInReach</span><span class="p">(</span><span class="n">HitResult</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span><span class="p">(</span><span class="n">PhysicsHandle</span> <span class="o">&amp;&amp;</span> <span class="n">HasHit</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">AActor</span> <span class="o">*</span><span class="n">HitActor</span> <span class="o">=</span> <span class="n">HitResult</span><span class="p">.</span><span class="n">GetActor</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">		<span class="n">HitActor</span><span class="o">-&gt;</span><span class="n">Tags</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="s">&#34;Grabbed&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Warning</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;The raycast has hit %s&#34;</span><span class="p">),</span> <span class="o">*</span><span class="n">HitActor</span><span class="o">-&gt;</span><span class="n">GetActorNameOrLabel</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">UPrimitiveComponent</span> <span class="o">*</span> <span class="n">HitComponent</span> <span class="o">=</span> <span class="n">HitResult</span><span class="p">.</span><span class="n">GetComponent</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">		<span class="n">HitComponent</span><span class="o">-&gt;</span><span class="n">WakeAllRigidBodies</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">		<span class="n">PhysicsHandle</span><span class="o">-&gt;</span><span class="n">GrabComponentAtLocationWithRotation</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">			<span class="n">HitComponent</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			<span class="n">NAME_None</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			<span class="n">HitResult</span><span class="p">.</span><span class="n">ImpactPoint</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">			<span class="n">GetComponentRotation</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">		<span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>其中，<code>HitComponent-&gt;WakeAllRigidBodies();</code>的目的是为了防止部分静止时间较长的物体不在模拟物理效果，而手动进行唤醒</p>
 <p>要放开物品的时候代码如下：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> UGrabber<span style="color:#f92672">::</span>Release()
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>	UPhysicsHandleComponent<span style="color:#f92672">*</span> PhysicsHandle <span style="color:#f92672">=</span> GetPhysicsHandle();
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span>(PhysicsHandle <span style="color:#f92672">&amp;&amp;</span> PhysicsHandle<span style="color:#f92672">-&gt;</span>GetGrabbedComponent()<span style="color:#f92672">!=</span><span style="color:#66d9ef">nullptr</span>)
-</span></span><span style="display:flex;"><span>	{
-</span></span><span style="display:flex;"><span>		AActor<span style="color:#f92672">*</span> GrabbedActor <span style="color:#f92672">=</span> PhysicsHandle<span style="color:#f92672">-&gt;</span>GetGrabbedComponent()<span style="color:#f92672">-&gt;</span>GetOwner();
-</span></span><span style="display:flex;"><span>		GrabbedActor<span style="color:#f92672">-&gt;</span>Tags.Remove(<span style="color:#e6db74">&#34;Grabbed&#34;</span>);
-</span></span><span style="display:flex;"><span>		PhysicsHandle<span style="color:#f92672">-&gt;</span>GetGrabbedComponent()<span style="color:#f92672">-&gt;</span>WakeAllRigidBodies();
-</span></span><span style="display:flex;"><span>		PhysicsHandle<span style="color:#f92672">-&gt;</span>ReleaseComponent();
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h2 id="物体碰撞关系">物体碰撞关系<a hidden class="anchor" aria-hidden="true" href="#物体碰撞关系">#</a></h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">UGrabber</span><span class="o">::</span><span class="n">Release</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">UPhysicsHandleComponent</span><span class="o">*</span> <span class="n">PhysicsHandle</span> <span class="o">=</span> <span class="n">GetPhysicsHandle</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">if</span><span class="p">(</span><span class="n">PhysicsHandle</span> <span class="o">&amp;&amp;</span> <span class="n">PhysicsHandle</span><span class="o">-&gt;</span><span class="n">GetGrabbedComponent</span><span class="p">()</span><span class="o">!=</span><span class="k">nullptr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">AActor</span><span class="o">*</span> <span class="n">GrabbedActor</span> <span class="o">=</span> <span class="n">PhysicsHandle</span><span class="o">-&gt;</span><span class="n">GetGrabbedComponent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetOwner</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">		<span class="n">GrabbedActor</span><span class="o">-&gt;</span><span class="n">Tags</span><span class="p">.</span><span class="n">Remove</span><span class="p">(</span><span class="s">&#34;Grabbed&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">PhysicsHandle</span><span class="o">-&gt;</span><span class="n">GetGrabbedComponent</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">WakeAllRigidBodies</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">		<span class="n">PhysicsHandle</span><span class="o">-&gt;</span><span class="n">ReleaseComponent</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="物体碰撞关系">物体碰撞关系<a hidden class="anchor" aria-hidden="true" href="#物体碰撞关系">#</a></h2>
 <p>两个物体之间的碰撞关系依赖于两者的collision的组合：</p>
 <table>
   <thead>
@@ -601,24 +723,50 @@ DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5);
 <h2 id="依赖注入">依赖注入<a hidden class="anchor" aria-hidden="true" href="#依赖注入">#</a></h2>
 <p>使用场景：自己希望调用一个组件，但是自己找不到该组件（object）</p>
 <p>实现方式：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span>UFUNCTION(BlueprintCallable)
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> SetMover(UMover <span style="color:#f92672">*</span> Mover);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> UTriggerComponent<span style="color:#f92672">::</span>SetMover(UMover<span style="color:#f92672">*</span> NewMover)
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>	Mover <span style="color:#f92672">=</span> NewMover;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>随后在蓝图中将Mover接到函数中</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="n">UFUNCTION</span><span class="p">(</span><span class="n">BlueprintCallable</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">SetMover</span><span class="p">(</span><span class="n">UMover</span> <span class="o">*</span> <span class="n">Mover</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">UTriggerComponent</span><span class="o">::</span><span class="n">SetMover</span><span class="p">(</span><span class="n">UMover</span><span class="o">*</span> <span class="n">NewMover</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">Mover</span> <span class="o">=</span> <span class="n">NewMover</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>随后在蓝图中将Mover接到函数中</p>
 <h2 id="强制转换与组件接触">强制转换与组件接触<a hidden class="anchor" aria-hidden="true" href="#强制转换与组件接触">#</a></h2>
 <p>Unreal中，<code>UPrimitiveComponent</code>是包含了物理性质的组件，而<code>USceneComponent</code>是其父组件，为了可以获取Actor的可能的<code>UPrimitiveComponent</code>，可以使用指针强制类型转换。完整强制转换与组件接触代码如下：</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-C++" data-lang="C++"><span style="display:flex;"><span>UPrimitiveComponent<span style="color:#f92672">*</span> Component <span style="color:#f92672">=</span> Cast<span style="color:#f92672">&lt;</span>UPrimitiveComponent<span style="color:#f92672">&gt;</span>(Actor<span style="color:#f92672">-&gt;</span>GetRootComponent());
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span>(Component<span style="color:#f92672">!=</span><span style="color:#66d9ef">nullptr</span>)
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    Component<span style="color:#f92672">-&gt;</span>SetSimulatePhysics(false);
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>Actor<span style="color:#f92672">-&gt;</span>AttachToComponent(<span style="color:#66d9ef">this</span>, FAttachmentTransformRules<span style="color:#f92672">::</span>KeepWorldTransform);
-</span></span><span style="display:flex;"><span>Mover<span style="color:#f92672">-&gt;</span>SetShouldMove(true);
-</span></span></code></pre></div><h2 id="uscenecomponent">USceneComponent<a hidden class="anchor" aria-hidden="true" href="#uscenecomponent">#</a></h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-C++" data-lang="C++"><span class="line"><span class="cl"><span class="n">UPrimitiveComponent</span><span class="o">*</span> <span class="n">Component</span> <span class="o">=</span> <span class="n">Cast</span><span class="o">&lt;</span><span class="n">UPrimitiveComponent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Actor</span><span class="o">-&gt;</span><span class="n">GetRootComponent</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="n">Component</span><span class="o">!=</span><span class="k">nullptr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Component</span><span class="o">-&gt;</span><span class="n">SetSimulatePhysics</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">Actor</span><span class="o">-&gt;</span><span class="n">AttachToComponent</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">FAttachmentTransformRules</span><span class="o">::</span><span class="n">KeepWorldTransform</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">Mover</span><span class="o">-&gt;</span><span class="n">SetShouldMove</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="角色常用组件以及相关类简介">角色常用组件以及相关类简介<a hidden class="anchor" aria-hidden="true" href="#角色常用组件以及相关类简介">#</a></h2>
 <h3 id="1-uscenecomponent">1. USceneComponent<a hidden class="anchor" aria-hidden="true" href="#1-uscenecomponent">#</a></h3>
 <ul>
 <li><strong>Transform</strong>: 具有变换（位置、旋转、缩放）功能。</li>
@@ -641,6 +789,15 @@ DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5);
 <li><strong><code>RootComponent</code></strong>: 类型为 <code>USceneComponent*</code>，是 Actor 的根组件。</li>
 <li><strong>修改 <code>RootComponent</code></strong>: 可以通过修改 <code>RootComponent</code> 来改变其类型，例如将其设置为 <code>UCapsuleComponent</code>。</li>
 </ul>
+<h3 id="5uspringarmcomponent">5.USpringArmComponent<a hidden class="anchor" aria-hidden="true" href="#5uspringarmcomponent">#</a></h3>
+<ul>
+<li>作为摄像机的支架（“弹簧臂”），用于设置摄像机与角色或物体之间的距离与角度；自动处理摄像机的碰撞检测和视野遮挡问题。</li>
+</ul>
+<h3 id="6ucameracomponent">6.UCameraComponent<a hidden class="anchor" aria-hidden="true" href="#6ucameracomponent">#</a></h3>
+<ul>
+<li>提供游戏视角，定义玩家视野范围、视野角度（FOV）及视图旋转等参数。通常配合<code>USpringArmComponent</code>使用，实现第三人称视角。</li>
+<li>通常在第三人称游戏中，将<code>USpringArmComponent</code>的<code>bUsePawnControlRotation</code>设为true，同时将<code>UCameraComponent</code>的同名属性设为false，以便更灵活地调整视野。</li>
+</ul>
 <h2 id="前向声明">前向声明<a hidden class="anchor" aria-hidden="true" href="#前向声明">#</a></h2>
 <ul>
 <li>Include only what you use in .cpp</li>
@@ -653,6 +810,7 @@ DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5);
 </ul>
 </li>
 </ul>
+<h2 id="摄像机">摄像机<a hidden class="anchor" aria-hidden="true" href="#摄像机">#</a></h2>
 
 
   </div>
