@@ -10,9 +10,9 @@
     <atom:link href="https://wstfdxfh.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Unreal Notes</title>
-      <link>https://wstfdxfh.github.io/posts/unrealengine/unreal-notes.html</link>
+      <link>https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/</link>
       <pubDate>Sun, 06 Apr 2025 19:45:39 +0800</pubDate>
-      <guid>https://wstfdxfh.github.io/posts/unrealengine/unreal-notes.html</guid>
+      <guid>https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/</guid>
       <description>&lt;h2 id=&#34;常见技巧&#34;&gt;常见技巧&lt;/h2&gt;
 &lt;h3 id=&#34;防止速度过快导致的平台位置偏移&#34;&gt;防止速度过快导致的平台位置偏移&lt;/h3&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
@@ -90,9 +90,9 @@
     </item>
     <item>
       <title>Converting Blueprint to C&#43;&#43;</title>
-      <link>https://wstfdxfh.github.io/posts/unrealengine/converting-blueprint-to-c&#43;&#43;.html</link>
+      <link>https://wstfdxfh.github.io/posts/unrealengine/converting-blueprint-to-c&#43;&#43;/</link>
       <pubDate>Tue, 25 Mar 2025 22:20:27 +0800</pubDate>
-      <guid>https://wstfdxfh.github.io/posts/unrealengine/converting-blueprint-to-c&#43;&#43;.html</guid>
+      <guid>https://wstfdxfh.github.io/posts/unrealengine/converting-blueprint-to-c&#43;&#43;/</guid>
       <description>&lt;h1 id=&#34;ue4-将蓝图转换为c&#34;&gt;UE4: 将蓝图转换为C++&lt;/h1&gt;
 &lt;p&gt;教程&lt;a href=&#34;https://dev.epicgames.com/community/learning/courses/KJ/unreal-engine-converting-blueprint-to-c/kjB/unreal-engine-introduction-to-blueprint-vs-c&#34;&gt;https://dev.epicgames.com/community/learning/courses/KJ/unreal-engine-converting-blueprint-to-c/kjB/unreal-engine-introduction-to-blueprint-vs-c&lt;/a&gt;的笔记&lt;/p&gt;
 &lt;h2 id=&#34;创建c基类&#34;&gt;创建C++基类&lt;/h2&gt;
@@ -195,9 +195,9 @@
     </item>
     <item>
       <title>ACMFormat</title>
-      <link>https://wstfdxfh.github.io/posts/others/acmformat.html</link>
+      <link>https://wstfdxfh.github.io/posts/others/acmformat/</link>
       <pubDate>Sun, 23 Mar 2025 21:13:01 +0800</pubDate>
-      <guid>https://wstfdxfh.github.io/posts/others/acmformat.html</guid>
+      <guid>https://wstfdxfh.github.io/posts/others/acmformat/</guid>
       <description>&lt;p&gt;在ACM竞赛中处理各种数据格式的输入输出时，需熟悉C++标准库的输入输出函数和格式控制方法。以下是常见数据类型的处理方式及示例：&lt;/p&gt;
 &lt;hr&gt;
 &lt;h3 id=&#34;1-整数输入输出&#34;&gt;&lt;strong&gt;1. 整数输入输出&lt;/strong&gt;&lt;/h3&gt;
@@ -290,9 +290,9 @@
     </item>
     <item>
       <title>IsPointInTriangle</title>
-      <link>https://wstfdxfh.github.io/posts/others/ispointintriangle.html</link>
+      <link>https://wstfdxfh.github.io/posts/others/ispointintriangle/</link>
       <pubDate>Sun, 23 Mar 2025 21:11:21 +0800</pubDate>
-      <guid>https://wstfdxfh.github.io/posts/others/ispointintriangle.html</guid>
+      <guid>https://wstfdxfh.github.io/posts/others/ispointintriangle/</guid>
       <description>&lt;ul&gt;
 &lt;li&gt;可以使用叉乘的方法判断一个点是否在三角形内部。当三角形中所有边的对点和点P都位于该边的一侧时，就说明P在三角形内部，而判断是否位于一侧可以使用叉乘的符号是否相等来判断。&lt;/li&gt;
 &lt;/ul&gt;
@@ -392,9 +392,9 @@
     </item>
     <item>
       <title>Platform Shooter</title>
-      <link>https://wstfdxfh.github.io/posts/gamedev/platform-shooter.html</link>
+      <link>https://wstfdxfh.github.io/posts/gamedev/platform-shooter/</link>
       <pubDate>Sun, 23 Mar 2025 21:08:55 +0800</pubDate>
-      <guid>https://wstfdxfh.github.io/posts/gamedev/platform-shooter.html</guid>
+      <guid>https://wstfdxfh.github.io/posts/gamedev/platform-shooter/</guid>
       <description>&lt;h2 id=&#34;ue5快节奏横板射击对战游戏&#34;&gt;UE5快节奏横板射击对战游戏&lt;/h2&gt;
 &lt;p&gt;这是一款基于虚幻引擎5开发的快节奏横板射击游戏，目前仍在早期开发中。游戏采用横板视角，玩家可以在地图中自由移动，通过射击击败对手获得胜利。&lt;/p&gt;
 &lt;p&gt;前往&lt;a href=&#34;https://github.com/wstfdxfh/Platform-Shooter&#34;&gt;Github仓库&lt;/a&gt;进行下载：&lt;/p&gt;

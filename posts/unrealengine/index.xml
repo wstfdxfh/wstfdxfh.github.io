@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>UnrealEngine on 李睿杰的博客</title>
-    <link>https://wstfdxfh.github.io/posts/unrealengine.html</link>
+    <link>https://wstfdxfh.github.io/posts/unrealengine/</link>
     <description>Recent content in UnrealEngine on 李睿杰的博客</description>
     <generator>Hugo -- 0.145.0</generator>
     <language>zh-CN</language>
@@ -10,9 +10,9 @@
     <atom:link href="https://wstfdxfh.github.io/posts/unrealengine/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Unreal Notes</title>
-      <link>https://wstfdxfh.github.io/posts/unrealengine/unreal-notes.html</link>
+      <link>https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/</link>
       <pubDate>Sun, 06 Apr 2025 19:45:39 +0800</pubDate>
-      <guid>https://wstfdxfh.github.io/posts/unrealengine/unreal-notes.html</guid>
+      <guid>https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/</guid>
       <description>&lt;h2 id=&#34;常见技巧&#34;&gt;常见技巧&lt;/h2&gt;
 &lt;h3 id=&#34;防止速度过快导致的平台位置偏移&#34;&gt;防止速度过快导致的平台位置偏移&lt;/h3&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
@@ -90,9 +90,9 @@
     </item>
     <item>
       <title>Converting Blueprint to C&#43;&#43;</title>
-      <link>https://wstfdxfh.github.io/posts/unrealengine/converting-blueprint-to-c&#43;&#43;.html</link>
+      <link>https://wstfdxfh.github.io/posts/unrealengine/converting-blueprint-to-c&#43;&#43;/</link>
       <pubDate>Tue, 25 Mar 2025 22:20:27 +0800</pubDate>
-      <guid>https://wstfdxfh.github.io/posts/unrealengine/converting-blueprint-to-c&#43;&#43;.html</guid>
+      <guid>https://wstfdxfh.github.io/posts/unrealengine/converting-blueprint-to-c&#43;&#43;/</guid>
       <description>&lt;h1 id=&#34;ue4-将蓝图转换为c&#34;&gt;UE4: 将蓝图转换为C++&lt;/h1&gt;
 &lt;p&gt;教程&lt;a href=&#34;https://dev.epicgames.com/community/learning/courses/KJ/unreal-engine-converting-blueprint-to-c/kjB/unreal-engine-introduction-to-blueprint-vs-c&#34;&gt;https://dev.epicgames.com/community/learning/courses/KJ/unreal-engine-converting-blueprint-to-c/kjB/unreal-engine-introduction-to-blueprint-vs-c&lt;/a&gt;的笔记&lt;/p&gt;
 &lt;h2 id=&#34;创建c基类&#34;&gt;创建C++基类&lt;/h2&gt;
