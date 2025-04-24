@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>GameDev on 李睿杰的博客</title>
-    <link>https://wstfdxfh.github.io/posts/gamedev/</link>
+    <link>https://wstfdxfh.github.io/posts/gamedev.html</link>
     <description>Recent content in GameDev on 李睿杰的博客</description>
     <generator>Hugo -- 0.145.0</generator>
     <language>zh-CN</language>
@@ -10,9 +10,9 @@
     <atom:link href="https://wstfdxfh.github.io/posts/gamedev/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Platform Shooter</title>
-      <link>https://wstfdxfh.github.io/posts/gamedev/platform-shooter/</link>
+      <link>https://wstfdxfh.github.io/posts/gamedev/platform-shooter.html</link>
       <pubDate>Sun, 23 Mar 2025 21:08:55 +0800</pubDate>
-      <guid>https://wstfdxfh.github.io/posts/gamedev/platform-shooter/</guid>
+      <guid>https://wstfdxfh.github.io/posts/gamedev/platform-shooter.html</guid>
       <description>&lt;h2 id=&#34;ue5快节奏横板射击对战游戏&#34;&gt;UE5快节奏横板射击对战游戏&lt;/h2&gt;
 &lt;p&gt;这是一款基于虚幻引擎5开发的快节奏横板射击游戏，目前仍在早期开发中。游戏采用横板视角，玩家可以在地图中自由移动，通过射击击败对手获得胜利。&lt;/p&gt;
 &lt;p&gt;前往&lt;a href=&#34;https://github.com/wstfdxfh/Platform-Shooter&#34;&gt;Github仓库&lt;/a&gt;进行下载：&lt;/p&gt;
