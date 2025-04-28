@@ -142,7 +142,7 @@
     </header>
     <div class="entry-content">
         <h4 id="非常想看孤独摇滚第二季">非常想看孤独摇滚第二季.</h4>
-<p><strong>一名玩家，动画爱好者，游戏开发者，我正在制作一款UE5的横板射击游戏，欢迎来我的博客了解我的开发进度，点击前往<a href="https://github.com/wstfdxfh/Platform-Shooter">Github仓库</a>进行下载：</strong></p>
+<p><strong>一名玩家，动画爱好者，游戏开发者，我在Github仓库存储了几款游戏Demo，使用UE5开发，点击前往<a href="https://github.com/wstfdxfh/Platform-Shooter">Github仓库</a>进行下载：</strong></p>
     </div>
     <footer class="entry-footer">
         <div class="social-icons" >
@@ -158,6 +158,24 @@
 </div>
 
     </footer>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">OddTanks
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>坦克大战 基于UE5的坦克射击游戏，来自教程 udemy.com/course/unrealcourse/
+和原教程中最终成品的主要区别在于：
+炮塔转动或者坦克移动时，发射的炮弹会发生随机偏差，更难瞄准敌人 使用一个射灯照出我方坦克的可能落弹点 其中，炮弹散射的实现方法如下：
+首先，在BasePawn.h中加入相关变量：
+1 2 3 4 5 6 7 8 9 10 // 记录最大偏移角度 UPROPERTY(EditAnywhere, Category=&#34;Combat&#34;) float MaxSpreadAngle=5.f; // 当前实时最大偏转角度（度数），由 Tick 更新 UPROPERTY(VisibleAnywhere, Category=&#34;Combat&#34;) float CurrentMaxSpread = 0.f; FTransform LastTransform; bool IsMoving = false; 随后在BasePawn的Tick函数中，检测有没有发生移动
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 void ABasePawn::Tick(float DeltaTime) { Super::Tick(DeltaTime); // 判断当前炮塔或者本体是否在移动或者转动 FTransform TurretMeshTransform = TurretMesh-&gt;GetComponentTransform(); IsMoving = !TurretMeshTransform.GetRotation().Equals(LastTransform.GetRotation(), 0.2*DeltaTime) || !TurretMeshTransform.GetLocation().Equals(LastTransform.GetLocation(), 1*DeltaTime); LastTransform = TurretMeshTransform; if(IsMoving) { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, MaxSpreadAngle, DeltaTime, 2); } else { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, 0, DeltaTime, 1); } if(Cast&lt;ATank&gt;(this)) { // UE_LOG(LogTemp, Display, TEXT(&#34;GetRotation: %s&#34;), *TurretMeshTransform.GetRotation().ToString()) // UE_LOG(LogTemp, Display, TEXT(&#34;GetLocation: %s&#34;), *TurretMeshTransform.GetLocation().ToString()) // UE_LOG(LogTemp, Display, TEXT(&#34;IsMoving: %d&#34;), IsMoving) UE_LOG(LogTemp, Display, TEXT(&#34;CurrentMaxSpread: %f&#34;), CurrentMaxSpread) } } 这里Equals函数就是指出两个变量是否小到了一定的误差，第二个参数就是相应的误差，这里不使用==运算符的原因是，因为采用了插值处理炮塔的旋转，所以在鼠标不移动后的很长时间内，炮塔都不会完全停止转动。
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-04-28 23:05:02 +0800 CST'>April 28, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <a class="entry-link" aria-label="post link to OddTanks" href="https://wstfdxfh.github.io/posts/gamedev/oddtanks/"></a>
 </article>
 
 <article class="post-entry"> 
