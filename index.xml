@@ -15,6 +15,7 @@
       <guid>https://wstfdxfh.github.io/posts/gamedev/oddtanks/</guid>
       <description>&lt;h2 id=&#34;坦克大战&#34;&gt;坦克大战&lt;/h2&gt;
 &lt;p&gt;基于UE5的坦克射击游戏，来自教程 udemy.com/course/unrealcourse/&lt;/p&gt;
+&lt;p&gt;下载 &lt;a href=&#34;https://github.com/wstfdxfh/Oddtanks&#34;&gt;https://github.com/wstfdxfh/Oddtanks&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;和原教程中最终成品的主要区别在于：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;炮塔转动或者坦克移动时，发射的炮弹会发生随机偏差，更难瞄准敌人&lt;/li&gt;
