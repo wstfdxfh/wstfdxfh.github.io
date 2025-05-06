@@ -162,6 +162,22 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">UnrealDocu
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>针对Unreal文档的摘录
+Unreal 反射系统 https://dev.epicgames.com/documentation/en-us/unreal-engine/reflection-system-in-unreal-engine?application_version=5.4
+Unreal Engine 反射系统通过多种宏封装类，以提供引擎和编辑器功能。在使用 Unreal Engine(UE)编程时，可以拥有标准的 C&#43;&#43;类、函数和变量。
+Unreal 中所有对象的基类是 UObject。 TSubclassOf 是一个模板类，提供 UClass 类型安全。它适用于分配从特定类型派生的类。例如，可以将此变量暴露给蓝图，设计师可以在其中指定为玩家角色生成哪种武器类。 类可以包含结构体。结构体是一种数据结构，有助于组织和管理其相关的成员属性。结构体可以使用 USTRUCT() 宏单独定义。 Unreal 智能指针库是对 C&#43;&#43;11 智能指针的自定义实现，旨在减轻内存分配和跟踪的负担。该实现包括行业标准的共享指针、弱指针、唯一指针以及行为类似于非可空共享指针的共享引用。 接口提供了可以在多个或不同类中实现的函数和额外游戏行为。你的玩家角色可以与世界中的各种 Actor 互动。这些互动中的每一个都可能对事件产生不同的反应。 元数据说明符控制类、接口、结构体、枚举、函数或属性如何与引擎和编辑器的各个方面交互。每种数据结构或成员都有其自己的元数据说明符列表。 UFUNCTION 和 UPROPERTY 宏使 UE 能够识别新的类、函数和变量。这些宏由引擎进行垃圾回收。在指定宏时，您可以在虚幻编辑器中编辑和显示它们。 Objects UCLASS 宏为 UObject 提供了一个指向描述其 Unreal 类型信息的 UCLASS 引用。每个 UCLASS 维护着一个名为类默认对象(Class Default Object, CDO)的 Object。CDO 本质上是由类构造函数生成且之后不再修改的默认“模板”对象。 虽然通常应视为只读，但可以通过给定对象实例检索 UCLASS 和 CDO。对象实例的 UCLASS 随时可通过 GetClass() 函数访问。 一个 UCLASS 包含一组定义类的属性和函数。这些是标准 C&#43;&#43;代码中可用的普通 C&#43;&#43;函数和变量，但带有控制其在对象系统内行为的 Unreal Engine 特定元数据标签。 UObject 类可以包含未用 UFUNCTION 或 UPROPERTY 说明符标记反射的原生属性。然而，只有被说明符宏标记的函数和属性才会在其对应的 UCLASS 中列出。 UObject 不支持构造函数参数。所有 C&#43;&#43; UObject 在引擎启动时初始化，引擎会调用它们的默认构造函数。如果没有默认构造函数，你的 UObject 将无法编译。UObject 在运行时应当仅通过 NewObject 创建，或在构造函数中使用 CreateDefaultSubobject。 UOBJECT支持以下广泛的功能：
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-05-05 23:22:23 +0800 CST'>May 5, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <a class="entry-link" aria-label="post link to UnrealDocu" href="https://wstfdxfh.github.io/posts/unrealengine/unrealdocu/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">OddTanks
     </h2>
   </header>
