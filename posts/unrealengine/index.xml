@@ -41,7 +41,8 @@
       <link>https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/</link>
       <pubDate>Sun, 06 Apr 2025 19:45:39 +0800</pubDate>
       <guid>https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/</guid>
-      <description>&lt;h2 id=&#34;常见技巧&#34;&gt;常见技巧&lt;/h2&gt;
+      <description>&lt;p&gt;&lt;a href=&#34;&#34;&gt;udemy.com/course/unrealcourse/&lt;/a&gt; 的课程笔记&lt;/p&gt;
+&lt;h2 id=&#34;常见技巧&#34;&gt;常见技巧&lt;/h2&gt;
 &lt;h3 id=&#34;防止速度过快导致的平台位置偏移&#34;&gt;防止速度过快导致的平台位置偏移&lt;/h3&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
 &lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
