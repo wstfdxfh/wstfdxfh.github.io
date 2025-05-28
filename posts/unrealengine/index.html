@@ -154,57 +154,47 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">UnrealDocu
+    <h2 class="entry-hint-parent">UnrealOnline
     </h2>
   </header>
   <div class="entry-content">
-    <p>针对Unreal文档的摘录
-Unreal 反射系统 https://dev.epicgames.com/documentation/en-us/unreal-engine/reflection-system-in-unreal-engine?application_version=5.4
-Unreal Engine 反射系统通过多种宏封装类，以提供引擎和编辑器功能。在使用 Unreal Engine(UE)编程时，可以拥有标准的 C&#43;&#43;类、函数和变量。
-Unreal 中所有对象的基类是 UObject。 TSubclassOf 是一个模板类，提供 UClass 类型安全。它适用于分配从特定类型派生的类。例如，可以将此变量暴露给蓝图，设计师可以在其中指定为玩家角色生成哪种武器类。 类可以包含结构体。结构体是一种数据结构，有助于组织和管理其相关的成员属性。结构体可以使用 USTRUCT() 宏单独定义。 Unreal 智能指针库是对 C&#43;&#43;11 智能指针的自定义实现，旨在减轻内存分配和跟踪的负担。该实现包括行业标准的共享指针、弱指针、唯一指针以及行为类似于非可空共享指针的共享引用。 接口提供了可以在多个或不同类中实现的函数和额外游戏行为。你的玩家角色可以与世界中的各种 Actor 互动。这些互动中的每一个都可能对事件产生不同的反应。 元数据说明符控制类、接口、结构体、枚举、函数或属性如何与引擎和编辑器的各个方面交互。每种数据结构或成员都有其自己的元数据说明符列表。 UFUNCTION 和 UPROPERTY 宏使 UE 能够识别新的类、函数和变量。这些宏由引擎进行垃圾回收。在指定宏时，您可以在虚幻编辑器中编辑和显示它们。 Objects UCLASS 宏为 UObject 提供了一个指向描述其 Unreal 类型信息的 UCLASS 引用。每个 UCLASS 维护着一个名为类默认对象(Class Default Object, CDO)的 Object。CDO 本质上是由类构造函数生成且之后不再修改的默认“模板”对象。 虽然通常应视为只读，但可以通过给定对象实例检索 UCLASS 和 CDO。对象实例的 UCLASS 随时可通过 GetClass() 函数访问。 一个 UCLASS 包含一组定义类的属性和函数。这些是标准 C&#43;&#43;代码中可用的普通 C&#43;&#43;函数和变量，但带有控制其在对象系统内行为的 Unreal Engine 特定元数据标签。 UObject 类可以包含未用 UFUNCTION 或 UPROPERTY 说明符标记反射的原生属性。然而，只有被说明符宏标记的函数和属性才会在其对应的 UCLASS 中列出。 UObject 不支持构造函数参数。所有 C&#43;&#43; UObject 在引擎启动时初始化，引擎会调用它们的默认构造函数。如果没有默认构造函数，你的 UObject 将无法编译。UObject 在运行时应当仅通过 NewObject 创建，或在构造函数中使用 CreateDefaultSubobject。 UOBJECT支持以下广泛的功能：
+    <p>简介 相关课程：
+https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter/
+这篇笔记简单介绍如何在UE5.5中建立一个在线链接，包含OnlineSubsystem的使用方法，自定义代理的建立等内容。
+效果如下：
+在steam登录的情况下，在2台不同的主机上可以建立链接，在一个大厅中进行游玩（注意需要不同的账号，以及相同的地域）。
+配置文件设置 在DefaultEngine.ini中，添加以下内容：
+1 2 3 4 5 6 7 8 9 10 11 12 13 [/Script/Engine.GameEngine] &#43;NetDriverDefinitions=(DefName=&#34;GameNetDriver&#34;,DriverClassName=&#34;OnlineSubsystemSteam.SteamNetDriver&#34;,DriverClassNameFallback=&#34;OnlineSubsystemUtils.IpNetDriver&#34;) [OnlineSubsystem] DefaultPlatformService=Steam [OnlineSubsystemSteam] bEnabled=true SteamDevAppId=480 bInitServerOnClient=true [/Script/OnlineSubsystemSteam.SteamNetDriver] NetConnectionClassName=&#34;OnlineSubsystemSteam.SteamNetConnection&#34; 480是一个公用的游戏id
+在DefaultEngine.ini中添加
+1 2 [/Script/Engine.GameSession] MaxPlayers=100 规定了最大玩家数量。
+插件创建 在编辑器的插件设置中可以创建相应的插件，并且在游戏中利用这些插件，以实现代码或者蓝图的复用。插件和游戏存在以下的单项依赖关系：
+例如，游戏模块可以依赖于游戏插件或者其他模块，但是插件不可依赖于游戏模块。
+在创建插件时，选择Blank模板，创建后在MultiplayerSessions.uplugin中添加依赖：
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 { ... &#34;Modules&#34;: [ { &#34;Name&#34;: &#34;MultiplayerSessions&#34;, &#34;Type&#34;: &#34;Runtime&#34;, &#34;LoadingPhase&#34;: &#34;Default&#34; } ], &#34;Plugins&#34;:[ { &#34;Name&#34;: &#34;OnlineSubsystem&#34;, &#34;Enabled&#34;: true }, { &#34;Name&#34;: &#34;OnlineSubsystemSteam&#34;, &#34;Enabled&#34;: true } ] } MultiplayerSessions.Build.cs
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-05-05 23:22:23 +0800 CST'>May 5, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
-  <a class="entry-link" aria-label="post link to UnrealDocu" href="https://wstfdxfh.github.io/posts/unrealengine/unrealdocu/"></a>
+  <footer class="entry-footer"><span title='2025-05-19 18:02:04 +0800 CST'>May 19, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <a class="entry-link" aria-label="post link to UnrealOnline" href="https://wstfdxfh.github.io/posts/unrealengine/unrealonline/"></a>
 </article>
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">Unreal Notes
+    <h2 class="entry-hint-parent">UnrealDebug
     </h2>
   </header>
   <div class="entry-content">
-    <p>udemy.com/course/unrealcourse/ 的课程笔记
-常见技巧 防止速度过快导致的平台位置偏移 1 2 3 4 5 6 7 8 9 10 11 12 13 14 void AMovingPlatform::Tick(float DeltaTime){ Super::Tick(DeltaTime); FVector CurrentLocation = GetActorLocation(); CurrentLocation = CurrentLocation &#43; (PlatformVelocity*DeltaTime); SetActorLocation(CurrentLocation); float DistanceMoved = FVector::Dist(StartLocation, CurrentLocation); if(DistanceMoved &gt; MoveDistance){ // 获得速度的单位向量 FVector MoveDirection = PlatformVelocty.GetSafeNormal(); StartLocation = StartLocation&#43; MoveDirection*MoveDistance; SetActorLocation(StartLocation); PlatformVelocty = -PlatformVelocty; } } 解决被方块撞击时人物视角异常的问题 这是因为只有角色默认只有在移动时才会检查碰撞
-解决方法：使用蓝图中的MoveUpdatedComponent，在每一帧都移动一个小距离再反向移动
-可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。
-背对光源时场景过暗的问题 在场景中加入PostProcessVolume，在Lens-Exposure-Metering Mode中，将选项改为Auto Exposure Basic，然后修改Brush中的x,y,z，令其覆盖整个场景。
-调试方法 UE_LOG 打印的格式如下：
+    <p>介绍UnrealEngine C&#43;&#43;常用的调试方法
+UE_LOG 打印的格式如下：
 1 UE_LOG(LogTemp, Warning, TEXT(&#34;Grabber Constructed&#34;)); 如果使用FString格式如下
-1 2 FString Name = GetName(); UE_LOG(LogTemp, Warning, TEXT(&#34;%s&#34;), *Name); 绘制调试射线、球 1 #include &#34;Engine/World.h&#34; 引入该头文件获得UWorld
+1 2 FString Name = GetName(); UE_LOG(LogTemp, Warning, TEXT(&#34;%s&#34;), *Name); 在已经打包好的游戏中要看到log，可以在exe所在的位置开启命令行，输入
+1 MenuSystem.exe -log 表示开启log同时运行游戏
+绘制调试射线、球 1 #include &#34;Engine/World.h&#34; 引入该头文件获得UWorld
+1 2 3 4 #include &#34;DrawDebugHelpers.h&#34; DrawDebugLine(GetWorld(), Start, End, FColor::Red); DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5); 绘制调试摄像机 在枪械开火时，从玩家视点绘制调试摄像机图形
+1 2 3 4 5 6 7 8 9 APawn* OwnerPawn = Cast&lt;APawn&gt;(GetOwner()); if(OwnerPawn == nullptr) return; AController* OwnerController = OwnerPawn-&gt;GetController; if(OwnerController == nullptr) return; FVector Location; FRotator Rotation; OwnerController-&gt;GetPlayerViewPoint(Location, Rotation); DrawDebugCamera(GetWorld(), Location, Rotation, 90, 2, FColor::Red, true); 在屏幕上绘制调试信息 1 2 3 4 5 6 7 8 9 if(GEngine) { GEngine-&gt;AddOnScreenDebugMessage( -1, 15.f, FColor::Cyan, FString::Printf(TEXT(&#34;Joining Match Type: %s&#34;), *MatchType) ); } -1表示这条调试信息不会被覆盖，15.f表示在屏幕持续时间为15秒，FColor::Cyan表示调试信息的颜色，FString::Printf(TEXT(&#34;Joining Match Type: %s&#34;), *MatchType)用于进行输出内容的格式化
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-04-06 19:45:39 +0800 CST'>April 6, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
-  <a class="entry-link" aria-label="post link to Unreal Notes" href="https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Converting Blueprint to C&#43;&#43;
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>UE4: 将蓝图转换为C&#43;&#43; 教程https://dev.epicgames.com/community/learning/courses/KJ/unreal-engine-converting-blueprint-to-c/kjB/unreal-engine-introduction-to-blueprint-vs-c的笔记
-创建C&#43;&#43;基类 注意点：
-可以使用蓝图继承C&#43;&#43;，反之不行 C&#43;&#43;可以在运行时调用蓝图的function，称之为Runtime Calls，调用的时候C&#43;&#43;调用一个C&#43;&#43;的声明函数，并且由蓝图函数实现 如果要使用蓝图继承C&#43;&#43;类，必须在C&#43;&#43;类头文件的的UCLASS宏中设置Blueprintable，注意这个关键词(Keyword)是可继承的，比如AActor中已经进行了标注了关键词(Keyword)的话，继承它的类就不需要再进行标注 1 2 3 4 5 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable) class BLUEPRINTSTOCPP_API UGrabber : public USceneComponent { // ... }; 需要对Visual Studio中的配置管理器设置为&#34;Development Editor&#34;, 方案平台设置为&#34;Win64&#34;，随后进行生成 进行生成后，点击VS的“开始执行（不调试）”，即可重启UE 如果发生错误，可以尝试删除项目中的&#34;Binaries&#34;文件夹以及&#34;Intermediate&#34;文件夹后右键.uproject生成VS项目 生命周期方法 对于AActor类和SceneComponent类来说，它们都有各自的构造函数、Beginplay函数以及Tick（或者是TickComponent）函数，可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。
-打印的格式如下：
-1 UE_LOG(LogTemp, Warning, TEXT(&#34;Grabber Constructed&#34;)); 在以上函数中都加入类似的日志打印以后生成，会发现构造函数在打开编辑器以及开始游戏时各调用一次；Beginplay在开始游戏时（在构造函数后）调用一次；Tick会在之后每帧调用，通过
-1 PrimaryComponentTick.bCanEverTick = false; 可以禁用Tick函数的调用，节约CPU，但是这个设置会被继承的蓝图覆盖。
-Actor 与 Components 比较 Actors Components Can be placed in levels √ ✘ Can have components √ ✘ Modularity 低 高 Inheritance √ √ Default variable values √ √ Maintainability 低 高 Composable _ √ 我们一般倾向于将Components接在Actor上，而Actor本身不去实现太多功能。
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2025-03-25 22:20:27 +0800 CST'>March 25, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
-  <a class="entry-link" aria-label="post link to Converting Blueprint to C&#43;&#43;" href="https://wstfdxfh.github.io/posts/unrealengine/converting-blueprint-to-c&#43;&#43;/"></a>
+  <footer class="entry-footer"><span title='2025-05-13 12:10:50 +0800 CST'>May 13, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <a class="entry-link" aria-label="post link to UnrealDebug" href="https://wstfdxfh.github.io/posts/unrealengine/unrealdebug/"></a>
 </article>
     </main>
     

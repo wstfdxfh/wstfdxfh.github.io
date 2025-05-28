@@ -70,9 +70,6 @@ bool IsMoving = false;
 21
 22
 23
-24
-25
-26
 
 
 void ABasePawn::Tick(float DeltaTime)
@@ -94,9 +91,6 @@ void ABasePawn::Tick(float DeltaTime)
     }
     if(Cast&lt;ATank&gt;(this))
     {
-       // UE_LOG(LogTemp, Display, TEXT(&#34;GetRotation: %s&#34;), *TurretMeshTransform.GetRotation().ToString())
-       // UE_LOG(LogTemp, Display, TEXT(&#34;GetLocation: %s&#34;), *TurretMeshTransform.GetLocation().ToString())
-       // UE_LOG(LogTemp, Display, TEXT(&#34;IsMoving: %d&#34;), IsMoving)
        UE_LOG(LogTemp, Display, TEXT(&#34;CurrentMaxSpread: %f&#34;), CurrentMaxSpread)
     }
    
@@ -160,7 +154,7 @@ void ABasePawn::Tick(float DeltaTime)
 炮塔转动或者坦克移动时，发射的炮弹会发生随机偏差，更难瞄准敌人 使用一个射灯照出我方坦克的可能落弹点 其中，炮弹散射的实现方法如下：
 首先，在BasePawn.h中加入相关变量：
 1 2 3 4 5 6 7 8 9 10 // 记录最大偏移角度 UPROPERTY(EditAnywhere, Category=&#34;Combat&#34;) float MaxSpreadAngle=5.f; // 当前实时最大偏转角度（度数），由 Tick 更新 UPROPERTY(VisibleAnywhere, Category=&#34;Combat&#34;) float CurrentMaxSpread = 0.f; FTransform LastTransform; bool IsMoving = false; 随后在BasePawn的Tick函数中，检测有没有发生移动
-1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 void ABasePawn::Tick(float DeltaTime) { Super::Tick(DeltaTime); // 判断当前炮塔或者本体是否在移动或者转动 FTransform TurretMeshTransform = TurretMesh-&gt;GetComponentTransform(); IsMoving = !TurretMeshTransform.GetRotation().Equals(LastTransform.GetRotation(), 0.2*DeltaTime) || !TurretMeshTransform.GetLocation().Equals(LastTransform.GetLocation(), 1*DeltaTime); LastTransform = TurretMeshTransform; if(IsMoving) { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, MaxSpreadAngle, DeltaTime, 2); } else { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, 0, DeltaTime, 1); } if(Cast&lt;ATank&gt;(this)) { // UE_LOG(LogTemp, Display, TEXT(&#34;GetRotation: %s&#34;), *TurretMeshTransform.GetRotation().ToString()) // UE_LOG(LogTemp, Display, TEXT(&#34;GetLocation: %s&#34;), *TurretMeshTransform.GetLocation().ToString()) // UE_LOG(LogTemp, Display, TEXT(&#34;IsMoving: %d&#34;), IsMoving) UE_LOG(LogTemp, Display, TEXT(&#34;CurrentMaxSpread: %f&#34;), CurrentMaxSpread) } } 这里Equals函数就是指出两个变量是否小到了一定的误差，第二个参数就是相应的误差，这里不使用==运算符的原因是，因为采用了插值处理炮塔的旋转，所以在鼠标不移动后的很长时间内，炮塔都不会完全停止转动。">
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 void ABasePawn::Tick(float DeltaTime) { Super::Tick(DeltaTime); // 判断当前炮塔或者本体是否在移动或者转动 FTransform TurretMeshTransform = TurretMesh-&gt;GetComponentTransform(); IsMoving = !TurretMeshTransform.GetRotation().Equals(LastTransform.GetRotation(), 0.2*DeltaTime) || !TurretMeshTransform.GetLocation().Equals(LastTransform.GetLocation(), 1*DeltaTime); LastTransform = TurretMeshTransform; if(IsMoving) { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, MaxSpreadAngle, DeltaTime, 2); } else { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, 0, DeltaTime, 1); } if(Cast&lt;ATank&gt;(this)) { UE_LOG(LogTemp, Display, TEXT(&#34;CurrentMaxSpread: %f&#34;), CurrentMaxSpread) } } 这里Equals函数就是指出两个变量是否小到了一定的误差，第二个参数就是相应的误差，这里不使用==运算符的原因是，因为采用了插值处理炮塔的旋转，所以在鼠标不移动后的很长时间内，炮塔都不会完全停止转动。">
   <meta property="og:locale" content="zh-CN">
   <meta property="og:type" content="article">
     <meta property="article:section" content="posts">
@@ -231,9 +225,6 @@ bool IsMoving = false;
 21
 22
 23
-24
-25
-26
 
 
 void ABasePawn::Tick(float DeltaTime)
@@ -255,9 +246,6 @@ void ABasePawn::Tick(float DeltaTime)
     }
     if(Cast&lt;ATank&gt;(this))
     {
-       // UE_LOG(LogTemp, Display, TEXT(&#34;GetRotation: %s&#34;), *TurretMeshTransform.GetRotation().ToString())
-       // UE_LOG(LogTemp, Display, TEXT(&#34;GetLocation: %s&#34;), *TurretMeshTransform.GetLocation().ToString())
-       // UE_LOG(LogTemp, Display, TEXT(&#34;IsMoving: %d&#34;), IsMoving)
        UE_LOG(LogTemp, Display, TEXT(&#34;CurrentMaxSpread: %f&#34;), CurrentMaxSpread)
     }
    
@@ -299,12 +287,12 @@ void ABasePawn::Tick(float DeltaTime)
   "@type": "BlogPosting",
   "headline": "OddTanks",
   "name": "OddTanks",
-  "description": "坦克大战 基于UE5的坦克射击游戏，来自教程 udemy.com/course/unrealcourse/\n下载 https://github.com/wstfdxfh/Oddtanks\n和原教程中最终成品的主要区别在于：\n炮塔转动或者坦克移动时，发射的炮弹会发生随机偏差，更难瞄准敌人 使用一个射灯照出我方坦克的可能落弹点 其中，炮弹散射的实现方法如下：\n首先，在BasePawn.h中加入相关变量：\n1 2 3 4 5 6 7 8 9 10 // 记录最大偏移角度 UPROPERTY(EditAnywhere, Category=\u0026#34;Combat\u0026#34;) float MaxSpreadAngle=5.f; // 当前实时最大偏转角度（度数），由 Tick 更新 UPROPERTY(VisibleAnywhere, Category=\u0026#34;Combat\u0026#34;) float CurrentMaxSpread = 0.f; FTransform LastTransform; bool IsMoving = false; 随后在BasePawn的Tick函数中，检测有没有发生移动\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 void ABasePawn::Tick(float DeltaTime) { Super::Tick(DeltaTime); // 判断当前炮塔或者本体是否在移动或者转动 FTransform TurretMeshTransform = TurretMesh-\u0026gt;GetComponentTransform(); IsMoving = !TurretMeshTransform.GetRotation().Equals(LastTransform.GetRotation(), 0.2*DeltaTime) || !TurretMeshTransform.GetLocation().Equals(LastTransform.GetLocation(), 1*DeltaTime); LastTransform = TurretMeshTransform; if(IsMoving) { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, MaxSpreadAngle, DeltaTime, 2); } else { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, 0, DeltaTime, 1); } if(Cast\u0026lt;ATank\u0026gt;(this)) { // UE_LOG(LogTemp, Display, TEXT(\u0026#34;GetRotation: %s\u0026#34;), *TurretMeshTransform.GetRotation().ToString()) // UE_LOG(LogTemp, Display, TEXT(\u0026#34;GetLocation: %s\u0026#34;), *TurretMeshTransform.GetLocation().ToString()) // UE_LOG(LogTemp, Display, TEXT(\u0026#34;IsMoving: %d\u0026#34;), IsMoving) UE_LOG(LogTemp, Display, TEXT(\u0026#34;CurrentMaxSpread: %f\u0026#34;), CurrentMaxSpread) } } 这里Equals函数就是指出两个变量是否小到了一定的误差，第二个参数就是相应的误差，这里不使用==运算符的原因是，因为采用了插值处理炮塔的旋转，所以在鼠标不移动后的很长时间内，炮塔都不会完全停止转动。\n",
+  "description": "坦克大战 基于UE5的坦克射击游戏，来自教程 udemy.com/course/unrealcourse/\n下载 https://github.com/wstfdxfh/Oddtanks\n和原教程中最终成品的主要区别在于：\n炮塔转动或者坦克移动时，发射的炮弹会发生随机偏差，更难瞄准敌人 使用一个射灯照出我方坦克的可能落弹点 其中，炮弹散射的实现方法如下：\n首先，在BasePawn.h中加入相关变量：\n1 2 3 4 5 6 7 8 9 10 // 记录最大偏移角度 UPROPERTY(EditAnywhere, Category=\u0026#34;Combat\u0026#34;) float MaxSpreadAngle=5.f; // 当前实时最大偏转角度（度数），由 Tick 更新 UPROPERTY(VisibleAnywhere, Category=\u0026#34;Combat\u0026#34;) float CurrentMaxSpread = 0.f; FTransform LastTransform; bool IsMoving = false; 随后在BasePawn的Tick函数中，检测有没有发生移动\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 void ABasePawn::Tick(float DeltaTime) { Super::Tick(DeltaTime); // 判断当前炮塔或者本体是否在移动或者转动 FTransform TurretMeshTransform = TurretMesh-\u0026gt;GetComponentTransform(); IsMoving = !TurretMeshTransform.GetRotation().Equals(LastTransform.GetRotation(), 0.2*DeltaTime) || !TurretMeshTransform.GetLocation().Equals(LastTransform.GetLocation(), 1*DeltaTime); LastTransform = TurretMeshTransform; if(IsMoving) { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, MaxSpreadAngle, DeltaTime, 2); } else { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, 0, DeltaTime, 1); } if(Cast\u0026lt;ATank\u0026gt;(this)) { UE_LOG(LogTemp, Display, TEXT(\u0026#34;CurrentMaxSpread: %f\u0026#34;), CurrentMaxSpread) } } 这里Equals函数就是指出两个变量是否小到了一定的误差，第二个参数就是相应的误差，这里不使用==运算符的原因是，因为采用了插值处理炮塔的旋转，所以在鼠标不移动后的很长时间内，炮塔都不会完全停止转动。\n",
   "keywords": [
     
   ],
-  "articleBody": "坦克大战 基于UE5的坦克射击游戏，来自教程 udemy.com/course/unrealcourse/\n下载 https://github.com/wstfdxfh/Oddtanks\n和原教程中最终成品的主要区别在于：\n炮塔转动或者坦克移动时，发射的炮弹会发生随机偏差，更难瞄准敌人 使用一个射灯照出我方坦克的可能落弹点 其中，炮弹散射的实现方法如下：\n首先，在BasePawn.h中加入相关变量：\n1 2 3 4 5 6 7 8 9 10 // 记录最大偏移角度 UPROPERTY(EditAnywhere, Category=\"Combat\") float MaxSpreadAngle=5.f; // 当前实时最大偏转角度（度数），由 Tick 更新 UPROPERTY(VisibleAnywhere, Category=\"Combat\") float CurrentMaxSpread = 0.f; FTransform LastTransform; bool IsMoving = false; 随后在BasePawn的Tick函数中，检测有没有发生移动\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 void ABasePawn::Tick(float DeltaTime) { Super::Tick(DeltaTime); // 判断当前炮塔或者本体是否在移动或者转动 FTransform TurretMeshTransform = TurretMesh-\u003eGetComponentTransform(); IsMoving = !TurretMeshTransform.GetRotation().Equals(LastTransform.GetRotation(), 0.2*DeltaTime) || !TurretMeshTransform.GetLocation().Equals(LastTransform.GetLocation(), 1*DeltaTime); LastTransform = TurretMeshTransform; if(IsMoving) { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, MaxSpreadAngle, DeltaTime, 2); } else { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, 0, DeltaTime, 1); } if(Cast\u003cATank\u003e(this)) { // UE_LOG(LogTemp, Display, TEXT(\"GetRotation: %s\"), *TurretMeshTransform.GetRotation().ToString()) // UE_LOG(LogTemp, Display, TEXT(\"GetLocation: %s\"), *TurretMeshTransform.GetLocation().ToString()) // UE_LOG(LogTemp, Display, TEXT(\"IsMoving: %d\"), IsMoving) UE_LOG(LogTemp, Display, TEXT(\"CurrentMaxSpread: %f\"), CurrentMaxSpread) } } 这里Equals函数就是指出两个变量是否小到了一定的误差，第二个参数就是相应的误差，这里不使用==运算符的原因是，因为采用了插值处理炮塔的旋转，所以在鼠标不移动后的很长时间内，炮塔都不会完全停止转动。\n最后是改变Fire函数的细节：\n1 2 3 4 5 FVector Location = ProjectileSpawnPoint-\u003eGetComponentLocation(); FRotator Rotation = ProjectileSpawnPoint-\u003eGetComponentRotation(); FRotator RotationOffset(FMath::RandRange(-CurrentMaxSpread, CurrentMaxSpread), FMath::RandRange(-CurrentMaxSpread, CurrentMaxSpread), 0); auto Projectile= GetWorld()-\u003eSpawnActor\u003cAProjectile\u003e(ProjectileClass, Location, Rotation + RotationOffset); Projectile-\u003eSetOwner(this); ",
-  "wordCount" : "164",
+  "articleBody": "坦克大战 基于UE5的坦克射击游戏，来自教程 udemy.com/course/unrealcourse/\n下载 https://github.com/wstfdxfh/Oddtanks\n和原教程中最终成品的主要区别在于：\n炮塔转动或者坦克移动时，发射的炮弹会发生随机偏差，更难瞄准敌人 使用一个射灯照出我方坦克的可能落弹点 其中，炮弹散射的实现方法如下：\n首先，在BasePawn.h中加入相关变量：\n1 2 3 4 5 6 7 8 9 10 // 记录最大偏移角度 UPROPERTY(EditAnywhere, Category=\"Combat\") float MaxSpreadAngle=5.f; // 当前实时最大偏转角度（度数），由 Tick 更新 UPROPERTY(VisibleAnywhere, Category=\"Combat\") float CurrentMaxSpread = 0.f; FTransform LastTransform; bool IsMoving = false; 随后在BasePawn的Tick函数中，检测有没有发生移动\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 void ABasePawn::Tick(float DeltaTime) { Super::Tick(DeltaTime); // 判断当前炮塔或者本体是否在移动或者转动 FTransform TurretMeshTransform = TurretMesh-\u003eGetComponentTransform(); IsMoving = !TurretMeshTransform.GetRotation().Equals(LastTransform.GetRotation(), 0.2*DeltaTime) || !TurretMeshTransform.GetLocation().Equals(LastTransform.GetLocation(), 1*DeltaTime); LastTransform = TurretMeshTransform; if(IsMoving) { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, MaxSpreadAngle, DeltaTime, 2); } else { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, 0, DeltaTime, 1); } if(Cast\u003cATank\u003e(this)) { UE_LOG(LogTemp, Display, TEXT(\"CurrentMaxSpread: %f\"), CurrentMaxSpread) } } 这里Equals函数就是指出两个变量是否小到了一定的误差，第二个参数就是相应的误差，这里不使用==运算符的原因是，因为采用了插值处理炮塔的旋转，所以在鼠标不移动后的很长时间内，炮塔都不会完全停止转动。\n最后是改变Fire函数的细节：\n1 2 3 4 5 FVector Location = ProjectileSpawnPoint-\u003eGetComponentLocation(); FRotator Rotation = ProjectileSpawnPoint-\u003eGetComponentRotation(); FRotator RotationOffset(FMath::RandRange(-CurrentMaxSpread, CurrentMaxSpread), FMath::RandRange(-CurrentMaxSpread, CurrentMaxSpread), 0); auto Projectile= GetWorld()-\u003eSpawnActor\u003cAProjectile\u003e(ProjectileClass, Location, Rotation + RotationOffset); Projectile-\u003eSetOwner(this); ",
+  "wordCount" : "143",
   "inLanguage": "en",
   "datePublished": "2025-04-28T23:05:02+08:00",
   "dateModified": "2025-04-28T23:05:02+08:00",
@@ -470,9 +458,6 @@ void ABasePawn::Tick(float DeltaTime)
 </span><span class="lnt">21
 </span><span class="lnt">22
 </span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">ABasePawn</span><span class="o">::</span><span class="n">Tick</span><span class="p">(</span><span class="kt">float</span> <span class="n">DeltaTime</span><span class="p">)</span>
@@ -494,17 +479,14 @@ void ABasePawn::Tick(float DeltaTime)
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">Cast</span><span class="o">&lt;</span><span class="n">ATank</span><span class="o">&gt;</span><span class="p">(</span><span class="k">this</span><span class="p">))</span>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
-</span></span><span class="line"><span class="cl">       <span class="c1">// UE_LOG(LogTemp, Display, TEXT(&#34;GetRotation: %s&#34;), *TurretMeshTransform.GetRotation().ToString())
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="c1">// UE_LOG(LogTemp, Display, TEXT(&#34;GetLocation: %s&#34;), *TurretMeshTransform.GetLocation().ToString())
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="c1">// UE_LOG(LogTemp, Display, TEXT(&#34;IsMoving: %d&#34;), IsMoving)
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>       <span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Display</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;CurrentMaxSpread: %f&#34;</span><span class="p">),</span> <span class="n">CurrentMaxSpread</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">       <span class="n">UE_LOG</span><span class="p">(</span><span class="n">LogTemp</span><span class="p">,</span> <span class="n">Display</span><span class="p">,</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;CurrentMaxSpread: %f&#34;</span><span class="p">),</span> <span class="n">CurrentMaxSpread</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="cl">   
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p>这里Equals函数就是指出两个变量是否小到了一定的误差，第二个参数就是相应的误差，这里不使用<code>==</code>运算符的原因是，因为采用了插值处理炮塔的旋转，所以在鼠标不移动后的很长时间内，炮塔都不会完全停止转动。</p>
-<p>最后是改变Fire函数的细节：</p>
+<p>最后是改变<code>Fire</code>函数的细节：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
@@ -529,15 +511,15 @@ void ABasePawn::Tick(float DeltaTime)
     <ul class="post-tags">
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://wstfdxfh.github.io/posts/unrealengine/unrealdocu/">
+  <a class="prev" href="https://wstfdxfh.github.io/posts/unrealengine/unrealdebug/">
     <span class="title">« Prev</span>
     <br>
-    <span>UnrealDocu</span>
+    <span>UnrealDebug</span>
   </a>
-  <a class="next" href="https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/">
+  <a class="next" href="https://wstfdxfh.github.io/posts/others/acmformat/">
     <span class="title">Next »</span>
     <br>
-    <span>Unreal Notes</span>
+    <span>ACMFormat</span>
   </a>
 </nav>
 
