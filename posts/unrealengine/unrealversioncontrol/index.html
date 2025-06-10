@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>UnrealVersionControl | 李睿杰的博客</title>
+<meta name="keywords" content="">
+<meta name="description" content="Unreal版本管理
+本文简单介绍如何通过Git LFS&#43;阿里云Codeup进行Unreal项目内容的版本管理
+使用阿里云Codeup的原因是因为其LFS拥有比较大的免费空间，也可以使用其他平台，比如Github, GitLab或者云服务器&#43;GitLab。
+1. 下载Git 和Git LFS
+https://git-scm.com/
+https://git-lfs.com/
+2.创建一个Codeup代码库
+
+3.在本地创建SSH的公钥和私钥，将公钥上传到Codeup（可选）
+https://help.aliyun.com/zh/yunxiao/user-guide/configure-ssh-key
+首先查看已经存在的SSH秘钥，在Git Bash或者Windows WSL中输入
+
+
+1
+2
+
+
+cat ~/.ssh/id_ed25519.pub
+cat ~/.ssh/id_rsa.pub
+
+
+查看是否有ed25519秘钥或者rsa秘钥，如果没有，就输入
+
+
+1
+
+
+ssh-keygen -t ed25519 -C &#34;&lt;注释内容&gt;&#34;
+
+
+或者
+
+
+1
+
+
+ssh-keygen -t rsa -C &#34;&lt;注释内容&gt;&#34;
+
+
+进行创建，注释内容可以是邮箱地址
+
+
+1
+2
+
+
+Generating public/private ed25519 key pair.
+Enter file in which to save the key (/home/user/.ssh/id_ed25519):
+
+
+密钥默认生成路径：/home/user/.ssh/id_ed25519，公钥与之对应为：/home/user/.ssh/id_ed25519.pub
+
+
+1
+2
+
+
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+
+
+秘钥口令默认为空
+
+
+1
+
+
+cat ~/.ssh/id_ed25519.pub | clip
+
+
+将秘钥复制到剪贴板，最后在codeup上的设置界面设置公钥。">
+<meta name="author" content="李睿杰">
+<link rel="canonical" href="https://wstfdxfh.github.io/posts/unrealengine/unrealversioncontrol/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://wstfdxfh.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://wstfdxfh.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://wstfdxfh.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://wstfdxfh.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://wstfdxfh.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://wstfdxfh.github.io/posts/unrealengine/unrealversioncontrol/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:url" content="https://wstfdxfh.github.io/posts/unrealengine/unrealversioncontrol/">
+  <meta property="og:site_name" content="李睿杰的博客">
+  <meta property="og:title" content="UnrealVersionControl">
+  <meta property="og:description" content="Unreal版本管理 本文简单介绍如何通过Git LFS&#43;阿里云Codeup进行Unreal项目内容的版本管理
+使用阿里云Codeup的原因是因为其LFS拥有比较大的免费空间，也可以使用其他平台，比如Github, GitLab或者云服务器&#43;GitLab。
+1. 下载Git 和Git LFS https://git-scm.com/
+https://git-lfs.com/
+2.创建一个Codeup代码库 3.在本地创建SSH的公钥和私钥，将公钥上传到Codeup（可选） https://help.aliyun.com/zh/yunxiao/user-guide/configure-ssh-key
+首先查看已经存在的SSH秘钥，在Git Bash或者Windows WSL中输入
+1 2 cat ~/.ssh/id_ed25519.pub cat ~/.ssh/id_rsa.pub 查看是否有ed25519秘钥或者rsa秘钥，如果没有，就输入
+1 ssh-keygen -t ed25519 -C &#34;&lt;注释内容&gt;&#34; 或者
+1 ssh-keygen -t rsa -C &#34;&lt;注释内容&gt;&#34; 进行创建，注释内容可以是邮箱地址
+1 2 Generating public/private ed25519 key pair. Enter file in which to save the key (/home/user/.ssh/id_ed25519): 密钥默认生成路径：/home/user/.ssh/id_ed25519，公钥与之对应为：/home/user/.ssh/id_ed25519.pub
+1 2 Enter passphrase (empty for no passphrase): Enter same passphrase again: 秘钥口令默认为空
+1 cat ~/.ssh/id_ed25519.pub | clip 将秘钥复制到剪贴板，最后在codeup上的设置界面设置公钥。">
+  <meta property="og:locale" content="zh-CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-06-08T17:33:36+08:00">
+    <meta property="article:modified_time" content="2025-06-08T17:33:36+08:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="UnrealVersionControl">
+<meta name="twitter:description" content="Unreal版本管理
+本文简单介绍如何通过Git LFS&#43;阿里云Codeup进行Unreal项目内容的版本管理
+使用阿里云Codeup的原因是因为其LFS拥有比较大的免费空间，也可以使用其他平台，比如Github, GitLab或者云服务器&#43;GitLab。
+1. 下载Git 和Git LFS
+https://git-scm.com/
+https://git-lfs.com/
+2.创建一个Codeup代码库
+
+3.在本地创建SSH的公钥和私钥，将公钥上传到Codeup（可选）
+https://help.aliyun.com/zh/yunxiao/user-guide/configure-ssh-key
+首先查看已经存在的SSH秘钥，在Git Bash或者Windows WSL中输入
+
+
+1
+2
+
+
+cat ~/.ssh/id_ed25519.pub
+cat ~/.ssh/id_rsa.pub
+
+
+查看是否有ed25519秘钥或者rsa秘钥，如果没有，就输入
+
+
+1
+
+
+ssh-keygen -t ed25519 -C &#34;&lt;注释内容&gt;&#34;
+
+
+或者
+
+
+1
+
+
+ssh-keygen -t rsa -C &#34;&lt;注释内容&gt;&#34;
+
+
+进行创建，注释内容可以是邮箱地址
+
+
+1
+2
+
+
+Generating public/private ed25519 key pair.
+Enter file in which to save the key (/home/user/.ssh/id_ed25519):
+
+
+密钥默认生成路径：/home/user/.ssh/id_ed25519，公钥与之对应为：/home/user/.ssh/id_ed25519.pub
+
+
+1
+2
+
+
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+
+
+秘钥口令默认为空
+
+
+1
+
+
+cat ~/.ssh/id_ed25519.pub | clip
+
+
+将秘钥复制到剪贴板，最后在codeup上的设置界面设置公钥。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://wstfdxfh.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "UnrealEngine",
+      "item": "https://wstfdxfh.github.io/posts/unrealengine/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "UnrealVersionControl",
+      "item": "https://wstfdxfh.github.io/posts/unrealengine/unrealversioncontrol/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "UnrealVersionControl",
+  "name": "UnrealVersionControl",
+  "description": "Unreal版本管理 本文简单介绍如何通过Git LFS+阿里云Codeup进行Unreal项目内容的版本管理\n使用阿里云Codeup的原因是因为其LFS拥有比较大的免费空间，也可以使用其他平台，比如Github, GitLab或者云服务器+GitLab。\n1. 下载Git 和Git LFS https://git-scm.com/\nhttps://git-lfs.com/\n2.创建一个Codeup代码库 3.在本地创建SSH的公钥和私钥，将公钥上传到Codeup（可选） https://help.aliyun.com/zh/yunxiao/user-guide/configure-ssh-key\n首先查看已经存在的SSH秘钥，在Git Bash或者Windows WSL中输入\n1 2 cat ~/.ssh/id_ed25519.pub cat ~/.ssh/id_rsa.pub 查看是否有ed25519秘钥或者rsa秘钥，如果没有，就输入\n1 ssh-keygen -t ed25519 -C \u0026#34;\u0026lt;注释内容\u0026gt;\u0026#34; 或者\n1 ssh-keygen -t rsa -C \u0026#34;\u0026lt;注释内容\u0026gt;\u0026#34; 进行创建，注释内容可以是邮箱地址\n1 2 Generating public/private ed25519 key pair. Enter file in which to save the key (/home/user/.ssh/id_ed25519): 密钥默认生成路径：/home/user/.ssh/id_ed25519，公钥与之对应为：/home/user/.ssh/id_ed25519.pub\n1 2 Enter passphrase (empty for no passphrase): Enter same passphrase again: 秘钥口令默认为空\n1 cat ~/.ssh/id_ed25519.pub | clip 将秘钥复制到剪贴板，最后在codeup上的设置界面设置公钥。\n",
+  "keywords": [
+    
+  ],
+  "articleBody": "Unreal版本管理 本文简单介绍如何通过Git LFS+阿里云Codeup进行Unreal项目内容的版本管理\n使用阿里云Codeup的原因是因为其LFS拥有比较大的免费空间，也可以使用其他平台，比如Github, GitLab或者云服务器+GitLab。\n1. 下载Git 和Git LFS https://git-scm.com/\nhttps://git-lfs.com/\n2.创建一个Codeup代码库 3.在本地创建SSH的公钥和私钥，将公钥上传到Codeup（可选） https://help.aliyun.com/zh/yunxiao/user-guide/configure-ssh-key\n首先查看已经存在的SSH秘钥，在Git Bash或者Windows WSL中输入\n1 2 cat ~/.ssh/id_ed25519.pub cat ~/.ssh/id_rsa.pub 查看是否有ed25519秘钥或者rsa秘钥，如果没有，就输入\n1 ssh-keygen -t ed25519 -C \"\u003c注释内容\u003e\" 或者\n1 ssh-keygen -t rsa -C \"\u003c注释内容\u003e\" 进行创建，注释内容可以是邮箱地址\n1 2 Generating public/private ed25519 key pair. Enter file in which to save the key (/home/user/.ssh/id_ed25519): 密钥默认生成路径：/home/user/.ssh/id_ed25519，公钥与之对应为：/home/user/.ssh/id_ed25519.pub\n1 2 Enter passphrase (empty for no passphrase): Enter same passphrase again: 秘钥口令默认为空\n1 cat ~/.ssh/id_ed25519.pub | clip 将秘钥复制到剪贴板，最后在codeup上的设置界面设置公钥。\n如果在克隆或者推送过程中出现Host key verification failed. fatal: Could not read from remote repository.等错误，就需要进行ssh配置，输入\n1 code ~/.ssh/config 进行编辑，输入\n1 2 3 4 5 6 Host codeup.aliyun.com HostName codeup.aliyun.com Port 22 # 默认SSH端口，如有特殊端口需修改 User git IdentityFile ~/.ssh/id_ed25519 # 指定私钥路径 IdentitiesOnly yes # 强制使用指定密钥 进行秘钥配置，随后即可正常拉取和上传文件\n由于也可以使用HTTP(S)进行下载和上传，所以不是必须内容\n4. 克隆项目 通过Git GUI进行克隆，或者通过git bash或者命令行输入\n1 git clone git@codeup.aliyun.com:6844ea9006a2c55225caea98/OddTanks.git my-project 进行克隆，其中my-project是表示存放目录的可选项\n5. 在Unreal中添加并且配置Git-LFS 点击右下角的Version Control，进行以下设置：\n其中，URL表示远程项目的HTTP地址，可以在\n查看。\n初始化成功后，在Github Disktop或者Git GUI中添加文件夹，并且在Git Bash中对大文件进行指定配置\n1 2 3 4 git lfs install cd \"E:\\CodeRepository\\Blasters\" git lfs track \"*.uasset\" git lfs track \"*.umap\" 6.提交和推送项目 可以在Github Desktop中对项目进行提交，进行推送的时候，需要用户名和密码，Codeup的用户名在用户设置如下：\n进行提交之前，首先需要拉取远程更改\n首先建立远程分支和当前分支的联系\n1 git branch --set-upstream-to=origin/master master 弹出以上弹窗是因为两个仓库各自进行了初始化，如果不需要保留远程初始化的内容的话可以直接进行强制push，或者使用\n1 git pull origin master --allow-unrelated-histories 强制拉取远程历史，并且解决冲突。\n随后就可以将当前内容push到远程分支\n注意：拉取内容或者其他任何可能改变当前工作区的内容时，必须关闭Unreal\n7.清除暂存内容，回退到上一次编辑结果 点击Discard all changes即可清除内容，回退到上一次编辑结果，但是要注意，必须关闭unreal进行相关操作。\n8.回退到某个分支 1 2 3 4 5 6 7 8 9 10 # 1. 查看提交历史，找到目标提交的哈希（如 abc1234） git log --oneline # 2. 混合重置（保留更改，但撤销暂存）HEAD 和暂存区回退，但工作区的文件修改保留（需重新 git add） git reset --mixed # --mixed 是默认选项，可省略 # 2. 硬重置到该提交 所有未提交的修改和之后的提交都会被删除！ git reset --hard abc1234 # 3. 强制推送到远程（如需） git push --force origin main ",
+  "wordCount" : "224",
+  "inLanguage": "en",
+  "datePublished": "2025-06-08T17:33:36+08:00",
+  "dateModified": "2025-06-08T17:33:36+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "李睿杰"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://wstfdxfh.github.io/posts/unrealengine/unrealversioncontrol/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "李睿杰的博客",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://wstfdxfh.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://wstfdxfh.github.io/" accesskey="h" title="李睿杰的博客 (Alt + H)">李睿杰的博客</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://wstfdxfh.github.io/archives/" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://wstfdxfh.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://wstfdxfh.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://wstfdxfh.github.io/posts/">Posts</a>&nbsp;»&nbsp;<a href="https://wstfdxfh.github.io/posts/unrealengine/">UnrealEngine</a></div>
+    <h1 class="post-title entry-hint-parent">
+      UnrealVersionControl
+    </h1>
+    <div class="post-meta"><span title='2025-06-08 17:33:36 +0800 CST'>June 8, 2025</span>&nbsp;·&nbsp;李睿杰
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#unreal%e7%89%88%e6%9c%ac%e7%ae%a1%e7%90%86" aria-label="Unreal版本管理">Unreal版本管理</a></li>
+                <li>
+                    <a href="#1-%e4%b8%8b%e8%bd%bdgit-%e5%92%8cgit-lfs" aria-label="1. 下载Git 和Git LFS">1. 下载Git 和Git LFS</a></li>
+                <li>
+                    <a href="#2%e5%88%9b%e5%bb%ba%e4%b8%80%e4%b8%aacodeup%e4%bb%a3%e7%a0%81%e5%ba%93" aria-label="2.创建一个Codeup代码库">2.创建一个Codeup代码库</a></li>
+                <li>
+                    <a href="#3%e5%9c%a8%e6%9c%ac%e5%9c%b0%e5%88%9b%e5%bb%bassh%e7%9a%84%e5%85%ac%e9%92%a5%e5%92%8c%e7%a7%81%e9%92%a5%e5%b0%86%e5%85%ac%e9%92%a5%e4%b8%8a%e4%bc%a0%e5%88%b0codeup%e5%8f%af%e9%80%89" aria-label="3.在本地创建SSH的公钥和私钥，将公钥上传到Codeup（可选）">3.在本地创建SSH的公钥和私钥，将公钥上传到Codeup（可选）</a></li>
+                <li>
+                    <a href="#4-%e5%85%8b%e9%9a%86%e9%a1%b9%e7%9b%ae" aria-label="4. 克隆项目">4. 克隆项目</a></li>
+                <li>
+                    <a href="#5-%e5%9c%a8unreal%e4%b8%ad%e6%b7%bb%e5%8a%a0%e5%b9%b6%e4%b8%94%e9%85%8d%e7%bd%aegit-lfs" aria-label="5. 在Unreal中添加并且配置Git-LFS">5. 在Unreal中添加并且配置Git-LFS</a></li>
+                <li>
+                    <a href="#6%e6%8f%90%e4%ba%a4%e5%92%8c%e6%8e%a8%e9%80%81%e9%a1%b9%e7%9b%ae" aria-label="6.提交和推送项目">6.提交和推送项目</a></li>
+                <li>
+                    <a href="#7%e6%b8%85%e9%99%a4%e6%9a%82%e5%ad%98%e5%86%85%e5%ae%b9%e5%9b%9e%e9%80%80%e5%88%b0%e4%b8%8a%e4%b8%80%e6%ac%a1%e7%bc%96%e8%be%91%e7%bb%93%e6%9e%9c" aria-label="7.清除暂存内容，回退到上一次编辑结果">7.清除暂存内容，回退到上一次编辑结果</a></li>
+                <li>
+                    <a href="#8%e5%9b%9e%e9%80%80%e5%88%b0%e6%9f%90%e4%b8%aa%e5%88%86%e6%94%af" aria-label="8.回退到某个分支">8.回退到某个分支</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="unreal版本管理">Unreal版本管理<a hidden class="anchor" aria-hidden="true" href="#unreal版本管理">#</a></h2>
+<p>本文简单介绍如何通过Git LFS+阿里云Codeup进行Unreal项目内容的版本管理</p>
+<p>使用阿里云Codeup的原因是因为其LFS拥有比较大的免费空间，也可以使用其他平台，比如Github, GitLab或者云服务器+GitLab。</p>
+<h2 id="1-下载git-和git-lfs">1. 下载Git 和Git LFS<a hidden class="anchor" aria-hidden="true" href="#1-下载git-和git-lfs">#</a></h2>
+<p><a href="https://git-scm.com/">https://git-scm.com/</a></p>
+<p><a href="https://git-lfs.com/">https://git-lfs.com/</a></p>
+<h2 id="2创建一个codeup代码库">2.创建一个Codeup代码库<a hidden class="anchor" aria-hidden="true" href="#2创建一个codeup代码库">#</a></h2>
+<p><img alt="image-20250608175403555" loading="lazy" src="/posts/unrealengine/unrealversioncontrol/image-20250608175403555.png"></p>
+<h2 id="3在本地创建ssh的公钥和私钥将公钥上传到codeup可选">3.在本地创建SSH的公钥和私钥，将公钥上传到Codeup（可选）<a hidden class="anchor" aria-hidden="true" href="#3在本地创建ssh的公钥和私钥将公钥上传到codeup可选">#</a></h2>
+<p><a href="https://help.aliyun.com/zh/yunxiao/user-guide/configure-ssh-key">https://help.aliyun.com/zh/yunxiao/user-guide/configure-ssh-key</a></p>
+<p>首先查看已经存在的SSH秘钥，在Git Bash或者Windows WSL中输入</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">cat ~/.ssh/id_ed25519.pub
+</span></span><span class="line"><span class="cl">cat ~/.ssh/id_rsa.pub
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查看是否有ed25519秘钥或者rsa秘钥，如果没有，就输入</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">ssh-keygen -t ed25519 -C <span class="s2">&#34;&lt;注释内容&gt;&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>或者</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">ssh-keygen -t rsa -C <span class="s2">&#34;&lt;注释内容&gt;&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>进行创建，注释内容可以是邮箱地址</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">Generating public/private ed25519 key pair.
+</span></span><span class="line"><span class="cl">Enter file in which to save the key <span class="o">(</span>/home/user/.ssh/id_ed25519<span class="o">)</span>:
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>密钥默认生成路径：<code>/home/user/.ssh/id_ed25519</code>，公钥与之对应为：<code>/home/user/.ssh/id_ed25519.pub</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">Enter passphrase <span class="o">(</span>empty <span class="k">for</span> no passphrase<span class="o">)</span>:
+</span></span><span class="line"><span class="cl">Enter same passphrase again:
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>秘钥口令默认为空</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">cat ~/.ssh/id_ed25519.pub <span class="p">|</span> clip
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>将秘钥复制到剪贴板，最后在codeup上的设置界面设置公钥。</p>
+<p>如果在克隆或者推送过程中出现Host key verification failed. fatal: Could not read from remote repository.等错误，就需要进行ssh配置，输入</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">code ~/.ssh/config
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>进行编辑，输入</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Host codeup.aliyun.com
+</span></span><span class="line"><span class="cl">  HostName codeup.aliyun.com
+</span></span><span class="line"><span class="cl">  Port 22  # 默认SSH端口，如有特殊端口需修改
+</span></span><span class="line"><span class="cl">  User git
+</span></span><span class="line"><span class="cl">  IdentityFile ~/.ssh/id_ed25519  # 指定私钥路径
+</span></span><span class="line"><span class="cl">  IdentitiesOnly yes              # 强制使用指定密钥
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>进行秘钥配置，随后即可正常拉取和上传文件</p>
+<p>由于也可以使用HTTP(S)进行下载和上传，所以不是必须内容</p>
+<h2 id="4-克隆项目">4. 克隆项目<a hidden class="anchor" aria-hidden="true" href="#4-克隆项目">#</a></h2>
+<p><img alt="image-20250608182412407" loading="lazy" src="/posts/unrealengine/unrealversioncontrol/image-20250608182412407.png"></p>
+<p>通过Git GUI进行克隆，或者通过git bash或者命令行输入</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">git clone git@codeup.aliyun.com:6844ea9006a2c55225caea98/OddTanks.git my-project
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>进行克隆，其中<code>my-project</code>是表示存放目录的可选项</p>
+<h2 id="5-在unreal中添加并且配置git-lfs">5. 在Unreal中添加并且配置Git-LFS<a hidden class="anchor" aria-hidden="true" href="#5-在unreal中添加并且配置git-lfs">#</a></h2>
+<p>点击右下角的Version Control，进行以下设置：</p>
+<p><img alt="image-20250608183420643" loading="lazy" src="/posts/unrealengine/unrealversioncontrol/image-20250608183420643.png"></p>
+<p>其中，URL表示远程项目的HTTP地址，可以在</p>
+<p><img alt="image-20250608183547725" loading="lazy" src="/posts/unrealengine/unrealversioncontrol/image-20250608183547725.png"></p>
+<p>查看。</p>
+<p>初始化成功后，在Github Disktop或者Git GUI中添加文件夹，并且在Git Bash中对大文件进行指定配置</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">git lfs install
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> <span class="s2">&#34;E:\CodeRepository\Blasters&#34;</span>
+</span></span><span class="line"><span class="cl">git lfs track <span class="s2">&#34;*.uasset&#34;</span>
+</span></span><span class="line"><span class="cl">git lfs track <span class="s2">&#34;*.umap&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="6提交和推送项目">6.提交和推送项目<a hidden class="anchor" aria-hidden="true" href="#6提交和推送项目">#</a></h2>
+<p>可以在Github Desktop中对项目进行提交，进行推送的时候，需要用户名和密码，Codeup的用户名在用户设置如下：</p>
+<p><img alt="image-20250608185241943" loading="lazy" src="/posts/unrealengine/unrealversioncontrol/image-20250608185241943.png"></p>
+<p>进行提交之前，首先需要拉取远程更改</p>
+<p>首先建立远程分支和当前分支的联系</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">git branch --set-upstream-to=origin/master master
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img alt="image-20250608201256255" loading="lazy" src="/posts/unrealengine/unrealversioncontrol/image-20250608201256255.png"></p>
+<p>弹出以上弹窗是因为两个仓库各自进行了初始化，如果不需要保留远程初始化的内容的话可以直接进行强制push，或者使用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">git pull origin master --allow-unrelated-histories
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>强制拉取远程历史，并且解决冲突。</p>
+<p>随后就可以将当前内容push到远程分支</p>
+<p><img alt="image-20250608191552422" loading="lazy" src="/posts/unrealengine/unrealversioncontrol/image-20250608191552422.png"></p>
+<p><strong>注意：拉取内容或者其他任何可能改变当前工作区的内容时，必须关闭Unreal</strong></p>
+<h2 id="7清除暂存内容回退到上一次编辑结果">7.清除暂存内容，回退到上一次编辑结果<a hidden class="anchor" aria-hidden="true" href="#7清除暂存内容回退到上一次编辑结果">#</a></h2>
+<p><img alt="image-20250608191341791" loading="lazy" src="/posts/unrealengine/unrealversioncontrol/image-20250608191341791.png"></p>
+<p>点击Discard all changes即可清除内容，回退到上一次编辑结果，但是要注意，必须关闭unreal进行相关操作。</p>
+<h2 id="8回退到某个分支">8.回退到某个分支<a hidden class="anchor" aria-hidden="true" href="#8回退到某个分支">#</a></h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 1. 查看提交历史，找到目标提交的哈希（如 abc1234）</span>
+</span></span><span class="line"><span class="cl">git log --oneline
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 2. 混合重置（保留更改，但撤销暂存）HEAD 和暂存区回退，但工作区的文件修改保留（需重新 git add）</span>
+</span></span><span class="line"><span class="cl">git reset --mixed &lt;commit-hash&gt;  <span class="c1"># --mixed 是默认选项，可省略</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 2. 硬重置到该提交 所有未提交的修改和之后的提交都会被删除！</span>
+</span></span><span class="line"><span class="cl">git reset --hard abc1234
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 3. 强制推送到远程（如需）</span>
+</span></span><span class="line"><span class="cl">git push --force origin main
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://wstfdxfh.github.io/posts/unrealengine/unrealonline/">
+    <span class="title">Next »</span>
+    <br>
+    <span>UnrealOnline</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://wstfdxfh.github.io/">李睿杰的博客</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

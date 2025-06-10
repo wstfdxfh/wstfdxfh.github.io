@@ -162,6 +162,30 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">UnrealVersionControl
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Unreal版本管理 本文简单介绍如何通过Git LFS&#43;阿里云Codeup进行Unreal项目内容的版本管理
+使用阿里云Codeup的原因是因为其LFS拥有比较大的免费空间，也可以使用其他平台，比如Github, GitLab或者云服务器&#43;GitLab。
+1. 下载Git 和Git LFS https://git-scm.com/
+https://git-lfs.com/
+2.创建一个Codeup代码库 3.在本地创建SSH的公钥和私钥，将公钥上传到Codeup（可选） https://help.aliyun.com/zh/yunxiao/user-guide/configure-ssh-key
+首先查看已经存在的SSH秘钥，在Git Bash或者Windows WSL中输入
+1 2 cat ~/.ssh/id_ed25519.pub cat ~/.ssh/id_rsa.pub 查看是否有ed25519秘钥或者rsa秘钥，如果没有，就输入
+1 ssh-keygen -t ed25519 -C &#34;&lt;注释内容&gt;&#34; 或者
+1 ssh-keygen -t rsa -C &#34;&lt;注释内容&gt;&#34; 进行创建，注释内容可以是邮箱地址
+1 2 Generating public/private ed25519 key pair. Enter file in which to save the key (/home/user/.ssh/id_ed25519): 密钥默认生成路径：/home/user/.ssh/id_ed25519，公钥与之对应为：/home/user/.ssh/id_ed25519.pub
+1 2 Enter passphrase (empty for no passphrase): Enter same passphrase again: 秘钥口令默认为空
+1 cat ~/.ssh/id_ed25519.pub | clip 将秘钥复制到剪贴板，最后在codeup上的设置界面设置公钥。
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-06-08 17:33:36 +0800 CST'>June 8, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <a class="entry-link" aria-label="post link to UnrealVersionControl" href="https://wstfdxfh.github.io/posts/unrealengine/unrealversioncontrol/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">UnrealOnline
     </h2>
   </header>
@@ -173,7 +197,7 @@ https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter/
 在steam登录的情况下，在2台不同的主机上可以建立链接，在一个大厅中进行游玩（注意需要不同的账号，以及相同的地域）。
 配置文件设置 在DefaultEngine.ini中，添加以下内容：
 1 2 3 4 5 6 7 8 9 10 11 12 13 [/Script/Engine.GameEngine] &#43;NetDriverDefinitions=(DefName=&#34;GameNetDriver&#34;,DriverClassName=&#34;OnlineSubsystemSteam.SteamNetDriver&#34;,DriverClassNameFallback=&#34;OnlineSubsystemUtils.IpNetDriver&#34;) [OnlineSubsystem] DefaultPlatformService=Steam [OnlineSubsystemSteam] bEnabled=true SteamDevAppId=480 bInitServerOnClient=true [/Script/OnlineSubsystemSteam.SteamNetDriver] NetConnectionClassName=&#34;OnlineSubsystemSteam.SteamNetConnection&#34; 480是一个公用的游戏id
-在DefaultEngine.ini中添加
+在DefaultGame.ini中添加
 1 2 [/Script/Engine.GameSession] MaxPlayers=100 规定了最大玩家数量。
 插件创建 在编辑器的插件设置中可以创建相应的插件，并且在游戏中利用这些插件，以实现代码或者蓝图的复用。插件和游戏存在以下的单项依赖关系：
 例如，游戏模块可以依赖于游戏插件或者其他模块，但是插件不可依赖于游戏模块。
@@ -253,22 +277,6 @@ UE_LOG 打印的格式如下：
   </div>
   <footer class="entry-footer"><span title='2025-03-23 21:11:21 +0800 CST'>March 23, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
   <a class="entry-link" aria-label="post link to IsPointInTriangle" href="https://wstfdxfh.github.io/posts/others/ispointintriangle/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
-    <h2 class="entry-hint-parent">Platform Shooter
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>UE5快节奏横板射击对战游戏 这是一款基于虚幻引擎5开发的快节奏横板射击游戏，目前仍在早期开发中。游戏采用横板视角，玩家可以在地图中自由移动，通过射击击败对手获得胜利。
-前往Github仓库进行下载：
-该游戏项目的原创部分适用于 CC BY-NC 4.0 许可
-开发进度 已完成功能 ✅ 基础场景搭建 ✅ 初始地图设计 ✅ 基础设计系统 ✅ 增益道具系统 ✅ 基础人物角色实现 待开发功能 ⏳ 敌方 AI 系统 ⏳ 多人游戏系统 ⏳ 游戏 UI 优化 ⏳ 更多地图场景 目前正在使用C&#43;&#43;对项目进行重构，如果对项目感兴趣，请联系我！
-</p>
-  </div>
-  <footer class="entry-footer"><span title='2025-03-23 21:08:55 +0800 CST'>March 23, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
-  <a class="entry-link" aria-label="post link to Platform Shooter" href="https://wstfdxfh.github.io/posts/gamedev/platform-shooter/"></a>
 </article>
     </main>
     
