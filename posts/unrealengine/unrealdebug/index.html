@@ -326,8 +326,8 @@ if(GEngine)
   "keywords": [
     
   ],
-  "articleBody": "介绍UnrealEngine C++常用的调试方法\nUE_LOG 打印的格式如下：\n1 UE_LOG(LogTemp, Warning, TEXT(\"Grabber Constructed\")); 如果使用FString格式如下\n1 2 FString Name = GetName(); UE_LOG(LogTemp, Warning, TEXT(\"%s\"), *Name); 在已经打包好的游戏中要看到log，可以在exe所在的位置开启命令行，输入\n1 MenuSystem.exe -log 表示开启log同时运行游戏\n绘制调试射线、球 1 #include \"Engine/World.h\" 引入该头文件获得UWorld\n1 2 3 4 #include \"DrawDebugHelpers.h\" DrawDebugLine(GetWorld(), Start, End, FColor::Red); DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5); 绘制调试摄像机 在枪械开火时，从玩家视点绘制调试摄像机图形\n1 2 3 4 5 6 7 8 9 APawn* OwnerPawn = Cast\u003cAPawn\u003e(GetOwner()); if(OwnerPawn == nullptr) return; AController* OwnerController = OwnerPawn-\u003eGetController; if(OwnerController == nullptr) return; FVector Location; FRotator Rotation; OwnerController-\u003eGetPlayerViewPoint(Location, Rotation); DrawDebugCamera(GetWorld(), Location, Rotation, 90, 2, FColor::Red, true); 在屏幕上绘制调试信息 1 2 3 4 5 6 7 8 9 if(GEngine) { GEngine-\u003eAddOnScreenDebugMessage( -1, 15.f, FColor::Cyan, FString::Printf(TEXT(\"Joining Match Type: %s\"), *MatchType) ); } -1表示这条调试信息不会被覆盖，15.f表示在屏幕持续时间为15秒，FColor::Cyan表示调试信息的颜色，FString::Printf(TEXT(\"Joining Match Type: %s\"), *MatchType)用于进行输出内容的格式化\n",
-  "wordCount" : "115",
+  "articleBody": "介绍UnrealEngine C++常用的调试方法\nUE_LOG 打印的格式如下：\n1 UE_LOG(LogTemp, Warning, TEXT(\"Grabber Constructed\")); 如果使用FString格式如下\n1 2 FString Name = GetName(); UE_LOG(LogTemp, Warning, TEXT(\"%s\"), *Name); 在已经打包好的游戏中要看到log，可以在exe所在的位置开启命令行，输入\n1 MenuSystem.exe -log 表示开启log同时运行游戏\n绘制调试射线、球 1 #include \"Engine/World.h\" 引入该头文件获得UWorld\n1 2 3 4 #include \"DrawDebugHelpers.h\" DrawDebugLine(GetWorld(), Start, End, FColor::Red); DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5); 绘制调试摄像机 在枪械开火时，从玩家视点绘制调试摄像机图形\n1 2 3 4 5 6 7 8 9 APawn* OwnerPawn = Cast\u003cAPawn\u003e(GetOwner()); if(OwnerPawn == nullptr) return; AController* OwnerController = OwnerPawn-\u003eGetController; if(OwnerController == nullptr) return; FVector Location; FRotator Rotation; OwnerController-\u003eGetPlayerViewPoint(Location, Rotation); DrawDebugCamera(GetWorld(), Location, Rotation, 90, 2, FColor::Red, true); 在屏幕上绘制调试信息 1 2 3 4 5 6 7 8 9 if(GEngine) { GEngine-\u003eAddOnScreenDebugMessage( -1, 15.f, FColor::Cyan, FString::Printf(TEXT(\"Joining Match Type: %s\"), *MatchType) ); } -1表示这条调试信息不会被覆盖，15.f表示在屏幕持续时间为15秒，FColor::Cyan表示调试信息的颜色，FString::Printf(TEXT(\"Joining Match Type: %s\"), *MatchType)用于进行输出内容的格式化\n绘制某枪管指向的射线 1 2 3 4 5 6 7 if(bWeaponEquipped \u0026\u0026 EquippedWeapon \u0026\u0026 EquippedWeapon-\u003eGetWeaponMesh() \u0026\u0026 BlasterCharacter-\u003eGetMesh()){ FTransform MuzzleTipTransform = EquippedWeapon-\u003eGetWeaponMesh()-\u003eGetSocketTransform(FName(\"MuzzleFlash\"), RTS_World); FVector MuzzleX(FRotationMatrix(MuzzleTipTransform.GetRotation().Rotator()).GetUnitAxis(EAxis::X)); DrawDebugLine(GetWorld(), MuzzleTipTransform.GetLocation(), MuzzleTipTransform.GetLocation() + MuzzleX * 1000.f, FColor::Red); DrawDebugLine(GetWorld(), MuzzleTipTransform.GetLocation(), BlasterCharacter-\u003eGetHitTarget(), FColor::Orange); } 首先，获取武器骨骼上的某个Socket的transform 确保该Socket的X轴指向朝枪口前方，随后可以使用FVector MuzzleX(FRotationMatrix(MuzzleTipTransform.GetRotation().Rotator()).GetUnitAxis(EAxis::X));获取指向X轴正方向的单位向量 最后绘制调试射线 ",
+  "wordCount" : "154",
   "inLanguage": "en",
   "datePublished": "2025-05-13T12:10:50+08:00",
   "dateModified": "2025-05-13T12:10:50+08:00",
@@ -429,7 +429,9 @@ if(GEngine)
                 <li>
                     <a href="#%e7%bb%98%e5%88%b6%e8%b0%83%e8%af%95%e6%91%84%e5%83%8f%e6%9c%ba" aria-label="绘制调试摄像机">绘制调试摄像机</a></li>
                 <li>
-                    <a href="#%e5%9c%a8%e5%b1%8f%e5%b9%95%e4%b8%8a%e7%bb%98%e5%88%b6%e8%b0%83%e8%af%95%e4%bf%a1%e6%81%af" aria-label="在屏幕上绘制调试信息">在屏幕上绘制调试信息</a>
+                    <a href="#%e5%9c%a8%e5%b1%8f%e5%b9%95%e4%b8%8a%e7%bb%98%e5%88%b6%e8%b0%83%e8%af%95%e4%bf%a1%e6%81%af" aria-label="在屏幕上绘制调试信息">在屏幕上绘制调试信息</a></li>
+                <li>
+                    <a href="#%e7%bb%98%e5%88%b6%e6%9f%90%e6%9e%aa%e7%ae%a1%e6%8c%87%e5%90%91%e7%9a%84%e5%b0%84%e7%ba%bf" aria-label="绘制某枪管指向的射线">绘制某枪管指向的射线</a>
                 </li>
             </ul>
         </div>
@@ -544,6 +546,32 @@ if(GEngine)
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p>-1表示这条调试信息不会被覆盖，15.f表示在屏幕持续时间为15秒，<code>FColor::Cyan</code>表示调试信息的颜色，<code>FString::Printf(TEXT(&quot;Joining Match Type: %s&quot;), *MatchType)</code>用于进行输出内容的格式化</p>
+<h2 id="绘制某枪管指向的射线">绘制某枪管指向的射线<a hidden class="anchor" aria-hidden="true" href="#绘制某枪管指向的射线">#</a></h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="n">bWeaponEquipped</span> <span class="o">&amp;&amp;</span> <span class="n">EquippedWeapon</span> <span class="o">&amp;&amp;</span> <span class="n">EquippedWeapon</span><span class="o">-&gt;</span><span class="n">GetWeaponMesh</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="n">BlasterCharacter</span><span class="o">-&gt;</span><span class="n">GetMesh</span><span class="p">()){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">FTransform</span> <span class="n">MuzzleTipTransform</span> <span class="o">=</span> <span class="n">EquippedWeapon</span><span class="o">-&gt;</span><span class="n">GetWeaponMesh</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">GetSocketTransform</span><span class="p">(</span><span class="n">FName</span><span class="p">(</span><span class="s">&#34;MuzzleFlash&#34;</span><span class="p">),</span> <span class="n">RTS_World</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">FVector</span>    <span class="nf">MuzzleX</span><span class="p">(</span><span class="n">FRotationMatrix</span><span class="p">(</span><span class="n">MuzzleTipTransform</span><span class="p">.</span><span class="n">GetRotation</span><span class="p">().</span><span class="n">Rotator</span><span class="p">()).</span><span class="n">GetUnitAxis</span><span class="p">(</span><span class="n">EAxis</span><span class="o">::</span><span class="n">X</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DrawDebugLine</span><span class="p">(</span><span class="n">GetWorld</span><span class="p">(),</span> <span class="n">MuzzleTipTransform</span><span class="p">.</span><span class="n">GetLocation</span><span class="p">(),</span> <span class="n">MuzzleTipTransform</span><span class="p">.</span><span class="n">GetLocation</span><span class="p">()</span> <span class="o">+</span> <span class="n">MuzzleX</span> <span class="o">*</span> <span class="mf">1000.f</span><span class="p">,</span> <span class="n">FColor</span><span class="o">::</span><span class="n">Red</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">DrawDebugLine</span><span class="p">(</span><span class="n">GetWorld</span><span class="p">(),</span> <span class="n">MuzzleTipTransform</span><span class="p">.</span><span class="n">GetLocation</span><span class="p">(),</span> <span class="n">BlasterCharacter</span><span class="o">-&gt;</span><span class="n">GetHitTarget</span><span class="p">(),</span> <span class="n">FColor</span><span class="o">::</span><span class="n">Orange</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol>
+<li>首先，获取武器骨骼上的某个Socket的transform</li>
+<li>确保该Socket的X轴指向朝枪口前方，随后可以使用<code>FVector    MuzzleX(FRotationMatrix(MuzzleTipTransform.GetRotation().Rotator()).GetUnitAxis(EAxis::X));</code>获取指向X轴正方向的单位向量</li>
+<li>最后绘制调试射线</li>
+</ol>
 
 
   </div>
