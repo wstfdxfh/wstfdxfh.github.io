@@ -162,6 +162,28 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
+    <h2 class="entry-hint-parent">MultiPlayerDemo
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>一款多人设计游戏的Demo，使用UnrealOnlineSubSystemSteam实现互联网双人联机
+游戏包含开始界面，等待大厅和正式游戏关卡，在关卡开始之前，玩家可以飞行浏览地图
+游戏开始后，玩家可以拾取地图上的武器，包括步枪和火箭筒，进行对抗
+HUD上记录了击杀数和被击败的次数，通过人头数量决定最后的胜者。
+相关内容参考 相关课程，UE5.5进行开发。相关开发笔记可以参见Unreal网络多人开发和Unreal版本控制等
+下载链接
+注意，游玩时，需要两台不同的电脑主机，各自登录不同的Steam账号；
+点击开始界面的Host主持游戏作为Listen Server，另一台点击加入后作为Client
+因为使用Steam的公用ID，在高峰期可能会出现连接缓慢或者无法加入的问题。
+附多人游戏截图：
+</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-07-16 14:31:30 +0800 CST'>July 16, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <a class="entry-link" aria-label="post link to MultiPlayerDemo" href="https://wstfdxfh.github.io/posts/gamedev/multiplayerdemo/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
     <h2 class="entry-hint-parent">UnrealVersionControl
     </h2>
   </header>
@@ -246,6 +268,24 @@ UE_LOG 打印的格式如下：
   </div>
   <footer class="entry-footer"><span title='2025-04-28 23:05:02 +0800 CST'>April 28, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
   <a class="entry-link" aria-label="post link to OddTanks" href="https://wstfdxfh.github.io/posts/gamedev/oddtanks/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Unreal Notes
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>udemy.com/course/unrealcourse/ 的课程笔记
+常见技巧 防止速度过快导致的平台位置偏移 1 2 3 4 5 6 7 8 9 10 11 12 13 14 void AMovingPlatform::Tick(float DeltaTime){ Super::Tick(DeltaTime); FVector CurrentLocation = GetActorLocation(); CurrentLocation = CurrentLocation &#43; (PlatformVelocity*DeltaTime); SetActorLocation(CurrentLocation); float DistanceMoved = FVector::Dist(StartLocation, CurrentLocation); if(DistanceMoved &gt; MoveDistance){ // 获得速度的单位向量 FVector MoveDirection = PlatformVelocty.GetSafeNormal(); StartLocation = StartLocation&#43; MoveDirection*MoveDistance; SetActorLocation(StartLocation); PlatformVelocty = -PlatformVelocty; } } 解决被方块撞击时人物视角异常的问题 这是因为只有角色默认只有在移动时才会检查碰撞
+解决方法：使用蓝图中的MoveUpdatedComponent，在每一帧都移动一个小距离再反向移动
+可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。
+背对光源时场景过暗的问题 在场景中加入PostProcessVolume，在Lens-Exposure-Metering Mode中，将选项改为Auto Exposure Basic，然后修改Brush中的x,y,z，令其覆盖整个场景。
+不同的灯光类型 名称 解释 Point Light 从一个点向外发射的光源 Spot Light 聚光灯，有方向性地发出光线 Rect Light 方形的有方向性光源 Directional Light 太阳光（只有方向，没有位置的光） Sky Light 将远处的场景作为光源 将SceneComponent添加到角色后，角色旋转和组件旋转的差异 1 2 3 4 5 6 7 8 9 10 11 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) { Super::TickComponent(DeltaTime, TickType, ThisTickFunction); auto Rotator = GetOwner()-&gt;GetActorRotation(); auto MyRotation = GetComponentRotation(); auto RotatorString = Rotator.ToCompactString(); auto MyRotationString = MyRotation.ToCompactString(); // LogTemp: Display: Owner Rotation: R(Y=-107.75), Component Rotation: R(P=-4.78, Y=-107.75) // 可以注意到，使用Owner Rotation得到的只有Yaw方向的旋转，而Component Rotation包含Pitch和Yaw旋转 UE_LOG(LogTemp, Display, TEXT(&#34;Owner Rotation: %s, Component Rotation: %s&#34;), *RotatorString, *MyRotationString); } 其中，Pitch是俯仰角，Yaw是偏航角，除此之外还有一个滚转角Roll。
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-04-06 19:45:39 +0800 CST'>April 6, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <a class="entry-link" aria-label="post link to Unreal Notes" href="https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/"></a>
 </article>
 
 <article class="post-entry"> 
