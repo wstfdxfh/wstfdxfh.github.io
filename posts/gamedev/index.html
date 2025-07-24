@@ -168,6 +168,9 @@ HUD上记录了击杀数和被击败的次数，通过人头数量决定最后�
 点击开始界面的Host主持游戏作为Listen Server，另一台点击加入后作为Client
 因为使用Steam的公用ID，在高峰期可能会出现连接缓慢或者无法加入的问题。
 附多人游戏截图：
+改进笔记 以下将改进的部分内容列在下方：
+源代码中，使用一个自定义的RocketMovementComponent解决火箭弹会在接触自己的时候爆炸的问题，而改进后只需要使用
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 void AProjectile::BeginPlay() { Super::BeginPlay(); if(Tracer) { TracerComponent = UGameplayStatics::SpawnEmitterAttached(Tracer, CollisionBox, NAME_None, GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition); } if(HasAuthority()) { CollisionBox-&gt;OnComponentHit.AddDynamic(this, &amp;AProjectile::OnHit); CollisionBox-&gt;IgnoreActorWhenMoving(Owner, true); } } 通过添加CollisionBox-&gt;IgnoreActorWhenMoving(Owner, true);实现
 </p>
   </div>
   <footer class="entry-footer"><span title='2025-07-16 14:31:30 +0800 CST'>July 16, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
