@@ -2,22 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://wstfdxfh.github.io/posts/gamedev/</loc>
-    <lastmod>2025-11-06T16:55:52+08:00</lastmod>
+    <loc>https://wstfdxfh.github.io/posts/cheetsheets/</loc>
+    <lastmod>2025-12-17T21:55:04+08:00</lastmod>
   </url><url>
     <loc>https://wstfdxfh.github.io/posts/</loc>
-    <lastmod>2025-11-06T16:55:52+08:00</lastmod>
+    <lastmod>2025-12-17T21:55:04+08:00</lastmod>
   </url><url>
     <loc>https://wstfdxfh.github.io/</loc>
-    <lastmod>2025-11-06T16:55:52+08:00</lastmod>
-  </url><url>
-    <loc>https://wstfdxfh.github.io/posts/others/</loc>
-    <lastmod>2025-08-24T08:35:32+08:00</lastmod>
+    <lastmod>2025-12-17T21:55:04+08:00</lastmod>
   </url><url>
     <loc>https://wstfdxfh.github.io/posts/unrealengine/</loc>
     <lastmod>2025-08-18T19:27:22+08:00</lastmod>
   </url><url>
-    <loc>https://wstfdxfh.github.io/posts/gamedev/multiplayerdemo/</loc>
+    <loc>https://wstfdxfh.github.io/posts/myworks/multiplayerdemo/</loc>
+    <lastmod>2025-07-16T14:31:30+08:00</lastmod>
+  </url><url>
+    <loc>https://wstfdxfh.github.io/posts/myworks/</loc>
     <lastmod>2025-07-16T14:31:30+08:00</lastmod>
   </url><url>
     <loc>https://wstfdxfh.github.io/posts/unrealengine/unrealversioncontrol/</loc>
@@ -29,11 +29,14 @@
     <loc>https://wstfdxfh.github.io/posts/unrealengine/unrealdebug/</loc>
     <lastmod>2025-05-13T12:10:50+08:00</lastmod>
   </url><url>
-    <loc>https://wstfdxfh.github.io/posts/gamedev/oddtanks/</loc>
+    <loc>https://wstfdxfh.github.io/posts/myworks/oddtanks/</loc>
     <lastmod>2025-04-28T23:05:02+08:00</lastmod>
   </url><url>
     <loc>https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/</loc>
     <lastmod>2025-04-06T19:45:39+08:00</lastmod>
+  </url><url>
+    <loc>https://wstfdxfh.github.io/posts/cheetsheets/cgalgos/</loc>
+    <lastmod>2025-03-23T21:11:21+08:00</lastmod>
   </url><url>
     <loc>https://wstfdxfh.github.io/archives/</loc>
   </url><url>

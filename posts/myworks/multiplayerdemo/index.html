@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>MultiPlayerDemo | 李睿杰的博客</title>
+<meta name="keywords" content="">
+<meta name="description" content="一款多人设计游戏的Demo，使用UnrealOnlineSubSystemSteam实现互联网双人联机
+游戏包含开始界面，等待大厅和正式游戏关卡，在关卡开始之前，玩家可以飞行浏览地图
+游戏开始后，玩家可以拾取地图上的武器，包括步枪和火箭筒，进行对抗
+HUD上记录了击杀数和被击败的次数，通过人头数量决定最后的胜者。
+相关内容参考 相关课程，UE5.5进行开发。相关开发笔记可以参见Unreal网络多人开发和Unreal版本控制等
+下载链接
+注意，游玩时，需要两台不同的电脑主机，各自登录不同的Steam账号；
+点击开始界面的Host主持游戏作为Listen Server，另一台点击加入后作为Client
+因为使用Steam的公用ID，在高峰期可能会出现连接缓慢或者无法加入的问题。
+附多人游戏截图：
+
+改进笔记
+以下将改进的部分内容列在下方：
+源代码中，使用一个自定义的RocketMovementComponent解决火箭弹会在接触自己的时候爆炸的问题，而改进后只需要使用
+
+
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+
+
+void AProjectile::BeginPlay()
+{
+    Super::BeginPlay();
+
+    if(Tracer)
+    {
+       TracerComponent = UGameplayStatics::SpawnEmitterAttached(Tracer, CollisionBox, NAME_None, GetActorLocation(), GetActorRotation(),
+                                                                EAttachLocation::KeepWorldPosition);
+    }
+    if(HasAuthority())
+    {
+       CollisionBox-&gt;OnComponentHit.AddDynamic(this, &amp;AProjectile::OnHit);
+       CollisionBox-&gt;IgnoreActorWhenMoving(Owner, true);
+    }
+}
+
+
+通过添加CollisionBox-&gt;IgnoreActorWhenMoving(Owner, true);实现">
+<meta name="author" content="李睿杰">
+<link rel="canonical" href="https://wstfdxfh.github.io/posts/myworks/multiplayerdemo/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://wstfdxfh.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://wstfdxfh.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://wstfdxfh.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://wstfdxfh.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://wstfdxfh.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://wstfdxfh.github.io/posts/myworks/multiplayerdemo/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:url" content="https://wstfdxfh.github.io/posts/myworks/multiplayerdemo/">
+  <meta property="og:site_name" content="李睿杰的博客">
+  <meta property="og:title" content="MultiPlayerDemo">
+  <meta property="og:description" content="一款多人设计游戏的Demo，使用UnrealOnlineSubSystemSteam实现互联网双人联机
+游戏包含开始界面，等待大厅和正式游戏关卡，在关卡开始之前，玩家可以飞行浏览地图
+游戏开始后，玩家可以拾取地图上的武器，包括步枪和火箭筒，进行对抗
+HUD上记录了击杀数和被击败的次数，通过人头数量决定最后的胜者。
+相关内容参考 相关课程，UE5.5进行开发。相关开发笔记可以参见Unreal网络多人开发和Unreal版本控制等
+下载链接
+注意，游玩时，需要两台不同的电脑主机，各自登录不同的Steam账号；
+点击开始界面的Host主持游戏作为Listen Server，另一台点击加入后作为Client
+因为使用Steam的公用ID，在高峰期可能会出现连接缓慢或者无法加入的问题。
+附多人游戏截图：
+改进笔记 以下将改进的部分内容列在下方：
+源代码中，使用一个自定义的RocketMovementComponent解决火箭弹会在接触自己的时候爆炸的问题，而改进后只需要使用
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 void AProjectile::BeginPlay() { Super::BeginPlay(); if(Tracer) { TracerComponent = UGameplayStatics::SpawnEmitterAttached(Tracer, CollisionBox, NAME_None, GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition); } if(HasAuthority()) { CollisionBox-&gt;OnComponentHit.AddDynamic(this, &amp;AProjectile::OnHit); CollisionBox-&gt;IgnoreActorWhenMoving(Owner, true); } } 通过添加CollisionBox-&gt;IgnoreActorWhenMoving(Owner, true);实现">
+  <meta property="og:locale" content="zh-CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-07-16T14:31:30+08:00">
+    <meta property="article:modified_time" content="2025-07-16T14:31:30+08:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MultiPlayerDemo">
+<meta name="twitter:description" content="一款多人设计游戏的Demo，使用UnrealOnlineSubSystemSteam实现互联网双人联机
+游戏包含开始界面，等待大厅和正式游戏关卡，在关卡开始之前，玩家可以飞行浏览地图
+游戏开始后，玩家可以拾取地图上的武器，包括步枪和火箭筒，进行对抗
+HUD上记录了击杀数和被击败的次数，通过人头数量决定最后的胜者。
+相关内容参考 相关课程，UE5.5进行开发。相关开发笔记可以参见Unreal网络多人开发和Unreal版本控制等
+下载链接
+注意，游玩时，需要两台不同的电脑主机，各自登录不同的Steam账号；
+点击开始界面的Host主持游戏作为Listen Server，另一台点击加入后作为Client
+因为使用Steam的公用ID，在高峰期可能会出现连接缓慢或者无法加入的问题。
+附多人游戏截图：
+
+改进笔记
+以下将改进的部分内容列在下方：
+源代码中，使用一个自定义的RocketMovementComponent解决火箭弹会在接触自己的时候爆炸的问题，而改进后只需要使用
+
+
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+
+
+void AProjectile::BeginPlay()
+{
+    Super::BeginPlay();
+
+    if(Tracer)
+    {
+       TracerComponent = UGameplayStatics::SpawnEmitterAttached(Tracer, CollisionBox, NAME_None, GetActorLocation(), GetActorRotation(),
+                                                                EAttachLocation::KeepWorldPosition);
+    }
+    if(HasAuthority())
+    {
+       CollisionBox-&gt;OnComponentHit.AddDynamic(this, &amp;AProjectile::OnHit);
+       CollisionBox-&gt;IgnoreActorWhenMoving(Owner, true);
+    }
+}
+
+
+通过添加CollisionBox-&gt;IgnoreActorWhenMoving(Owner, true);实现">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://wstfdxfh.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "MyWorks",
+      "item": "https://wstfdxfh.github.io/posts/myworks/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  3 ,
+      "name": "MultiPlayerDemo",
+      "item": "https://wstfdxfh.github.io/posts/myworks/multiplayerdemo/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "MultiPlayerDemo",
+  "name": "MultiPlayerDemo",
+  "description": "一款多人设计游戏的Demo，使用UnrealOnlineSubSystemSteam实现互联网双人联机\n游戏包含开始界面，等待大厅和正式游戏关卡，在关卡开始之前，玩家可以飞行浏览地图\n游戏开始后，玩家可以拾取地图上的武器，包括步枪和火箭筒，进行对抗\nHUD上记录了击杀数和被击败的次数，通过人头数量决定最后的胜者。\n相关内容参考 相关课程，UE5.5进行开发。相关开发笔记可以参见Unreal网络多人开发和Unreal版本控制等\n下载链接\n注意，游玩时，需要两台不同的电脑主机，各自登录不同的Steam账号；\n点击开始界面的Host主持游戏作为Listen Server，另一台点击加入后作为Client\n因为使用Steam的公用ID，在高峰期可能会出现连接缓慢或者无法加入的问题。\n附多人游戏截图：\n改进笔记 以下将改进的部分内容列在下方：\n源代码中，使用一个自定义的RocketMovementComponent解决火箭弹会在接触自己的时候爆炸的问题，而改进后只需要使用\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 void AProjectile::BeginPlay() { Super::BeginPlay(); if(Tracer) { TracerComponent = UGameplayStatics::SpawnEmitterAttached(Tracer, CollisionBox, NAME_None, GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition); } if(HasAuthority()) { CollisionBox-\u0026gt;OnComponentHit.AddDynamic(this, \u0026amp;AProjectile::OnHit); CollisionBox-\u0026gt;IgnoreActorWhenMoving(Owner, true); } } 通过添加CollisionBox-\u0026gt;IgnoreActorWhenMoving(Owner, true);实现\n",
+  "keywords": [
+    
+  ],
+  "articleBody": "一款多人设计游戏的Demo，使用UnrealOnlineSubSystemSteam实现互联网双人联机\n游戏包含开始界面，等待大厅和正式游戏关卡，在关卡开始之前，玩家可以飞行浏览地图\n游戏开始后，玩家可以拾取地图上的武器，包括步枪和火箭筒，进行对抗\nHUD上记录了击杀数和被击败的次数，通过人头数量决定最后的胜者。\n相关内容参考 相关课程，UE5.5进行开发。相关开发笔记可以参见Unreal网络多人开发和Unreal版本控制等\n下载链接\n注意，游玩时，需要两台不同的电脑主机，各自登录不同的Steam账号；\n点击开始界面的Host主持游戏作为Listen Server，另一台点击加入后作为Client\n因为使用Steam的公用ID，在高峰期可能会出现连接缓慢或者无法加入的问题。\n附多人游戏截图：\n改进笔记 以下将改进的部分内容列在下方：\n源代码中，使用一个自定义的RocketMovementComponent解决火箭弹会在接触自己的时候爆炸的问题，而改进后只需要使用\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 void AProjectile::BeginPlay() { Super::BeginPlay(); if(Tracer) { TracerComponent = UGameplayStatics::SpawnEmitterAttached(Tracer, CollisionBox, NAME_None, GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition); } if(HasAuthority()) { CollisionBox-\u003eOnComponentHit.AddDynamic(this, \u0026AProjectile::OnHit); CollisionBox-\u003eIgnoreActorWhenMoving(Owner, true); } } 通过添加CollisionBox-\u003eIgnoreActorWhenMoving(Owner, true);实现\n",
+  "wordCount" : "55",
+  "inLanguage": "en",
+  "datePublished": "2025-07-16T14:31:30+08:00",
+  "dateModified": "2025-07-16T14:31:30+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "李睿杰"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://wstfdxfh.github.io/posts/myworks/multiplayerdemo/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "李睿杰的博客",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://wstfdxfh.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://wstfdxfh.github.io/" accesskey="h" title="李睿杰的博客 (Alt + H)">李睿杰的博客</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://wstfdxfh.github.io/archives/" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://wstfdxfh.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://wstfdxfh.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://wstfdxfh.github.io/posts/">Posts</a>&nbsp;»&nbsp;<a href="https://wstfdxfh.github.io/posts/myworks/">MyWorks</a></div>
+    <h1 class="post-title entry-hint-parent">
+      MultiPlayerDemo
+    </h1>
+    <div class="post-meta"><span title='2025-07-16 14:31:30 +0800 CST'>July 16, 2025</span>&nbsp;·&nbsp;李睿杰
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e6%94%b9%e8%bf%9b%e7%ac%94%e8%ae%b0" aria-label="改进笔记">改进笔记</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>一款多人设计游戏的Demo，使用UnrealOnlineSubSystemSteam实现互联网双人联机</p>
+<p>游戏包含开始界面，等待大厅和正式游戏关卡，在关卡开始之前，玩家可以飞行浏览地图</p>
+<p>游戏开始后，玩家可以拾取地图上的武器，包括步枪和火箭筒，进行对抗</p>
+<p>HUD上记录了击杀数和被击败的次数，通过人头数量决定最后的胜者。</p>
+<p>相关内容参考 <a href="https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter">相关课程</a>，UE5.5进行开发。相关开发笔记可以参见<a href="/posts/UnrealEngine/UnrealOnline/">Unreal网络多人开发</a>和<a href="/posts/UnrealEngine/UnrealVersionControl/">Unreal版本控制</a>等</p>
+<p><a href="https://github.com/wstfdxfh/UnealOnlineDemo/releases/tag/v1.0.0">下载链接</a></p>
+<p><strong>注意</strong>，游玩时，需要两台不同的电脑主机，各自登录不同的Steam账号；</p>
+<p>点击开始界面的Host主持游戏作为Listen Server，另一台点击加入后作为Client</p>
+<p>因为使用Steam的公用ID，在高峰期可能会出现连接缓慢或者无法加入的问题。</p>
+<p>附多人游戏截图：</p>
+<!-- raw HTML omitted -->
+<h2 id="改进笔记">改进笔记<a hidden class="anchor" aria-hidden="true" href="#改进笔记">#</a></h2>
+<p>以下将改进的部分内容列在下方：</p>
+<p>源代码中，使用一个自定义的RocketMovementComponent解决火箭弹会在接触自己的时候爆炸的问题，而改进后只需要使用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">AProjectile</span><span class="o">::</span><span class="n">BeginPlay</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Super</span><span class="o">::</span><span class="n">BeginPlay</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">Tracer</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">       <span class="n">TracerComponent</span> <span class="o">=</span> <span class="n">UGameplayStatics</span><span class="o">::</span><span class="n">SpawnEmitterAttached</span><span class="p">(</span><span class="n">Tracer</span><span class="p">,</span> <span class="n">CollisionBox</span><span class="p">,</span> <span class="n">NAME_None</span><span class="p">,</span> <span class="n">GetActorLocation</span><span class="p">(),</span> <span class="n">GetActorRotation</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">                                                                <span class="n">EAttachLocation</span><span class="o">::</span><span class="n">KeepWorldPosition</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span><span class="p">(</span><span class="n">HasAuthority</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">       <span class="n">CollisionBox</span><span class="o">-&gt;</span><span class="n">OnComponentHit</span><span class="p">.</span><span class="n">AddDynamic</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">AProjectile</span><span class="o">::</span><span class="n">OnHit</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">       <span class="n">CollisionBox</span><span class="o">-&gt;</span><span class="n">IgnoreActorWhenMoving</span><span class="p">(</span><span class="n">Owner</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>通过添加<code>CollisionBox-&gt;IgnoreActorWhenMoving(Owner, true);</code>实现</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://wstfdxfh.github.io/posts/unrealengine/unrealversioncontrol/">
+    <span class="title">Next »</span>
+    <br>
+    <span>UnrealVersionControl</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://wstfdxfh.github.io/">李睿杰的博客</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
