@@ -139,6 +139,11 @@
                     <span>Search</span>
                 </a>
             </li>
+            <li>
+                <a href="https://wstfdxfh.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
         </ul>
     </nav>
 </header>
@@ -173,7 +178,7 @@ HUD上记录了击杀数和被击败的次数，通过人头数量决定最后�
 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 void AProjectile::BeginPlay() { Super::BeginPlay(); if(Tracer) { TracerComponent = UGameplayStatics::SpawnEmitterAttached(Tracer, CollisionBox, NAME_None, GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition); } if(HasAuthority()) { CollisionBox-&gt;OnComponentHit.AddDynamic(this, &amp;AProjectile::OnHit); CollisionBox-&gt;IgnoreActorWhenMoving(Owner, true); } } 通过添加CollisionBox-&gt;IgnoreActorWhenMoving(Owner, true);实现
 </p>
   </div>
-  <footer class="entry-footer"><span title='2025-07-16 14:31:30 +0800 CST'>July 16, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <footer class="entry-footer"><span title='2025-07-16 14:31:30 +0800 CST'>July 16, 2025</span>&nbsp;·&nbsp;1 min&nbsp;·&nbsp;55 words&nbsp;·&nbsp;李睿杰</footer>
   <a class="entry-link" aria-label="post link to MultiPlayerDemo" href="https://wstfdxfh.github.io/posts/myworks/multiplayerdemo/"></a>
 </article>
 
@@ -192,7 +197,7 @@ HUD上记录了击杀数和被击败的次数，通过人头数量决定最后�
 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 void ABasePawn::Tick(float DeltaTime) { Super::Tick(DeltaTime); // 判断当前炮塔或者本体是否在移动或者转动 FTransform TurretMeshTransform = TurretMesh-&gt;GetComponentTransform(); IsMoving = !TurretMeshTransform.GetRotation().Equals(LastTransform.GetRotation(), 0.2*DeltaTime) || !TurretMeshTransform.GetLocation().Equals(LastTransform.GetLocation(), 1*DeltaTime); LastTransform = TurretMeshTransform; if(IsMoving) { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, MaxSpreadAngle, DeltaTime, 2); } else { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, 0, DeltaTime, 1); } if(Cast&lt;ATank&gt;(this)) { UE_LOG(LogTemp, Display, TEXT(&#34;CurrentMaxSpread: %f&#34;), CurrentMaxSpread) } } 这里Equals函数就是指出两个变量是否小到了一定的误差，第二个参数就是相应的误差，这里不使用==运算符的原因是，因为采用了插值处理炮塔的旋转，所以在鼠标不移动后的很长时间内，炮塔都不会完全停止转动。
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-04-28 23:05:02 +0800 CST'>April 28, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <footer class="entry-footer"><span title='2025-04-28 23:05:02 +0800 CST'>April 28, 2025</span>&nbsp;·&nbsp;1 min&nbsp;·&nbsp;143 words&nbsp;·&nbsp;李睿杰</footer>
   <a class="entry-link" aria-label="post link to OddTanks" href="https://wstfdxfh.github.io/posts/myworks/oddtanks/"></a>
 </article>
     </main>

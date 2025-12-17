@@ -132,6 +132,11 @@
                     <span>Search</span>
                 </a>
             </li>
+            <li>
+                <a href="https://wstfdxfh.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
         </ul>
     </nav>
 </header>
@@ -181,7 +186,7 @@ HUD上记录了击杀数和被击败的次数，通过人头数量决定最后�
 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 void AProjectile::BeginPlay() { Super::BeginPlay(); if(Tracer) { TracerComponent = UGameplayStatics::SpawnEmitterAttached(Tracer, CollisionBox, NAME_None, GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition); } if(HasAuthority()) { CollisionBox-&gt;OnComponentHit.AddDynamic(this, &amp;AProjectile::OnHit); CollisionBox-&gt;IgnoreActorWhenMoving(Owner, true); } } 通过添加CollisionBox-&gt;IgnoreActorWhenMoving(Owner, true);实现
 </p>
   </div>
-  <footer class="entry-footer"><span title='2025-07-16 14:31:30 +0800 CST'>July 16, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <footer class="entry-footer"><span title='2025-07-16 14:31:30 +0800 CST'>July 16, 2025</span>&nbsp;·&nbsp;1 min&nbsp;·&nbsp;55 words&nbsp;·&nbsp;李睿杰</footer>
   <a class="entry-link" aria-label="post link to MultiPlayerDemo" href="https://wstfdxfh.github.io/posts/myworks/multiplayerdemo/"></a>
 </article>
 
@@ -205,7 +210,7 @@ https://git-lfs.com/
 1 cat ~/.ssh/id_ed25519.pub | clip 将秘钥复制到剪贴板，最后在codeup上的设置界面设置公钥。
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-06-08 17:33:36 +0800 CST'>June 8, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <footer class="entry-footer"><span title='2025-06-08 17:33:36 +0800 CST'>June 8, 2025</span>&nbsp;·&nbsp;2 min&nbsp;·&nbsp;224 words&nbsp;·&nbsp;李睿杰</footer>
   <a class="entry-link" aria-label="post link to UnrealVersionControl" href="https://wstfdxfh.github.io/posts/unrealengine/unrealversioncontrol/"></a>
 </article>
 
@@ -230,7 +235,7 @@ https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter/
 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 { ... &#34;Modules&#34;: [ { &#34;Name&#34;: &#34;MultiplayerSessions&#34;, &#34;Type&#34;: &#34;Runtime&#34;, &#34;LoadingPhase&#34;: &#34;Default&#34; } ], &#34;Plugins&#34;:[ { &#34;Name&#34;: &#34;OnlineSubsystem&#34;, &#34;Enabled&#34;: true }, { &#34;Name&#34;: &#34;OnlineSubsystemSteam&#34;, &#34;Enabled&#34;: true } ] } MultiplayerSessions.Build.cs
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-05-19 18:02:04 +0800 CST'>May 19, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <footer class="entry-footer"><span title='2025-05-19 18:02:04 +0800 CST'>May 19, 2025</span>&nbsp;·&nbsp;30 min&nbsp;·&nbsp;6294 words&nbsp;·&nbsp;李睿杰</footer>
   <a class="entry-link" aria-label="post link to UnrealOnline" href="https://wstfdxfh.github.io/posts/unrealengine/unrealonline/"></a>
 </article>
 
@@ -250,7 +255,7 @@ UE_LOG 打印的格式如下：
 1 2 3 4 5 6 7 8 9 APawn* OwnerPawn = Cast&lt;APawn&gt;(GetOwner()); if(OwnerPawn == nullptr) return; AController* OwnerController = OwnerPawn-&gt;GetController; if(OwnerController == nullptr) return; FVector Location; FRotator Rotation; OwnerController-&gt;GetPlayerViewPoint(Location, Rotation); DrawDebugCamera(GetWorld(), Location, Rotation, 90, 2, FColor::Red, true); 在屏幕上绘制调试信息 1 2 3 4 5 6 7 8 9 if(GEngine) { GEngine-&gt;AddOnScreenDebugMessage( -1, 15.f, FColor::Cyan, FString::Printf(TEXT(&#34;Joining Match Type: %s&#34;), *MatchType) ); } -1表示这条调试信息不会被覆盖，15.f表示在屏幕持续时间为15秒，FColor::Cyan表示调试信息的颜色，FString::Printf(TEXT(&#34;Joining Match Type: %s&#34;), *MatchType)用于进行输出内容的格式化
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-05-13 12:10:50 +0800 CST'>May 13, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <footer class="entry-footer"><span title='2025-05-13 12:10:50 +0800 CST'>May 13, 2025</span>&nbsp;·&nbsp;1 min&nbsp;·&nbsp;154 words&nbsp;·&nbsp;李睿杰</footer>
   <a class="entry-link" aria-label="post link to UnrealDebug" href="https://wstfdxfh.github.io/posts/unrealengine/unrealdebug/"></a>
 </article>
 
@@ -269,7 +274,7 @@ UE_LOG 打印的格式如下：
 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 void ABasePawn::Tick(float DeltaTime) { Super::Tick(DeltaTime); // 判断当前炮塔或者本体是否在移动或者转动 FTransform TurretMeshTransform = TurretMesh-&gt;GetComponentTransform(); IsMoving = !TurretMeshTransform.GetRotation().Equals(LastTransform.GetRotation(), 0.2*DeltaTime) || !TurretMeshTransform.GetLocation().Equals(LastTransform.GetLocation(), 1*DeltaTime); LastTransform = TurretMeshTransform; if(IsMoving) { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, MaxSpreadAngle, DeltaTime, 2); } else { CurrentMaxSpread = FMath::FInterpTo(CurrentMaxSpread, 0, DeltaTime, 1); } if(Cast&lt;ATank&gt;(this)) { UE_LOG(LogTemp, Display, TEXT(&#34;CurrentMaxSpread: %f&#34;), CurrentMaxSpread) } } 这里Equals函数就是指出两个变量是否小到了一定的误差，第二个参数就是相应的误差，这里不使用==运算符的原因是，因为采用了插值处理炮塔的旋转，所以在鼠标不移动后的很长时间内，炮塔都不会完全停止转动。
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-04-28 23:05:02 +0800 CST'>April 28, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <footer class="entry-footer"><span title='2025-04-28 23:05:02 +0800 CST'>April 28, 2025</span>&nbsp;·&nbsp;1 min&nbsp;·&nbsp;143 words&nbsp;·&nbsp;李睿杰</footer>
   <a class="entry-link" aria-label="post link to OddTanks" href="https://wstfdxfh.github.io/posts/myworks/oddtanks/"></a>
 </article>
 
@@ -287,7 +292,7 @@ UE_LOG 打印的格式如下：
 不同的灯光类型 名称 解释 Point Light 从一个点向外发射的光源 Spot Light 聚光灯，有方向性地发出光线 Rect Light 方形的有方向性光源 Directional Light 太阳光（只有方向，没有位置的光） Sky Light 将远处的场景作为光源 将SceneComponent添加到角色后，角色旋转和组件旋转的差异 1 2 3 4 5 6 7 8 9 10 11 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) { Super::TickComponent(DeltaTime, TickType, ThisTickFunction); auto Rotator = GetOwner()-&gt;GetActorRotation(); auto MyRotation = GetComponentRotation(); auto RotatorString = Rotator.ToCompactString(); auto MyRotationString = MyRotation.ToCompactString(); // LogTemp: Display: Owner Rotation: R(Y=-107.75), Component Rotation: R(P=-4.78, Y=-107.75) // 可以注意到，使用Owner Rotation得到的只有Yaw方向的旋转，而Component Rotation包含Pitch和Yaw旋转 UE_LOG(LogTemp, Display, TEXT(&#34;Owner Rotation: %s, Component Rotation: %s&#34;), *RotatorString, *MyRotationString); } 其中，Pitch是俯仰角，Yaw是偏航角，除此之外还有一个滚转角Roll。
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-04-06 19:45:39 +0800 CST'>April 6, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <footer class="entry-footer"><span title='2025-04-06 19:45:39 +0800 CST'>April 6, 2025</span>&nbsp;·&nbsp;10 min&nbsp;·&nbsp;2114 words&nbsp;·&nbsp;李睿杰</footer>
   <a class="entry-link" aria-label="post link to Unreal Course Notes" href="https://wstfdxfh.github.io/posts/unrealengine/unrealcoursenotes/"></a>
 </article>
 
@@ -301,7 +306,7 @@ UE_LOG 打印的格式如下：
 一个点是否在三角形内部 可以使用叉乘的方法判断一个点是否在三角形内部。当三角形中所有边的对点和点P都位于该边的一侧时，就说明P在三角形内部，而判断是否位于一侧可以使用叉乘的符号是否相等来判断。 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 #include &lt;iostream&gt; struct Point { double x, y; }; // 向量叉积：计算向量a × 向量b的值 double crossProduct(const Point&amp; a, const Point&amp; b) { return a.x * b.y - a.y * b.x; } // 检查点p1和p2是否在边a-b的同一侧（包含边上的点） bool isSameSide(const Point&amp; p1, const Point&amp; p2, const Point&amp; a, const Point&amp; b) { Point ab = {b.x - a.x, b.y - a.y}; // 边a→b的向量 Point ap1 = {p1.x - a.x, p1.y - a.y}; Point ap2 = {p2.x - a.x, p2.y - a.y}; double cp1 = crossProduct(ab, ap1); // 计算叉积AB × AP1 double cp2 = crossProduct(ab, ap2); // 计算叉积AB × AP2 return (cp1 * cp2) &gt;= 0; // 符号相同或其中一个为0（点在线段上） } // 判断点P是否在三角形ABC内 bool isInsideTriangle(const Point&amp; A, const Point&amp; B, const Point&amp; C, const Point&amp; P) { return isSameSide(P, C, A, B) &amp;&amp; // P和C在AB同侧 isSameSide(P, A, B, C) &amp;&amp; // P和A在BC同侧 isSameSide(P, B, C, A); // P和B在CA同侧 } int main() { Point A = {0, 0}; Point B = {3, 0}; Point C = {1.5, 2.5}; Point P = {1.5, 10}; // 待检测点 if (isInsideTriangle(A, B, C, P)) { std::cout &lt;&lt; &#34;点P在三角形内部&#34; &lt;&lt; std::endl; } else { std::cout &lt;&lt; &#34;点P在三角形外部&#34; &lt;&lt; std::endl; } return 0; } 欧拉路径 问题本质 题目要求“是否存在一条路径恰好经过所有有向边一次”，其实就是有向欧拉路径 (Eulerian Path) / 欧拉回路 (Eulerian Circuit) 的判定与构造问题。
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-03-23 21:11:21 +0800 CST'>March 23, 2025</span>&nbsp;·&nbsp;李睿杰</footer>
+  <footer class="entry-footer"><span title='2025-03-23 21:11:21 +0800 CST'>March 23, 2025</span>&nbsp;·&nbsp;5 min&nbsp;·&nbsp;881 words&nbsp;·&nbsp;李睿杰</footer>
   <a class="entry-link" aria-label="post link to CGAlgos" href="https://wstfdxfh.github.io/posts/cheetsheets/cgalgos/"></a>
 </article>
     </main>
