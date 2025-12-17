@@ -466,12 +466,11 @@
 &lt;/div&gt;&lt;p&gt;这里Equals函数就是指出两个变量是否小到了一定的误差，第二个参数就是相应的误差，这里不使用&lt;code&gt;==&lt;/code&gt;运算符的原因是，因为采用了插值处理炮塔的旋转，所以在鼠标不移动后的很长时间内，炮塔都不会完全停止转动。&lt;/p&gt;</description>
     </item>
     <item>
-      <title>Unreal Notes</title>
-      <link>https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/</link>
+      <title>Unreal Course Notes</title>
+      <link>https://wstfdxfh.github.io/posts/unrealengine/unrealcoursenotes/</link>
       <pubDate>Sun, 06 Apr 2025 19:45:39 +0800</pubDate>
-      <guid>https://wstfdxfh.github.io/posts/unrealengine/unreal-notes/</guid>
-      <description>&lt;p&gt;[TOC]&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;&#34;&gt;udemy.com/course/unrealcourse/&lt;/a&gt; 以及部分&lt;a href=&#34;&#34;&gt;https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter/&lt;/a&gt;的课程笔记&lt;/p&gt;
+      <guid>https://wstfdxfh.github.io/posts/unrealengine/unrealcoursenotes/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;&#34;&gt;udemy.com/course/unrealcourse/&lt;/a&gt; 以及部分&lt;a href=&#34;&#34;&gt;https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter/&lt;/a&gt;的课程笔记&lt;/p&gt;
 &lt;h2 id=&#34;常见技巧&#34;&gt;常见技巧&lt;/h2&gt;
 &lt;h3 id=&#34;防止速度过快导致的平台位置偏移&#34;&gt;防止速度过快导致的平台位置偏移&lt;/h3&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
