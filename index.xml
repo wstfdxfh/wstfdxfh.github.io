@@ -1,627 +1,709 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>李睿杰的博客</title><link>https://wstfdxfh.github.io/</link><description>Recent content on 李睿杰的博客</description><generator>Hugo -- 0.145.0</generator><language>zh-CN</language><lastBuildDate>Wed, 16 Jul 2025 14:31:30 +0800</lastBuildDate><atom:link href="https://wstfdxfh.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>MultiPlayerDemo</title><link>https://wstfdxfh.github.io/posts/myworks/multiplayerdemo/</link><pubDate>Wed, 16 Jul 2025 14:31:30 +0800</pubDate><guid>https://wstfdxfh.github.io/posts/myworks/multiplayerdemo/</guid><description>&lt;p>一款多人设计游戏的Demo，使用UnrealOnlineSubSystemSteam实现互联网双人联机&lt;/p>
-&lt;p>游戏包含开始界面，等待大厅和正式游戏关卡，在关卡开始之前，玩家可以飞行浏览地图&lt;/p>
-&lt;p>游戏开始后，玩家可以拾取地图上的武器，包括步枪和火箭筒，进行对抗&lt;/p>
-&lt;p>HUD上记录了击杀数和被击败的次数，通过人头数量决定最后的胜者。&lt;/p>
-&lt;p>相关内容参考 &lt;a href="https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter">相关课程&lt;/a>，UE5.5进行开发。相关开发笔记可以参见&lt;a href="https://wstfdxfh.github.io/posts/UnrealEngine/UnrealOnline/">Unreal网络多人开发&lt;/a>和&lt;a href="https://wstfdxfh.github.io/posts/UnrealEngine/UnrealVersionControl/">Unreal版本控制&lt;/a>等&lt;/p>
-&lt;p>&lt;a href="https://github.com/wstfdxfh/UnealOnlineDemo/releases/tag/v1.0.0">下载链接&lt;/a>&lt;/p>
-&lt;p>&lt;strong>注意&lt;/strong>，游玩时，需要两台不同的电脑主机，各自登录不同的Steam账号；&lt;/p>
-&lt;p>点击开始界面的Host主持游戏作为Listen Server，另一台点击加入后作为Client&lt;/p>
-&lt;p>因为使用Steam的公用ID，在高峰期可能会出现连接缓慢或者无法加入的问题。&lt;/p>
-&lt;p>附多人游戏截图：&lt;/p>
-&lt;!-- raw HTML omitted -->
-&lt;h2 id="改进笔记">改进笔记&lt;/h2>
-&lt;p>以下将改进的部分内容列在下方：&lt;/p>
-&lt;p>源代码中，使用一个自定义的RocketMovementComponent解决火箭弹会在接触自己的时候爆炸的问题，而改进后只需要使用&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="n">AProjectile&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">BeginPlay&lt;/span>&lt;span class="p">()&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Super&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">BeginPlay&lt;/span>&lt;span class="p">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Tracer&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">TracerComponent&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">UGameplayStatics&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">SpawnEmitterAttached&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Tracer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">CollisionBox&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">NAME_None&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">GetActorLocation&lt;/span>&lt;span class="p">(),&lt;/span> &lt;span class="n">GetActorRotation&lt;/span>&lt;span class="p">(),&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">EAttachLocation&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">KeepWorldPosition&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">HasAuthority&lt;/span>&lt;span class="p">())&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">CollisionBox&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">OnComponentHit&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">AddDynamic&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">AProjectile&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">OnHit&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">CollisionBox&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">IgnoreActorWhenMoving&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Owner&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">true&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>通过添加&lt;code>CollisionBox-&amp;gt;IgnoreActorWhenMoving(Owner, true);&lt;/code>实现&lt;/p></description></item><item><title>UnrealVersionControl</title><link>https://wstfdxfh.github.io/posts/unrealengine/unrealversioncontrol/</link><pubDate>Sun, 08 Jun 2025 17:33:36 +0800</pubDate><guid>https://wstfdxfh.github.io/posts/unrealengine/unrealversioncontrol/</guid><description>&lt;h2 id="unreal版本管理">Unreal版本管理&lt;/h2>
-&lt;p>本文简单介绍如何通过Git LFS+阿里云Codeup进行Unreal项目内容的版本管理&lt;/p>
-&lt;p>使用阿里云Codeup的原因是因为其LFS拥有比较大的免费空间，也可以使用其他平台，比如Github, GitLab或者云服务器+GitLab。&lt;/p>
-&lt;h2 id="1-下载git-和git-lfs">1. 下载Git 和Git LFS&lt;/h2>
-&lt;p>&lt;a href="https://git-scm.com/">https://git-scm.com/&lt;/a>&lt;/p>
-&lt;p>&lt;a href="https://git-lfs.com/">https://git-lfs.com/&lt;/a>&lt;/p>
-&lt;h2 id="2创建一个codeup代码库">2.创建一个Codeup代码库&lt;/h2>
-&lt;p>&lt;img alt="image-20250608175403555" loading="lazy" src="https://wstfdxfh.github.io/posts/unrealengine/unrealversioncontrol/image-20250608175403555.png">&lt;/p>
-&lt;h2 id="3在本地创建ssh的公钥和私钥将公钥上传到codeup可选">3.在本地创建SSH的公钥和私钥，将公钥上传到Codeup（可选）&lt;/h2>
-&lt;p>&lt;a href="https://help.aliyun.com/zh/yunxiao/user-guide/configure-ssh-key">https://help.aliyun.com/zh/yunxiao/user-guide/configure-ssh-key&lt;/a>&lt;/p>
-&lt;p>首先查看已经存在的SSH秘钥，在Git Bash或者Windows WSL中输入&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">cat ~/.ssh/id_ed25519.pub
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cat ~/.ssh/id_rsa.pub
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>查看是否有ed25519秘钥或者rsa秘钥，如果没有，就输入&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">ssh-keygen -t ed25519 -C &lt;span class="s2">&amp;#34;&amp;lt;注释内容&amp;gt;&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>或者&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">ssh-keygen -t rsa -C &lt;span class="s2">&amp;#34;&amp;lt;注释内容&amp;gt;&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>进行创建，注释内容可以是邮箱地址&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">Generating public/private ed25519 key pair.
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Enter file in which to save the key &lt;span class="o">(&lt;/span>/home/user/.ssh/id_ed25519&lt;span class="o">)&lt;/span>:
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>密钥默认生成路径：&lt;code>/home/user/.ssh/id_ed25519&lt;/code>，公钥与之对应为：&lt;code>/home/user/.ssh/id_ed25519.pub&lt;/code>&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">Enter passphrase &lt;span class="o">(&lt;/span>empty &lt;span class="k">for&lt;/span> no passphrase&lt;span class="o">)&lt;/span>:
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Enter same passphrase again:
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>秘钥口令默认为空&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cat ~/.ssh/id_ed25519.pub &lt;span class="p">|&lt;/span> clip
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>将秘钥复制到剪贴板，最后在codeup上的设置界面设置公钥。&lt;/p></description></item><item><title>UnrealOnline</title><link>https://wstfdxfh.github.io/posts/unrealengine/unrealonline/</link><pubDate>Mon, 19 May 2025 18:02:04 +0800</pubDate><guid>https://wstfdxfh.github.io/posts/unrealengine/unrealonline/</guid><description>&lt;h2 id="简介">简介&lt;/h2>
-&lt;p>相关课程：&lt;/p>
-&lt;p>&lt;a href="https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter/">https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter/&lt;/a>&lt;/p>
-&lt;p>这篇笔记简单介绍如何在UE5.5中建立一个在线链接，包含OnlineSubsystem的使用方法，自定义代理的建立等内容。&lt;/p>
-&lt;p>效果如下：&lt;/p>
-&lt;!-- raw HTML omitted -->
-&lt;p>在steam登录的情况下，在2台不同的主机上可以建立链接，在一个大厅中进行游玩（注意需要不同的账号，以及相同的地域）。&lt;/p>
-&lt;h2 id="配置文件设置">配置文件设置&lt;/h2>
-&lt;p>在&lt;code>DefaultEngine.ini&lt;/code>中，添加以下内容：&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-ini" data-lang="ini">&lt;span class="line">&lt;span class="cl">&lt;span class="k">[/Script/Engine.GameEngine]&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">+NetDriverDefinitions&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">(DefName=&amp;#34;GameNetDriver&amp;#34;,DriverClassName=&amp;#34;OnlineSubsystemSteam.SteamNetDriver&amp;#34;,DriverClassNameFallback=&amp;#34;OnlineSubsystemUtils.IpNetDriver&amp;#34;)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">[OnlineSubsystem]&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">DefaultPlatformService&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">Steam&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">[OnlineSubsystemSteam]&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">bEnabled&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">SteamDevAppId&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">480&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">bInitServerOnClient&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">[/Script/OnlineSubsystemSteam.SteamNetDriver]&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">NetConnectionClassName&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;OnlineSubsystemSteam.SteamNetConnection&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>480是一个公用的游戏id&lt;/p>
-&lt;p>在&lt;code>DefaultGame.ini&lt;/code>中添加&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-ini" data-lang="ini">&lt;span class="line">&lt;span class="cl">&lt;span class="k">[/Script/Engine.GameSession]&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="na">MaxPlayers&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">100&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>规定了最大玩家数量。&lt;/p>
-&lt;h2 id="插件创建">插件创建&lt;/h2>
-&lt;p>在编辑器的插件设置中可以创建相应的插件，并且在游戏中利用这些插件，以实现代码或者蓝图的复用。插件和游戏存在以下的单项依赖关系：&lt;/p>
-&lt;p>&lt;img alt="image-20250519182751415" loading="lazy" src="https://wstfdxfh.github.io/posts/unrealengine/unrealonline/image-20250519182751415.png">&lt;/p>
-&lt;p>例如，游戏模块可以依赖于游戏插件或者其他模块，但是插件不可依赖于游戏模块。&lt;/p>
-&lt;p>在创建插件时，选择&lt;code>Blank&lt;/code>模板，创建后在&lt;code>MultiplayerSessions.uplugin&lt;/code>中添加依赖：&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;span class="lnt">18
-&lt;/span>&lt;span class="lnt">19
-&lt;/span>&lt;span class="lnt">20
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="err">...&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Modules&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;MultiplayerSessions&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Type&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Runtime&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;LoadingPhase&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Default&amp;#34;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">],&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Plugins&amp;#34;&lt;/span>&lt;span class="p">:[&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;OnlineSubsystem&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Enabled&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;OnlineSubsystemSteam&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;Enabled&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="kc">true&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">]&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>&lt;code>MultiplayerSessions.Build.cs&lt;/code>&lt;/p></description></item><item><title>UnrealDebug</title><link>https://wstfdxfh.github.io/posts/unrealengine/unrealdebug/</link><pubDate>Tue, 13 May 2025 12:10:50 +0800</pubDate><guid>https://wstfdxfh.github.io/posts/unrealengine/unrealdebug/</guid><description>&lt;p>介绍UnrealEngine C++常用的调试方法&lt;/p>
-&lt;h2 id="ue_log">UE_LOG&lt;/h2>
-&lt;p>打印的格式如下：&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">UE_LOG(LogTemp, Warning, TEXT(&amp;#34;Grabber Constructed&amp;#34;));
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>如果使用&lt;code>FString&lt;/code>格式如下&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">FString Name = GetName();
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">UE_LOG(LogTemp, Warning, TEXT(&amp;#34;%s&amp;#34;), *Name);
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>在已经打包好的游戏中要看到log，可以在exe所在的位置开启命令行，输入&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">MenuSystem.exe -log
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>表示开启log同时运行游戏&lt;/p>
-&lt;h2 id="绘制调试射线球">绘制调试射线、球&lt;/h2>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;#34;Engine/World.h&amp;#34;&lt;/span>&lt;span class="cp">
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>引入该头文件获得UWorld&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;#34;DrawDebugHelpers.h&amp;#34;&lt;/span>&lt;span class="cp">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">DrawDebugLine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">GetWorld&lt;/span>&lt;span class="p">(),&lt;/span> &lt;span class="n">Start&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">End&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">FColor&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Red&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">DrawDebugSphere&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">GetWorld&lt;/span>&lt;span class="p">(),&lt;/span> &lt;span class="n">End&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">FColor&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Blue&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">false&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="绘制调试摄像机">绘制调试摄像机&lt;/h2>
-&lt;p>在枪械开火时，从玩家视点绘制调试摄像机图形&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;span class="lnt">6
-&lt;/span>&lt;span class="lnt">7
-&lt;/span>&lt;span class="lnt">8
-&lt;/span>&lt;span class="lnt">9
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="n">APawn&lt;/span>&lt;span class="o">*&lt;/span> &lt;span class="n">OwnerPawn&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">Cast&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">APawn&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">GetOwner&lt;/span>&lt;span class="p">());&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">OwnerPawn&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="k">nullptr&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">AController&lt;/span>&lt;span class="o">*&lt;/span> &lt;span class="n">OwnerController&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">OwnerPawn&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">GetController&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">OwnerController&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="k">nullptr&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">FVector&lt;/span> &lt;span class="n">Location&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">FRotator&lt;/span> &lt;span class="n">Rotation&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">OwnerController&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">GetPlayerViewPoint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Location&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Rotation&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">DrawDebugCamera&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">GetWorld&lt;/span>&lt;span class="p">(),&lt;/span> &lt;span class="n">Location&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Rotation&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">90&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">FColor&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Red&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">true&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="在屏幕上绘制调试信息">在屏幕上绘制调试信息&lt;/h2>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;span class="lnt">6
-&lt;/span>&lt;span class="lnt">7
-&lt;/span>&lt;span class="lnt">8
-&lt;/span>&lt;span class="lnt">9
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">GEngine&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">GEngine&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">AddOnScreenDebugMessage&lt;/span>&lt;span class="p">(&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">15.f&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">FColor&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Cyan&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">FString&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">TEXT&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Joining Match Type: %s&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">MatchType&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>-1表示这条调试信息不会被覆盖，15.f表示在屏幕持续时间为15秒，&lt;code>FColor::Cyan&lt;/code>表示调试信息的颜色，&lt;code>FString::Printf(TEXT(&amp;quot;Joining Match Type: %s&amp;quot;), *MatchType)&lt;/code>用于进行输出内容的格式化&lt;/p></description></item><item><title>OddTanks</title><link>https://wstfdxfh.github.io/posts/myworks/oddtanks/</link><pubDate>Mon, 28 Apr 2025 23:05:02 +0800</pubDate><guid>https://wstfdxfh.github.io/posts/myworks/oddtanks/</guid><description>&lt;h2 id="坦克大战">坦克大战&lt;/h2>
-&lt;p>基于UE5的坦克射击游戏，来自教程 udemy.com/course/unrealcourse/&lt;/p>
-&lt;p>下载 &lt;a href="https://github.com/wstfdxfh/Oddtanks">https://github.com/wstfdxfh/Oddtanks&lt;/a>&lt;/p>
-&lt;p>和原教程中最终成品的主要区别在于：&lt;/p>
-&lt;ul>
-&lt;li>炮塔转动或者坦克移动时，发射的炮弹会发生随机偏差，更难瞄准敌人&lt;/li>
-&lt;li>使用一个射灯照出我方坦克的可能落弹点&lt;/li>
-&lt;/ul>
-&lt;p>&lt;img alt="image-20250428230817419" loading="lazy" src="https://wstfdxfh.github.io/posts/myworks/oddtanks/image-20250428230817419.png">&lt;/p>
-&lt;p>其中，炮弹散射的实现方法如下：&lt;/p>
-&lt;p>首先，在BasePawn.h中加入相关变量：&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 记录最大偏移角度
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="n">UPROPERTY&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">EditAnywhere&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Category&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;Combat&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">float&lt;/span> &lt;span class="n">MaxSpreadAngle&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mf">5.f&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 当前实时最大偏转角度（度数），由 Tick 更新
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="n">UPROPERTY&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">VisibleAnywhere&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Category&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;Combat&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">float&lt;/span> &lt;span class="n">CurrentMaxSpread&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mf">0.f&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">FTransform&lt;/span> &lt;span class="n">LastTransform&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">bool&lt;/span> &lt;span class="n">IsMoving&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">false&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>随后在&lt;code>BasePawn&lt;/code>的Tick函数中，检测有没有发生移动&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;span class="lnt">18
-&lt;/span>&lt;span class="lnt">19
-&lt;/span>&lt;span class="lnt">20
-&lt;/span>&lt;span class="lnt">21
-&lt;/span>&lt;span class="lnt">22
-&lt;/span>&lt;span class="lnt">23
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="n">ABasePawn&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Tick&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">float&lt;/span> &lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Super&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Tick&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 判断当前炮塔或者本体是否在移动或者转动
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">FTransform&lt;/span> &lt;span class="n">TurretMeshTransform&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">TurretMesh&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">GetComponentTransform&lt;/span>&lt;span class="p">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">IsMoving&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="o">!&lt;/span>&lt;span class="n">TurretMeshTransform&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetRotation&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">Equals&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">LastTransform&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetRotation&lt;/span>&lt;span class="p">(),&lt;/span> &lt;span class="mf">0.2&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">||&lt;/span> &lt;span class="o">!&lt;/span>&lt;span class="n">TurretMeshTransform&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetLocation&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">Equals&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">LastTransform&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetLocation&lt;/span>&lt;span class="p">(),&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">LastTransform&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">TurretMeshTransform&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">IsMoving&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">CurrentMaxSpread&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FMath&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">FInterpTo&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">CurrentMaxSpread&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">MaxSpreadAngle&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">CurrentMaxSpread&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FMath&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">FInterpTo&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">CurrentMaxSpread&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Cast&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">ATank&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">))&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UE_LOG&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">LogTemp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Display&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">TEXT&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;CurrentMaxSpread: %f&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">CurrentMaxSpread&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>这里Equals函数就是指出两个变量是否小到了一定的误差，第二个参数就是相应的误差，这里不使用&lt;code>==&lt;/code>运算符的原因是，因为采用了插值处理炮塔的旋转，所以在鼠标不移动后的很长时间内，炮塔都不会完全停止转动。&lt;/p></description></item><item><title>Unreal Course Notes</title><link>https://wstfdxfh.github.io/posts/unrealengine/unrealcoursenotes/</link><pubDate>Sun, 06 Apr 2025 19:45:39 +0800</pubDate><guid>https://wstfdxfh.github.io/posts/unrealengine/unrealcoursenotes/</guid><description>&lt;p>&lt;a href="">udemy.com/course/unrealcourse/&lt;/a> 以及部分&lt;a href="">https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter/&lt;/a>的课程笔记&lt;/p>
-&lt;h2 id="常见技巧">常见技巧&lt;/h2>
-&lt;h3 id="防止速度过快导致的平台位置偏移">防止速度过快导致的平台位置偏移&lt;/h3>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="n">AMovingPlatform&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Tick&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">float&lt;/span> &lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">){&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Super&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Tick&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">FVector&lt;/span> &lt;span class="n">CurrentLocation&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">GetActorLocation&lt;/span>&lt;span class="p">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">CurrentLocation&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">CurrentLocation&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">PlatformVelocity&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">SetActorLocation&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">CurrentLocation&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">float&lt;/span> &lt;span class="n">DistanceMoved&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FVector&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Dist&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">StartLocation&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">CurrentLocation&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">DistanceMoved&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">MoveDistance&lt;/span>&lt;span class="p">){&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 获得速度的单位向量
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">FVector&lt;/span> &lt;span class="n">MoveDirection&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">PlatformVelocty&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetSafeNormal&lt;/span>&lt;span class="p">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">StartLocation&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">StartLocation&lt;/span>&lt;span class="o">+&lt;/span> &lt;span class="n">MoveDirection&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">MoveDistance&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">SetActorLocation&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">StartLocation&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PlatformVelocty&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">PlatformVelocty&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="解决被方块撞击时人物视角异常的问题">解决被方块撞击时人物视角异常的问题&lt;/h3>
-&lt;p>这是因为只有角色默认只有在移动时才会检查碰撞&lt;/p>
-&lt;p>解决方法：使用蓝图中的&lt;code>MoveUpdatedComponent&lt;/code>，在每一帧都移动一个小距离再反向移动&lt;/p>
-&lt;p>可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。&lt;/p>
-&lt;h3 id="背对光源时场景过暗的问题">背对光源时场景过暗的问题&lt;/h3>
-&lt;p>在场景中加入&lt;code>PostProcessVolume&lt;/code>，在&lt;code>Lens-Exposure-Metering Mode&lt;/code>中，将选项改为&lt;code>Auto Exposure Basic&lt;/code>，然后修改&lt;code>Brush&lt;/code>中的x,y,z，令其覆盖整个场景。&lt;/p>
-&lt;h2 id="不同的灯光类型">不同的灯光类型&lt;/h2>
-&lt;table>
-&lt;thead>
-&lt;tr>
-&lt;th>名称&lt;/th>
-&lt;th style="text-align: left">解释&lt;/th>
-&lt;/tr>
-&lt;/thead>
-&lt;tbody>
-&lt;tr>
-&lt;td>Point Light&lt;/td>
-&lt;td style="text-align: left">从一个点向外发射的光源&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Spot Light&lt;/td>
-&lt;td style="text-align: left">聚光灯，有方向性地发出光线&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Rect Light&lt;/td>
-&lt;td style="text-align: left">方形的有方向性光源&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Directional Light&lt;/td>
-&lt;td style="text-align: left">太阳光（只有方向，没有位置的光）&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Sky Light&lt;/td>
-&lt;td style="text-align: left">将远处的场景作为光源&lt;/td>
-&lt;/tr>
-&lt;/tbody>
-&lt;/table>
-&lt;h2 id="将scenecomponent添加到角色后角色旋转和组件旋转的差异">将SceneComponent添加到角色后，角色旋转和组件旋转的差异&lt;/h2>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="n">UGrabber&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">TickComponent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">float&lt;/span> &lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ELevelTick&lt;/span> &lt;span class="n">TickType&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">FActorComponentTickFunction&lt;/span>&lt;span class="o">*&lt;/span> &lt;span class="n">ThisTickFunction&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Super&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">TickComponent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">TickType&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ThisTickFunction&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">auto&lt;/span> &lt;span class="n">Rotator&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">GetOwner&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">GetActorRotation&lt;/span>&lt;span class="p">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">auto&lt;/span> &lt;span class="n">MyRotation&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">GetComponentRotation&lt;/span>&lt;span class="p">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">auto&lt;/span> &lt;span class="n">RotatorString&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">Rotator&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ToCompactString&lt;/span>&lt;span class="p">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">auto&lt;/span> &lt;span class="n">MyRotationString&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">MyRotation&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ToCompactString&lt;/span>&lt;span class="p">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// LogTemp: Display: Owner Rotation: R(Y=-107.75), Component Rotation: R(P=-4.78, Y=-107.75)
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// 可以注意到，使用Owner Rotation得到的只有Yaw方向的旋转，而Component Rotation包含Pitch和Yaw旋转
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">UE_LOG&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">LogTemp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Display&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">TEXT&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Owner Rotation: %s, Component Rotation: %s&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">RotatorString&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">MyRotationString&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>&lt;strong>其中，Pitch是俯仰角，Yaw是偏航角，除此之外还有一个滚转角Roll。&lt;/strong>&lt;/p></description></item><item><title>CGAlgos</title><link>https://wstfdxfh.github.io/posts/cheetsheets/cgalgos/</link><pubDate>Sun, 23 Mar 2025 21:11:21 +0800</pubDate><guid>https://wstfdxfh.github.io/posts/cheetsheets/cgalgos/</guid><description>&lt;p>这篇文章介绍了几种常见的和游戏开发、计算机图形学密切相关的算法题&lt;/p>
-&lt;h3 id="一个点是否在三角形内部">一个点是否在三角形内部&lt;/h3>
-&lt;ul>
-&lt;li>可以使用叉乘的方法判断一个点是否在三角形内部。当三角形中所有边的对点和点P都位于该边的一侧时，就说明P在三角形内部，而判断是否位于一侧可以使用叉乘的符号是否相等来判断。&lt;/li>
-&lt;/ul>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;span class="lnt">18
-&lt;/span>&lt;span class="lnt">19
-&lt;/span>&lt;span class="lnt">20
-&lt;/span>&lt;span class="lnt">21
-&lt;/span>&lt;span class="lnt">22
-&lt;/span>&lt;span class="lnt">23
-&lt;/span>&lt;span class="lnt">24
-&lt;/span>&lt;span class="lnt">25
-&lt;/span>&lt;span class="lnt">26
-&lt;/span>&lt;span class="lnt">27
-&lt;/span>&lt;span class="lnt">28
-&lt;/span>&lt;span class="lnt">29
-&lt;/span>&lt;span class="lnt">30
-&lt;/span>&lt;span class="lnt">31
-&lt;/span>&lt;span class="lnt">32
-&lt;/span>&lt;span class="lnt">33
-&lt;/span>&lt;span class="lnt">34
-&lt;/span>&lt;span class="lnt">35
-&lt;/span>&lt;span class="lnt">36
-&lt;/span>&lt;span class="lnt">37
-&lt;/span>&lt;span class="lnt">38
-&lt;/span>&lt;span class="lnt">39
-&lt;/span>&lt;span class="lnt">40
-&lt;/span>&lt;span class="lnt">41
-&lt;/span>&lt;span class="lnt">42
-&lt;/span>&lt;span class="lnt">43
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;iostream&amp;gt;&lt;/span>&lt;span class="cp">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">struct&lt;/span> &lt;span class="nc">Point&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">double&lt;/span> &lt;span class="n">x&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">y&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 向量叉积：计算向量a × 向量b的值
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kt">double&lt;/span> &lt;span class="nf">crossProduct&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">const&lt;/span> &lt;span class="n">Point&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">const&lt;/span> &lt;span class="n">Point&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">x&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 检查点p1和p2是否在边a-b的同一侧（包含边上的点）
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kt">bool&lt;/span> &lt;span class="nf">isSameSide&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">const&lt;/span> &lt;span class="n">Point&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">p1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">const&lt;/span> &lt;span class="n">Point&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">p2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">const&lt;/span> &lt;span class="n">Point&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="n">Point&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Point&lt;/span> &lt;span class="n">ab&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="n">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">x&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">y&lt;/span>&lt;span class="p">};&lt;/span> &lt;span class="c1">// 边a→b的向量
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">Point&lt;/span> &lt;span class="n">ap1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="n">p1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">x&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">p1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">y&lt;/span>&lt;span class="p">};&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Point&lt;/span> &lt;span class="n">ap2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="n">p2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">x&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">p2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">y&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">y&lt;/span>&lt;span class="p">};&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">double&lt;/span> &lt;span class="n">cp1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">crossProduct&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ab&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ap1&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// 计算叉积AB × AP1
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kt">double&lt;/span> &lt;span class="n">cp2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">crossProduct&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ab&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ap2&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// 计算叉积AB × AP2
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">cp1&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">cp2&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 符号相同或其中一个为0（点在线段上）
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 判断点P是否在三角形ABC内
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kt">bool&lt;/span> &lt;span class="nf">isInsideTriangle&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">const&lt;/span> &lt;span class="n">Point&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">const&lt;/span> &lt;span class="n">Point&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">B&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">const&lt;/span> &lt;span class="n">Point&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">,&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="n">Point&lt;/span>&lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">P&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">isSameSide&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">P&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">B&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="c1">// P和C在AB同侧
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">isSameSide&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">P&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">B&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="c1">// P和A在BC同侧
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">isSameSide&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">P&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">B&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">A&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// P和B在CA同侧
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Point&lt;/span> &lt;span class="n">A&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Point&lt;/span> &lt;span class="n">B&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Point&lt;/span> &lt;span class="n">C&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mf">1.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">2.5&lt;/span>&lt;span class="p">};&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Point&lt;/span> &lt;span class="n">P&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mf">1.5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">};&lt;/span> &lt;span class="c1">// 待检测点
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">isInsideTriangle&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">A&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">B&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">C&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">P&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">std&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">cout&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="s">&amp;#34;点P在三角形内部&amp;#34;&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="n">std&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">endl&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">std&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">cout&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="s">&amp;#34;点P在三角形外部&amp;#34;&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="n">std&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">endl&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="欧拉路径">欧拉路径&lt;/h3>
-&lt;ol>
-&lt;li>问题本质&lt;/li>
-&lt;/ol>
-&lt;p>题目要求“是否存在一条路径恰好经过所有有向边一次”，其实就是&lt;strong>有向欧拉路径 (Eulerian Path) / 欧拉回路 (Eulerian Circuit)&lt;/strong> 的判定与构造问题。&lt;/p></description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>李睿杰的博客</title>
+    <link>https://wstfdxfh.github.io/</link>
+    <description>Recent content on 李睿杰的博客</description>
+    <generator>Hugo -- 0.145.0</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 24 Dec 2025 13:27:30 +0800</lastBuildDate>
+    <atom:link href="https://wstfdxfh.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>RealtimeRendering</title>
+      <link>https://wstfdxfh.github.io/posts/cheetsheets/realtimerendering/</link>
+      <pubDate>Wed, 24 Dec 2025 13:27:30 +0800</pubDate>
+      <guid>https://wstfdxfh.github.io/posts/cheetsheets/realtimerendering/</guid>
+      <description>&lt;p&gt;本文简要介绍实时渲染的基础数学知识，渲染管线，以及面试常见问题&lt;/p&gt;
+&lt;h2 id=&#34;数学基础&#34;&gt;数学基础&lt;/h2&gt;
+&lt;h3 id=&#34;坐标表示&#34;&gt;坐标表示&lt;/h3&gt;
+&lt;p&gt;在三维计算机图形学中，我们通常使用**齐次坐标（Homogeneous Coordinates）**来表示点和向量。&lt;/p&gt;
+&lt;p&gt;三维空间点变换时为什么需要齐次坐标？&lt;/p&gt;
+&lt;p&gt;这主要是为了解决“平移”运算的线性化问题。在普通的三维笛卡尔坐标系中，旋转和缩放可以通过 $3 \times 3$ 矩阵与向量相乘（线性变换）来实现，但平移仅仅是向量的加法，无法合并进同一个 $3 \times 3$ 矩阵乘法中。&lt;/p&gt;
+&lt;p&gt;通过引入第四个分量 $w$，将三维向量 $(x, y, z)$ 扩展为四维向量 $(x, y, z, w)$，我们就能够将平移、旋转和缩放全部统一到一个 $4 \times 4$ 的矩阵乘法运算中。对于点，通常设置 $w=1$，表示位置；对于方向向量，设置 $w=0$，意味着它不受平移影响（因为方向只有朝向和大小，没有具体位置）。这种统一性使得图形硬件（GPU）能够用一套通用的逻辑快速处理所有类型的变换。&lt;/p&gt;
+&lt;h3 id=&#34;物体变换矩阵&#34;&gt;物体变换矩阵&lt;/h3&gt;
+&lt;p&gt;物体变换通常涉及三个基础操作：平移（Translation）、旋转（Rotation）和缩放（Scale）。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;平移、缩放、旋转物体变换矩阵分别是？&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;平移矩阵&lt;/strong&gt;：基于齐次坐标，我们将平移量 $(t_x, t_y, t_z)$ 放在矩阵的最后一列。
+$$
+T = \begin{bmatrix} 1 &amp;amp; 0 &amp;amp; 0 &amp;amp; t_x \ 0 &amp;amp; 1 &amp;amp; 0 &amp;amp; t_y \ 0 &amp;amp; 0 &amp;amp; 1 &amp;amp; t_z \ 0 &amp;amp; 0 &amp;amp; 0 &amp;amp; 1 \end{bmatrix}
+$$&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>MultiPlayerDemo</title>
+      <link>https://wstfdxfh.github.io/posts/myworks/multiplayerdemo/</link>
+      <pubDate>Wed, 16 Jul 2025 14:31:30 +0800</pubDate>
+      <guid>https://wstfdxfh.github.io/posts/myworks/multiplayerdemo/</guid>
+      <description>&lt;p&gt;一款多人设计游戏的Demo，使用UnrealOnlineSubSystemSteam实现互联网双人联机&lt;/p&gt;
+&lt;p&gt;游戏包含开始界面，等待大厅和正式游戏关卡，在关卡开始之前，玩家可以飞行浏览地图&lt;/p&gt;
+&lt;p&gt;游戏开始后，玩家可以拾取地图上的武器，包括步枪和火箭筒，进行对抗&lt;/p&gt;
+&lt;p&gt;HUD上记录了击杀数和被击败的次数，通过人头数量决定最后的胜者。&lt;/p&gt;
+&lt;p&gt;相关内容参考 &lt;a href=&#34;https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter&#34;&gt;相关课程&lt;/a&gt;，UE5.5进行开发。相关开发笔记可以参见&lt;a href=&#34;./posts/UnrealEngine/UnrealOnline/&#34;&gt;Unreal网络多人开发&lt;/a&gt;和&lt;a href=&#34;./posts/UnrealEngine/UnrealVersionControl/&#34;&gt;Unreal版本控制&lt;/a&gt;等&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/wstfdxfh/UnealOnlineDemo/releases/tag/v1.0.0&#34;&gt;下载链接&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt;，游玩时，需要两台不同的电脑主机，各自登录不同的Steam账号；&lt;/p&gt;
+&lt;p&gt;点击开始界面的Host主持游戏作为Listen Server，另一台点击加入后作为Client&lt;/p&gt;
+&lt;p&gt;因为使用Steam的公用ID，在高峰期可能会出现连接缓慢或者无法加入的问题。&lt;/p&gt;
+&lt;p&gt;附多人游戏截图：&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;h2 id=&#34;改进笔记&#34;&gt;改进笔记&lt;/h2&gt;
+&lt;p&gt;以下将改进的部分内容列在下方：&lt;/p&gt;
+&lt;p&gt;源代码中，使用一个自定义的RocketMovementComponent解决火箭弹会在接触自己的时候爆炸的问题，而改进后只需要使用&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;AProjectile&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;BeginPlay&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;Super&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;BeginPlay&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Tracer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;       &lt;span class=&#34;n&#34;&gt;TracerComponent&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;UGameplayStatics&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;SpawnEmitterAttached&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Tracer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;CollisionBox&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;NAME_None&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;GetActorLocation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;GetActorRotation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(),&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                                                                &lt;span class=&#34;n&#34;&gt;EAttachLocation&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;KeepWorldPosition&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;HasAuthority&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;())&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;       &lt;span class=&#34;n&#34;&gt;CollisionBox&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;OnComponentHit&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;AddDynamic&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;AProjectile&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;OnHit&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;       &lt;span class=&#34;n&#34;&gt;CollisionBox&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;IgnoreActorWhenMoving&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Owner&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;通过添加&lt;code&gt;CollisionBox-&amp;gt;IgnoreActorWhenMoving(Owner, true);&lt;/code&gt;实现&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>UnrealVersionControl</title>
+      <link>https://wstfdxfh.github.io/posts/unrealengine/unrealversioncontrol/</link>
+      <pubDate>Sun, 08 Jun 2025 17:33:36 +0800</pubDate>
+      <guid>https://wstfdxfh.github.io/posts/unrealengine/unrealversioncontrol/</guid>
+      <description>&lt;h2 id=&#34;unreal版本管理&#34;&gt;Unreal版本管理&lt;/h2&gt;
+&lt;p&gt;本文简单介绍如何通过Git LFS+阿里云Codeup进行Unreal项目内容的版本管理&lt;/p&gt;
+&lt;p&gt;使用阿里云Codeup的原因是因为其LFS拥有比较大的免费空间，也可以使用其他平台，比如Github, GitLab或者云服务器+GitLab。&lt;/p&gt;
+&lt;h2 id=&#34;1-下载git-和git-lfs&#34;&gt;1. 下载Git 和Git LFS&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://git-scm.com/&#34;&gt;https://git-scm.com/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://git-lfs.com/&#34;&gt;https://git-lfs.com/&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;2创建一个codeup代码库&#34;&gt;2.创建一个Codeup代码库&lt;/h2&gt;
+&lt;p&gt;&lt;img alt=&#34;image-20250608175403555&#34; loading=&#34;lazy&#34; src=&#34;./posts/unrealengine/unrealversioncontrol/image-20250608175403555.png&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;3在本地创建ssh的公钥和私钥将公钥上传到codeup可选&#34;&gt;3.在本地创建SSH的公钥和私钥，将公钥上传到Codeup（可选）&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://help.aliyun.com/zh/yunxiao/user-guide/configure-ssh-key&#34;&gt;https://help.aliyun.com/zh/yunxiao/user-guide/configure-ssh-key&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;首先查看已经存在的SSH秘钥，在Git Bash或者Windows WSL中输入&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;cat ~/.ssh/id_ed25519.pub
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;cat ~/.ssh/id_rsa.pub
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;查看是否有ed25519秘钥或者rsa秘钥，如果没有，就输入&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ssh-keygen -t ed25519 -C &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;lt;注释内容&amp;gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;或者&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ssh-keygen -t rsa -C &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;lt;注释内容&amp;gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;进行创建，注释内容可以是邮箱地址&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Generating public/private ed25519 key pair.
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Enter file in which to save the key &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;/home/user/.ssh/id_ed25519&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;密钥默认生成路径：&lt;code&gt;/home/user/.ssh/id_ed25519&lt;/code&gt;，公钥与之对应为：&lt;code&gt;/home/user/.ssh/id_ed25519.pub&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Enter passphrase &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;empty &lt;span class=&#34;k&#34;&gt;for&lt;/span&gt; no passphrase&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Enter same passphrase again:
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;秘钥口令默认为空&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;cat ~/.ssh/id_ed25519.pub &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; clip
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;将秘钥复制到剪贴板，最后在codeup上的设置界面设置公钥。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>UnrealOnline</title>
+      <link>https://wstfdxfh.github.io/posts/unrealengine/unrealonline/</link>
+      <pubDate>Mon, 19 May 2025 18:02:04 +0800</pubDate>
+      <guid>https://wstfdxfh.github.io/posts/unrealengine/unrealonline/</guid>
+      <description>&lt;h2 id=&#34;简介&#34;&gt;简介&lt;/h2&gt;
+&lt;p&gt;相关课程：&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter/&#34;&gt;https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;这篇笔记简单介绍如何在UE5.5中建立一个在线链接，包含OnlineSubsystem的使用方法，自定义代理的建立等内容。&lt;/p&gt;
+&lt;p&gt;效果如下：&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;p&gt;在steam登录的情况下，在2台不同的主机上可以建立链接，在一个大厅中进行游玩（注意需要不同的账号，以及相同的地域）。&lt;/p&gt;
+&lt;h2 id=&#34;配置文件设置&#34;&gt;配置文件设置&lt;/h2&gt;
+&lt;p&gt;在&lt;code&gt;DefaultEngine.ini&lt;/code&gt;中，添加以下内容：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-ini&#34; data-lang=&#34;ini&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;[/Script/Engine.GameEngine]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;+NetDriverDefinitions&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;(DefName=&amp;#34;GameNetDriver&amp;#34;,DriverClassName=&amp;#34;OnlineSubsystemSteam.SteamNetDriver&amp;#34;,DriverClassNameFallback=&amp;#34;OnlineSubsystemUtils.IpNetDriver&amp;#34;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;[OnlineSubsystem]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;DefaultPlatformService&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;Steam&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;[OnlineSubsystemSteam]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;bEnabled&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;SteamDevAppId&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;480&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;bInitServerOnClient&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;[/Script/OnlineSubsystemSteam.SteamNetDriver]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;NetConnectionClassName&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;OnlineSubsystemSteam.SteamNetConnection&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;480是一个公用的游戏id&lt;/p&gt;
+&lt;p&gt;在&lt;code&gt;DefaultGame.ini&lt;/code&gt;中添加&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-ini&#34; data-lang=&#34;ini&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;[/Script/Engine.GameSession]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;MaxPlayers&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;100&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;规定了最大玩家数量。&lt;/p&gt;
+&lt;h2 id=&#34;插件创建&#34;&gt;插件创建&lt;/h2&gt;
+&lt;p&gt;在编辑器的插件设置中可以创建相应的插件，并且在游戏中利用这些插件，以实现代码或者蓝图的复用。插件和游戏存在以下的单项依赖关系：&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;image-20250519182751415&#34; loading=&#34;lazy&#34; src=&#34;./posts/unrealengine/unrealonline/image-20250519182751415.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;例如，游戏模块可以依赖于游戏插件或者其他模块，但是插件不可依赖于游戏模块。&lt;/p&gt;
+&lt;p&gt;在创建插件时，选择&lt;code&gt;Blank&lt;/code&gt;模板，创建后在&lt;code&gt;MultiplayerSessions.uplugin&lt;/code&gt;中添加依赖：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;err&#34;&gt;...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	&lt;span class=&#34;nt&#34;&gt;&amp;#34;Modules&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;		&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;			&lt;span class=&#34;nt&#34;&gt;&amp;#34;Name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;MultiplayerSessions&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;			&lt;span class=&#34;nt&#34;&gt;&amp;#34;Type&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;Runtime&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;			&lt;span class=&#34;nt&#34;&gt;&amp;#34;LoadingPhase&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;Default&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;		&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	&lt;span class=&#34;nt&#34;&gt;&amp;#34;Plugins&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;		&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;			&lt;span class=&#34;nt&#34;&gt;&amp;#34;Name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;OnlineSubsystem&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;			&lt;span class=&#34;nt&#34;&gt;&amp;#34;Enabled&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;		&lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;		&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;			&lt;span class=&#34;nt&#34;&gt;&amp;#34;Name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;OnlineSubsystemSteam&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;			&lt;span class=&#34;nt&#34;&gt;&amp;#34;Enabled&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;		&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;MultiplayerSessions.Build.cs&lt;/code&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>UnrealDebug</title>
+      <link>https://wstfdxfh.github.io/posts/unrealengine/unrealdebug/</link>
+      <pubDate>Tue, 13 May 2025 12:10:50 +0800</pubDate>
+      <guid>https://wstfdxfh.github.io/posts/unrealengine/unrealdebug/</guid>
+      <description>&lt;p&gt;介绍UnrealEngine C++常用的调试方法&lt;/p&gt;
+&lt;h2 id=&#34;ue_log&#34;&gt;UE_LOG&lt;/h2&gt;
+&lt;p&gt;打印的格式如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;UE_LOG(LogTemp, Warning, TEXT(&amp;#34;Grabber Constructed&amp;#34;));
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;如果使用&lt;code&gt;FString&lt;/code&gt;格式如下&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;FString Name = GetName();
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;UE_LOG(LogTemp, Warning, TEXT(&amp;#34;%s&amp;#34;), *Name);
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;在已经打包好的游戏中要看到log，可以在exe所在的位置开启命令行，输入&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;MenuSystem.exe -log
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;表示开启log同时运行游戏&lt;/p&gt;
+&lt;h2 id=&#34;绘制调试射线球&#34;&gt;绘制调试射线、球&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;#34;Engine/World.h&amp;#34;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;引入该头文件获得UWorld&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;#34;DrawDebugHelpers.h&amp;#34;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;DrawDebugLine&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetWorld&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Start&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;End&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;FColor&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Red&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;DrawDebugSphere&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetWorld&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;End&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;FColor&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Blue&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;绘制调试摄像机&#34;&gt;绘制调试摄像机&lt;/h2&gt;
+&lt;p&gt;在枪械开火时，从玩家视点绘制调试摄像机图形&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;APawn&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;OwnerPawn&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Cast&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;APawn&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetOwner&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;());&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;OwnerPawn&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;nullptr&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;AController&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;OwnerController&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;OwnerPawn&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetController&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;OwnerController&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;nullptr&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;FVector&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Location&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;FRotator&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Rotation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;OwnerController&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetPlayerViewPoint&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Location&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Rotation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;DrawDebugCamera&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetWorld&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Location&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Rotation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;90&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;FColor&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Red&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;在屏幕上绘制调试信息&#34;&gt;在屏幕上绘制调试信息&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GEngine&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;GEngine&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;AddOnScreenDebugMessage&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;mf&#34;&gt;15.f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;FColor&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Cyan&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;FString&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Printf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;TEXT&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Joining Match Type: %s&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;MatchType&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;-1表示这条调试信息不会被覆盖，15.f表示在屏幕持续时间为15秒，&lt;code&gt;FColor::Cyan&lt;/code&gt;表示调试信息的颜色，&lt;code&gt;FString::Printf(TEXT(&amp;quot;Joining Match Type: %s&amp;quot;), *MatchType)&lt;/code&gt;用于进行输出内容的格式化&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>OddTanks</title>
+      <link>https://wstfdxfh.github.io/posts/myworks/oddtanks/</link>
+      <pubDate>Mon, 28 Apr 2025 23:05:02 +0800</pubDate>
+      <guid>https://wstfdxfh.github.io/posts/myworks/oddtanks/</guid>
+      <description>&lt;h2 id=&#34;坦克大战&#34;&gt;坦克大战&lt;/h2&gt;
+&lt;p&gt;基于UE5的坦克射击游戏，来自教程 udemy.com/course/unrealcourse/&lt;/p&gt;
+&lt;p&gt;下载 &lt;a href=&#34;https://github.com/wstfdxfh/Oddtanks&#34;&gt;https://github.com/wstfdxfh/Oddtanks&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;和原教程中最终成品的主要区别在于：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;炮塔转动或者坦克移动时，发射的炮弹会发生随机偏差，更难瞄准敌人&lt;/li&gt;
+&lt;li&gt;使用一个射灯照出我方坦克的可能落弹点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img alt=&#34;image-20250428230817419&#34; loading=&#34;lazy&#34; src=&#34;./posts/myworks/oddtanks/image-20250428230817419.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;其中，炮弹散射的实现方法如下：&lt;/p&gt;
+&lt;p&gt;首先，在BasePawn.h中加入相关变量：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// 记录最大偏移角度
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;UPROPERTY&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;EditAnywhere&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Category&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Combat&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;MaxSpreadAngle&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;5.f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// 当前实时最大偏转角度（度数），由 Tick 更新 
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;UPROPERTY&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;VisibleAnywhere&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Category&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Combat&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;CurrentMaxSpread&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;FTransform&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;LastTransform&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;bool&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;IsMoving&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;随后在&lt;code&gt;BasePawn&lt;/code&gt;的Tick函数中，检测有没有发生移动&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ABasePawn&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Tick&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;Super&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Tick&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;c1&#34;&gt;// 判断当前炮塔或者本体是否在移动或者转动
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;n&#34;&gt;FTransform&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;TurretMeshTransform&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;TurretMesh&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetComponentTransform&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;IsMoving&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;TurretMeshTransform&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetRotation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;().&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Equals&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;LastTransform&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetRotation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(),&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.2&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;TurretMeshTransform&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetLocation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;().&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Equals&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;LastTransform&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetLocation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(),&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;LastTransform&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;TurretMeshTransform&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;IsMoving&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;       &lt;span class=&#34;n&#34;&gt;CurrentMaxSpread&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;FMath&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;FInterpTo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;CurrentMaxSpread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;MaxSpreadAngle&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;       &lt;span class=&#34;n&#34;&gt;CurrentMaxSpread&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;FMath&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;FInterpTo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;CurrentMaxSpread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Cast&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ATank&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;       &lt;span class=&#34;n&#34;&gt;UE_LOG&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;LogTemp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Display&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;TEXT&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;CurrentMaxSpread: %f&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;CurrentMaxSpread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;这里Equals函数就是指出两个变量是否小到了一定的误差，第二个参数就是相应的误差，这里不使用&lt;code&gt;==&lt;/code&gt;运算符的原因是，因为采用了插值处理炮塔的旋转，所以在鼠标不移动后的很长时间内，炮塔都不会完全停止转动。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Unreal Course Notes</title>
+      <link>https://wstfdxfh.github.io/posts/unrealengine/unrealcoursenotes/</link>
+      <pubDate>Sun, 06 Apr 2025 19:45:39 +0800</pubDate>
+      <guid>https://wstfdxfh.github.io/posts/unrealengine/unrealcoursenotes/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;&#34;&gt;udemy.com/course/unrealcourse/&lt;/a&gt; 以及部分&lt;a href=&#34;&#34;&gt;https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter/&lt;/a&gt;的课程笔记&lt;/p&gt;
+&lt;h2 id=&#34;常见技巧&#34;&gt;常见技巧&lt;/h2&gt;
+&lt;h3 id=&#34;防止速度过快导致的平台位置偏移&#34;&gt;防止速度过快导致的平台位置偏移&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c++&#34; data-lang=&#34;c++&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;AMovingPlatform&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Tick&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	&lt;span class=&#34;n&#34;&gt;Super&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Tick&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;FVector&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;CurrentLocation&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;GetActorLocation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;CurrentLocation&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;CurrentLocation&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;PlatformVelocity&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;SetActorLocation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;CurrentLocation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;DistanceMoved&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;FVector&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Dist&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;StartLocation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;CurrentLocation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;DistanceMoved&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;MoveDistance&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;c1&#34;&gt;// 获得速度的单位向量
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;        &lt;span class=&#34;n&#34;&gt;FVector&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;MoveDirection&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;PlatformVelocty&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetSafeNormal&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;StartLocation&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;StartLocation&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;MoveDirection&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;MoveDistance&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;SetActorLocation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;StartLocation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;n&#34;&gt;PlatformVelocty&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;PlatformVelocty&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;解决被方块撞击时人物视角异常的问题&#34;&gt;解决被方块撞击时人物视角异常的问题&lt;/h3&gt;
+&lt;p&gt;这是因为只有角色默认只有在移动时才会检查碰撞&lt;/p&gt;
+&lt;p&gt;解决方法：使用蓝图中的&lt;code&gt;MoveUpdatedComponent&lt;/code&gt;，在每一帧都移动一个小距离再反向移动&lt;/p&gt;
+&lt;p&gt;可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。&lt;/p&gt;
+&lt;h3 id=&#34;背对光源时场景过暗的问题&#34;&gt;背对光源时场景过暗的问题&lt;/h3&gt;
+&lt;p&gt;在场景中加入&lt;code&gt;PostProcessVolume&lt;/code&gt;，在&lt;code&gt;Lens-Exposure-Metering Mode&lt;/code&gt;中，将选项改为&lt;code&gt;Auto Exposure Basic&lt;/code&gt;，然后修改&lt;code&gt;Brush&lt;/code&gt;中的x,y,z，令其覆盖整个场景。&lt;/p&gt;
+&lt;h2 id=&#34;不同的灯光类型&#34;&gt;不同的灯光类型&lt;/h2&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;名称&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;解释&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Point Light&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;从一个点向外发射的光源&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Spot Light&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;聚光灯，有方向性地发出光线&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Rect Light&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;方形的有方向性光源&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Directional Light&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;太阳光（只有方向，没有位置的光）&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Sky Light&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;将远处的场景作为光源&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;将scenecomponent添加到角色后角色旋转和组件旋转的差异&#34;&gt;将SceneComponent添加到角色后，角色旋转和组件旋转的差异&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c++&#34; data-lang=&#34;c++&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;UGrabber&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;TickComponent&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ELevelTick&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;TickType&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;FActorComponentTickFunction&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThisTickFunction&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	&lt;span class=&#34;n&#34;&gt;Super&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;TickComponent&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;TickType&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ThisTickFunction&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	&lt;span class=&#34;k&#34;&gt;auto&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Rotator&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;GetOwner&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetActorRotation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	&lt;span class=&#34;k&#34;&gt;auto&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;MyRotation&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;GetComponentRotation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	&lt;span class=&#34;k&#34;&gt;auto&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;RotatorString&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Rotator&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ToCompactString&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	&lt;span class=&#34;k&#34;&gt;auto&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;MyRotationString&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;MyRotation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ToCompactString&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	&lt;span class=&#34;c1&#34;&gt;// LogTemp: Display: Owner Rotation: R(Y=-107.75), Component Rotation: R(P=-4.78, Y=-107.75)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;	&lt;span class=&#34;c1&#34;&gt;// 可以注意到，使用Owner Rotation得到的只有Yaw方向的旋转，而Component Rotation包含Pitch和Yaw旋转
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;	&lt;span class=&#34;n&#34;&gt;UE_LOG&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;LogTemp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Display&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;TEXT&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Owner Rotation: %s, Component Rotation: %s&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;RotatorString&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;MyRotationString&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;其中，Pitch是俯仰角，Yaw是偏航角，除此之外还有一个滚转角Roll。&lt;/strong&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>CGAlgos</title>
+      <link>https://wstfdxfh.github.io/posts/cheetsheets/cgalgos/</link>
+      <pubDate>Sun, 23 Mar 2025 21:11:21 +0800</pubDate>
+      <guid>https://wstfdxfh.github.io/posts/cheetsheets/cgalgos/</guid>
+      <description>&lt;p&gt;这篇文章介绍了几种常见的和游戏开发、计算机图形学密切相关的算法题&lt;/p&gt;
+&lt;h3 id=&#34;一个点是否在三角形内部&#34;&gt;一个点是否在三角形内部&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;可以使用叉乘的方法判断一个点是否在三角形内部。当三角形中所有边的对点和点P都位于该边的一侧时，就说明P在三角形内部，而判断是否位于一侧可以使用叉乘的符号是否相等来判断。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;24
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;25
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;26
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;27
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;28
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;29
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;30
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;31
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;32
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;33
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;34
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;35
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;36
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;37
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;38
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;39
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;40
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;41
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;42
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;43
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-c++&#34; data-lang=&#34;c++&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;lt;iostream&amp;gt;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;struct&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Point&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;kt&#34;&gt;double&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;y&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// 向量叉积：计算向量a × 向量b的值
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;double&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;crossProduct&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;y&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;y&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// 检查点p1和p2是否在边a-b的同一侧（包含边上的点）
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;bool&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;isSameSide&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                &lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ab&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;b&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;y&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;y&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// 边a→b的向量
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ap1&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;p1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;y&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;y&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ap2&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;p2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;p2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;y&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;y&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;kt&#34;&gt;double&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cp1&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;crossProduct&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ab&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ap1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// 计算叉积AB × AP1
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;kt&#34;&gt;double&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cp2&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;crossProduct&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ab&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ap2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// 计算叉积AB × AP2
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cp1&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;cp2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;             &lt;span class=&#34;c1&#34;&gt;// 符号相同或其中一个为0（点在线段上）
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// 判断点P是否在三角形ABC内
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;bool&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;isInsideTriangle&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;A&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;B&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;C&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                      &lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;P&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;isSameSide&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;P&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;C&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;A&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;B&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// P和C在AB同侧
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;         &lt;span class=&#34;n&#34;&gt;isSameSide&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;P&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;A&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;B&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;C&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// P和A在BC同侧
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;         &lt;span class=&#34;n&#34;&gt;isSameSide&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;P&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;B&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;C&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;A&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;    &lt;span class=&#34;c1&#34;&gt;// P和B在CA同侧
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;A&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;B&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;C&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;1.5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;2.5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;Point&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;P&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;1.5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// 待检测点
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;isInsideTriangle&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;A&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;B&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;C&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;P&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cout&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;点P在三角形内部&amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;endl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cout&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;点P在三角形外部&amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;endl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;欧拉路径&#34;&gt;欧拉路径&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;问题本质&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;题目要求“是否存在一条路径恰好经过所有有向边一次”，其实就是&lt;strong&gt;有向欧拉路径 (Eulerian Path) / 欧拉回路 (Eulerian Circuit)&lt;/strong&gt; 的判定与构造问题。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

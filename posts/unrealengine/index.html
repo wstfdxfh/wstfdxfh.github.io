@@ -1,45 +1,319 @@
-<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>UnrealEngine | 李睿杰的博客</title>
-<meta name=keywords content><meta name=description content="Contains posts related to UnrealEngine"><meta name=author content="李睿杰"><link rel=canonical href=https://wstfdxfh.github.io/posts/unrealengine/><link crossorigin=anonymous href=/assets/css/stylesheet.css rel="preload stylesheet" as=style><link rel=icon href=https://wstfdxfh.github.io/favicon.ico><link rel=icon type=image/png sizes=16x16 href=https://wstfdxfh.github.io/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=https://wstfdxfh.github.io/favicon-32x32.png><link rel=apple-touch-icon href=https://wstfdxfh.github.io/apple-touch-icon.png><link rel=mask-icon href=https://wstfdxfh.github.io/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate type=application/rss+xml href=https://wstfdxfh.github.io/posts/unrealengine/index.xml><link rel=alternate hreflang=en href=https://wstfdxfh.github.io/posts/unrealengine/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><meta property="og:url" content="https://wstfdxfh.github.io/posts/unrealengine/"><meta property="og:site_name" content="李睿杰的博客"><meta property="og:title" content="UnrealEngine"><meta property="og:description" content="Contains posts related to UnrealEngine"><meta property="og:locale" content="zh-CN"><meta property="og:type" content="website"><meta name=twitter:card content="summary"><meta name=twitter:title content="UnrealEngine"><meta name=twitter:description content="Contains posts related to UnrealEngine"><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"https://wstfdxfh.github.io/posts/"},{"@type":"ListItem","position":2,"name":"UnrealEngine","item":"https://wstfdxfh.github.io/posts/unrealengine/"}]}</script></head><body class=list id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=https://wstfdxfh.github.io/ accesskey=h title="李睿杰的博客 (Alt + H)">李睿杰的博客</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)" aria-label="Toggle theme"><svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=https://wstfdxfh.github.io/archives/ title=Archive><span>Archive</span></a></li><li><a href=https://wstfdxfh.github.io/search/ title="Search (Alt + /)" accesskey=/><span>Search</span></a></li><li><a href=https://wstfdxfh.github.io/tags/ title=Tags><span>Tags</span></a></li></ul></nav></header><main class=main><header class=page-header><div class=breadcrumbs><a href=https://wstfdxfh.github.io/>Home</a>&nbsp;»&nbsp;<a href=https://wstfdxfh.github.io/posts/>Posts</a></div><h1>UnrealEngine</h1><div class=post-description>Contains posts related to UnrealEngine</div></header><article class=post-entry><header class=entry-header><h2 class=entry-hint-parent>UnrealVersionControl</h2></header><div class=entry-content><p>Unreal版本管理 本文简单介绍如何通过Git LFS+阿里云Codeup进行Unreal项目内容的版本管理
-使用阿里云Codeup的原因是因为其LFS拥有比较大的免费空间，也可以使用其他平台，比如Github, GitLab或者云服务器+GitLab。
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>UnrealEngine | 李睿杰的博客</title>
+<meta name="keywords" content="">
+<meta name="description" content="Contains posts related to UnrealEngine">
+<meta name="author" content="李睿杰">
+<link rel="canonical" href="https://wstfdxfh.github.io/posts/unrealengine/">
+<link crossorigin="anonymous" href="../../assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://wstfdxfh.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://wstfdxfh.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://wstfdxfh.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://wstfdxfh.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://wstfdxfh.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" type="application/rss+xml" href="https://wstfdxfh.github.io/posts/unrealengine/index.xml">
+<link rel="alternate" hreflang="en" href="https://wstfdxfh.github.io/posts/unrealengine/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:url" content="https://wstfdxfh.github.io/posts/unrealengine/">
+  <meta property="og:site_name" content="李睿杰的博客">
+  <meta property="og:title" content="UnrealEngine">
+  <meta property="og:description" content="Contains posts related to UnrealEngine">
+  <meta property="og:locale" content="zh-CN">
+  <meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="UnrealEngine">
+<meta name="twitter:description" content="Contains posts related to UnrealEngine">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://wstfdxfh.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "UnrealEngine",
+      "item": "https://wstfdxfh.github.io/posts/unrealengine/"
+    }
+  ]
+}
+</script>
+</head>
+
+<body class="list" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://wstfdxfh.github.io/" accesskey="h" title="李睿杰的博客 (Alt + H)">李睿杰的博客</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://wstfdxfh.github.io/archives/" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://wstfdxfh.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://wstfdxfh.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main"> 
+<header class="page-header"><div class="breadcrumbs"><a href="https://wstfdxfh.github.io/">Home</a>&nbsp;»&nbsp;<a href="https://wstfdxfh.github.io/posts/">Posts</a></div>
+  <h1>
+    UnrealEngine
+  </h1>
+  <div class="post-description">
+    Contains posts related to UnrealEngine
+  </div>
+</header>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">UnrealVersionControl
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>Unreal版本管理 本文简单介绍如何通过Git LFS&#43;阿里云Codeup进行Unreal项目内容的版本管理
+使用阿里云Codeup的原因是因为其LFS拥有比较大的免费空间，也可以使用其他平台，比如Github, GitLab或者云服务器&#43;GitLab。
 1. 下载Git 和Git LFS https://git-scm.com/
 https://git-lfs.com/
 2.创建一个Codeup代码库 3.在本地创建SSH的公钥和私钥，将公钥上传到Codeup（可选） https://help.aliyun.com/zh/yunxiao/user-guide/configure-ssh-key
 首先查看已经存在的SSH秘钥，在Git Bash或者Windows WSL中输入
 1 2 cat ~/.ssh/id_ed25519.pub cat ~/.ssh/id_rsa.pub 查看是否有ed25519秘钥或者rsa秘钥，如果没有，就输入
-1 ssh-keygen -t ed25519 -C "&lt;注释内容>" 或者
-1 ssh-keygen -t rsa -C "&lt;注释内容>" 进行创建，注释内容可以是邮箱地址
+1 ssh-keygen -t ed25519 -C &#34;&lt;注释内容&gt;&#34; 或者
+1 ssh-keygen -t rsa -C &#34;&lt;注释内容&gt;&#34; 进行创建，注释内容可以是邮箱地址
 1 2 Generating public/private ed25519 key pair. Enter file in which to save the key (/home/user/.ssh/id_ed25519): 密钥默认生成路径：/home/user/.ssh/id_ed25519，公钥与之对应为：/home/user/.ssh/id_ed25519.pub
 1 2 Enter passphrase (empty for no passphrase): Enter same passphrase again: 秘钥口令默认为空
 1 cat ~/.ssh/id_ed25519.pub | clip 将秘钥复制到剪贴板，最后在codeup上的设置界面设置公钥。
-...</p></div><footer class=entry-footer><span title='2025-06-08 17:33:36 +0800 CST'>June 8, 2025</span>&nbsp;·&nbsp;2 min&nbsp;·&nbsp;224 words&nbsp;·&nbsp;李睿杰</footer><a class=entry-link aria-label="post link to UnrealVersionControl" href=https://wstfdxfh.github.io/posts/unrealengine/unrealversioncontrol/></a></article><article class=post-entry><header class=entry-header><h2 class=entry-hint-parent>UnrealOnline</h2></header><div class=entry-content><p>简介 相关课程：
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-06-08 17:33:36 +0800 CST'>June 8, 2025</span>&nbsp;·&nbsp;2 min&nbsp;·&nbsp;224 words&nbsp;·&nbsp;李睿杰</footer>
+  <a class="entry-link" aria-label="post link to UnrealVersionControl" href="https://wstfdxfh.github.io/posts/unrealengine/unrealversioncontrol/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">UnrealOnline
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>简介 相关课程：
 https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter/
 这篇笔记简单介绍如何在UE5.5中建立一个在线链接，包含OnlineSubsystem的使用方法，自定义代理的建立等内容。
 效果如下：
 在steam登录的情况下，在2台不同的主机上可以建立链接，在一个大厅中进行游玩（注意需要不同的账号，以及相同的地域）。
 配置文件设置 在DefaultEngine.ini中，添加以下内容：
-1 2 3 4 5 6 7 8 9 10 11 12 13 [/Script/Engine.GameEngine] +NetDriverDefinitions=(DefName="GameNetDriver",DriverClassName="OnlineSubsystemSteam.SteamNetDriver",DriverClassNameFallback="OnlineSubsystemUtils.IpNetDriver") [OnlineSubsystem] DefaultPlatformService=Steam [OnlineSubsystemSteam] bEnabled=true SteamDevAppId=480 bInitServerOnClient=true [/Script/OnlineSubsystemSteam.SteamNetDriver] NetConnectionClassName="OnlineSubsystemSteam.SteamNetConnection" 480是一个公用的游戏id
+1 2 3 4 5 6 7 8 9 10 11 12 13 [/Script/Engine.GameEngine] &#43;NetDriverDefinitions=(DefName=&#34;GameNetDriver&#34;,DriverClassName=&#34;OnlineSubsystemSteam.SteamNetDriver&#34;,DriverClassNameFallback=&#34;OnlineSubsystemUtils.IpNetDriver&#34;) [OnlineSubsystem] DefaultPlatformService=Steam [OnlineSubsystemSteam] bEnabled=true SteamDevAppId=480 bInitServerOnClient=true [/Script/OnlineSubsystemSteam.SteamNetDriver] NetConnectionClassName=&#34;OnlineSubsystemSteam.SteamNetConnection&#34; 480是一个公用的游戏id
 在DefaultGame.ini中添加
 1 2 [/Script/Engine.GameSession] MaxPlayers=100 规定了最大玩家数量。
 插件创建 在编辑器的插件设置中可以创建相应的插件，并且在游戏中利用这些插件，以实现代码或者蓝图的复用。插件和游戏存在以下的单项依赖关系：
 例如，游戏模块可以依赖于游戏插件或者其他模块，但是插件不可依赖于游戏模块。
 在创建插件时，选择Blank模板，创建后在MultiplayerSessions.uplugin中添加依赖：
-1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 { ... "Modules": [ { "Name": "MultiplayerSessions", "Type": "Runtime", "LoadingPhase": "Default" } ], "Plugins":[ { "Name": "OnlineSubsystem", "Enabled": true }, { "Name": "OnlineSubsystemSteam", "Enabled": true } ] } MultiplayerSessions.Build.cs
-...</p></div><footer class=entry-footer><span title='2025-05-19 18:02:04 +0800 CST'>May 19, 2025</span>&nbsp;·&nbsp;30 min&nbsp;·&nbsp;6294 words&nbsp;·&nbsp;李睿杰</footer><a class=entry-link aria-label="post link to UnrealOnline" href=https://wstfdxfh.github.io/posts/unrealengine/unrealonline/></a></article><article class=post-entry><header class=entry-header><h2 class=entry-hint-parent>UnrealDebug</h2></header><div class=entry-content><p>介绍UnrealEngine C++常用的调试方法
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 { ... &#34;Modules&#34;: [ { &#34;Name&#34;: &#34;MultiplayerSessions&#34;, &#34;Type&#34;: &#34;Runtime&#34;, &#34;LoadingPhase&#34;: &#34;Default&#34; } ], &#34;Plugins&#34;:[ { &#34;Name&#34;: &#34;OnlineSubsystem&#34;, &#34;Enabled&#34;: true }, { &#34;Name&#34;: &#34;OnlineSubsystemSteam&#34;, &#34;Enabled&#34;: true } ] } MultiplayerSessions.Build.cs
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-05-19 18:02:04 +0800 CST'>May 19, 2025</span>&nbsp;·&nbsp;30 min&nbsp;·&nbsp;6294 words&nbsp;·&nbsp;李睿杰</footer>
+  <a class="entry-link" aria-label="post link to UnrealOnline" href="https://wstfdxfh.github.io/posts/unrealengine/unrealonline/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">UnrealDebug
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>介绍UnrealEngine C&#43;&#43;常用的调试方法
 UE_LOG 打印的格式如下：
-1 UE_LOG(LogTemp, Warning, TEXT("Grabber Constructed")); 如果使用FString格式如下
-1 2 FString Name = GetName(); UE_LOG(LogTemp, Warning, TEXT("%s"), *Name); 在已经打包好的游戏中要看到log，可以在exe所在的位置开启命令行，输入
+1 UE_LOG(LogTemp, Warning, TEXT(&#34;Grabber Constructed&#34;)); 如果使用FString格式如下
+1 2 FString Name = GetName(); UE_LOG(LogTemp, Warning, TEXT(&#34;%s&#34;), *Name); 在已经打包好的游戏中要看到log，可以在exe所在的位置开启命令行，输入
 1 MenuSystem.exe -log 表示开启log同时运行游戏
-绘制调试射线、球 1 #include "Engine/World.h" 引入该头文件获得UWorld
-1 2 3 4 #include "DrawDebugHelpers.h" DrawDebugLine(GetWorld(), Start, End, FColor::Red); DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5); 绘制调试摄像机 在枪械开火时，从玩家视点绘制调试摄像机图形
-1 2 3 4 5 6 7 8 9 APawn* OwnerPawn = Cast&lt;APawn>(GetOwner()); if(OwnerPawn == nullptr) return; AController* OwnerController = OwnerPawn->GetController; if(OwnerController == nullptr) return; FVector Location; FRotator Rotation; OwnerController->GetPlayerViewPoint(Location, Rotation); DrawDebugCamera(GetWorld(), Location, Rotation, 90, 2, FColor::Red, true); 在屏幕上绘制调试信息 1 2 3 4 5 6 7 8 9 if(GEngine) { GEngine->AddOnScreenDebugMessage( -1, 15.f, FColor::Cyan, FString::Printf(TEXT("Joining Match Type: %s"), *MatchType) ); } -1表示这条调试信息不会被覆盖，15.f表示在屏幕持续时间为15秒，FColor::Cyan表示调试信息的颜色，FString::Printf(TEXT("Joining Match Type: %s"), *MatchType)用于进行输出内容的格式化
-...</p></div><footer class=entry-footer><span title='2025-05-13 12:10:50 +0800 CST'>May 13, 2025</span>&nbsp;·&nbsp;1 min&nbsp;·&nbsp;154 words&nbsp;·&nbsp;李睿杰</footer><a class=entry-link aria-label="post link to UnrealDebug" href=https://wstfdxfh.github.io/posts/unrealengine/unrealdebug/></a></article><article class=post-entry><header class=entry-header><h2 class=entry-hint-parent>Unreal Course Notes</h2></header><div class=entry-content><p>udemy.com/course/unrealcourse/ 以及部分https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter/的课程笔记
-常见技巧 防止速度过快导致的平台位置偏移 1 2 3 4 5 6 7 8 9 10 11 12 13 14 void AMovingPlatform::Tick(float DeltaTime){ Super::Tick(DeltaTime); FVector CurrentLocation = GetActorLocation(); CurrentLocation = CurrentLocation + (PlatformVelocity*DeltaTime); SetActorLocation(CurrentLocation); float DistanceMoved = FVector::Dist(StartLocation, CurrentLocation); if(DistanceMoved > MoveDistance){ // 获得速度的单位向量 FVector MoveDirection = PlatformVelocty.GetSafeNormal(); StartLocation = StartLocation+ MoveDirection*MoveDistance; SetActorLocation(StartLocation); PlatformVelocty = -PlatformVelocty; } } 解决被方块撞击时人物视角异常的问题 这是因为只有角色默认只有在移动时才会检查碰撞
+绘制调试射线、球 1 #include &#34;Engine/World.h&#34; 引入该头文件获得UWorld
+1 2 3 4 #include &#34;DrawDebugHelpers.h&#34; DrawDebugLine(GetWorld(), Start, End, FColor::Red); DrawDebugSphere(GetWorld(), End, 10, 10, FColor::Blue, false, 5); 绘制调试摄像机 在枪械开火时，从玩家视点绘制调试摄像机图形
+1 2 3 4 5 6 7 8 9 APawn* OwnerPawn = Cast&lt;APawn&gt;(GetOwner()); if(OwnerPawn == nullptr) return; AController* OwnerController = OwnerPawn-&gt;GetController; if(OwnerController == nullptr) return; FVector Location; FRotator Rotation; OwnerController-&gt;GetPlayerViewPoint(Location, Rotation); DrawDebugCamera(GetWorld(), Location, Rotation, 90, 2, FColor::Red, true); 在屏幕上绘制调试信息 1 2 3 4 5 6 7 8 9 if(GEngine) { GEngine-&gt;AddOnScreenDebugMessage( -1, 15.f, FColor::Cyan, FString::Printf(TEXT(&#34;Joining Match Type: %s&#34;), *MatchType) ); } -1表示这条调试信息不会被覆盖，15.f表示在屏幕持续时间为15秒，FColor::Cyan表示调试信息的颜色，FString::Printf(TEXT(&#34;Joining Match Type: %s&#34;), *MatchType)用于进行输出内容的格式化
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-05-13 12:10:50 +0800 CST'>May 13, 2025</span>&nbsp;·&nbsp;1 min&nbsp;·&nbsp;154 words&nbsp;·&nbsp;李睿杰</footer>
+  <a class="entry-link" aria-label="post link to UnrealDebug" href="https://wstfdxfh.github.io/posts/unrealengine/unrealdebug/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">Unreal Course Notes
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>udemy.com/course/unrealcourse/ 以及部分https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter/的课程笔记
+常见技巧 防止速度过快导致的平台位置偏移 1 2 3 4 5 6 7 8 9 10 11 12 13 14 void AMovingPlatform::Tick(float DeltaTime){ Super::Tick(DeltaTime); FVector CurrentLocation = GetActorLocation(); CurrentLocation = CurrentLocation &#43; (PlatformVelocity*DeltaTime); SetActorLocation(CurrentLocation); float DistanceMoved = FVector::Dist(StartLocation, CurrentLocation); if(DistanceMoved &gt; MoveDistance){ // 获得速度的单位向量 FVector MoveDirection = PlatformVelocty.GetSafeNormal(); StartLocation = StartLocation&#43; MoveDirection*MoveDistance; SetActorLocation(StartLocation); PlatformVelocty = -PlatformVelocty; } } 解决被方块撞击时人物视角异常的问题 这是因为只有角色默认只有在移动时才会检查碰撞
 解决方法：使用蓝图中的MoveUpdatedComponent，在每一帧都移动一个小距离再反向移动
 可以使用UE_LOG进行日志打印，打印的结果会出现在UE的Output Log窗口中。
 背对光源时场景过暗的问题 在场景中加入PostProcessVolume，在Lens-Exposure-Metering Mode中，将选项改为Auto Exposure Basic，然后修改Brush中的x,y,z，令其覆盖整个场景。
-不同的灯光类型 名称 解释 Point Light 从一个点向外发射的光源 Spot Light 聚光灯，有方向性地发出光线 Rect Light 方形的有方向性光源 Directional Light 太阳光（只有方向，没有位置的光） Sky Light 将远处的场景作为光源 将SceneComponent添加到角色后，角色旋转和组件旋转的差异 1 2 3 4 5 6 7 8 9 10 11 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) { Super::TickComponent(DeltaTime, TickType, ThisTickFunction); auto Rotator = GetOwner()->GetActorRotation(); auto MyRotation = GetComponentRotation(); auto RotatorString = Rotator.ToCompactString(); auto MyRotationString = MyRotation.ToCompactString(); // LogTemp: Display: Owner Rotation: R(Y=-107.75), Component Rotation: R(P=-4.78, Y=-107.75) // 可以注意到，使用Owner Rotation得到的只有Yaw方向的旋转，而Component Rotation包含Pitch和Yaw旋转 UE_LOG(LogTemp, Display, TEXT("Owner Rotation: %s, Component Rotation: %s"), *RotatorString, *MyRotationString); } 其中，Pitch是俯仰角，Yaw是偏航角，除此之外还有一个滚转角Roll。
-...</p></div><footer class=entry-footer><span title='2025-04-06 19:45:39 +0800 CST'>April 6, 2025</span>&nbsp;·&nbsp;10 min&nbsp;·&nbsp;2114 words&nbsp;·&nbsp;李睿杰</footer><a class=entry-link aria-label="post link to Unreal Course Notes" href=https://wstfdxfh.github.io/posts/unrealengine/unrealcoursenotes/></a></article></main><footer class=footer><span>&copy; 2025 <a href=https://wstfdxfh.github.io/>李睿杰的博客</a></span> ·
-<span>Powered by
-<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
-        <a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg>
-</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script></body></html>
+不同的灯光类型 名称 解释 Point Light 从一个点向外发射的光源 Spot Light 聚光灯，有方向性地发出光线 Rect Light 方形的有方向性光源 Directional Light 太阳光（只有方向，没有位置的光） Sky Light 将远处的场景作为光源 将SceneComponent添加到角色后，角色旋转和组件旋转的差异 1 2 3 4 5 6 7 8 9 10 11 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) { Super::TickComponent(DeltaTime, TickType, ThisTickFunction); auto Rotator = GetOwner()-&gt;GetActorRotation(); auto MyRotation = GetComponentRotation(); auto RotatorString = Rotator.ToCompactString(); auto MyRotationString = MyRotation.ToCompactString(); // LogTemp: Display: Owner Rotation: R(Y=-107.75), Component Rotation: R(P=-4.78, Y=-107.75) // 可以注意到，使用Owner Rotation得到的只有Yaw方向的旋转，而Component Rotation包含Pitch和Yaw旋转 UE_LOG(LogTemp, Display, TEXT(&#34;Owner Rotation: %s, Component Rotation: %s&#34;), *RotatorString, *MyRotationString); } 其中，Pitch是俯仰角，Yaw是偏航角，除此之外还有一个滚转角Roll。
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-04-06 19:45:39 +0800 CST'>April 6, 2025</span>&nbsp;·&nbsp;10 min&nbsp;·&nbsp;2114 words&nbsp;·&nbsp;李睿杰</footer>
+  <a class="entry-link" aria-label="post link to Unreal Course Notes" href="https://wstfdxfh.github.io/posts/unrealengine/unrealcoursenotes/"></a>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://wstfdxfh.github.io/">李睿杰的博客</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

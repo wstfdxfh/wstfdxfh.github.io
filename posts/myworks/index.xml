@@ -1,141 +1,166 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>MyWorks on 李睿杰的博客</title><link>https://wstfdxfh.github.io/posts/myworks/</link><description>Recent content in MyWorks on 李睿杰的博客</description><generator>Hugo -- 0.145.0</generator><language>zh-CN</language><lastBuildDate>Wed, 16 Jul 2025 14:31:30 +0800</lastBuildDate><atom:link href="https://wstfdxfh.github.io/posts/myworks/index.xml" rel="self" type="application/rss+xml"/><item><title>MultiPlayerDemo</title><link>https://wstfdxfh.github.io/posts/myworks/multiplayerdemo/</link><pubDate>Wed, 16 Jul 2025 14:31:30 +0800</pubDate><guid>https://wstfdxfh.github.io/posts/myworks/multiplayerdemo/</guid><description>&lt;p>一款多人设计游戏的Demo，使用UnrealOnlineSubSystemSteam实现互联网双人联机&lt;/p>
-&lt;p>游戏包含开始界面，等待大厅和正式游戏关卡，在关卡开始之前，玩家可以飞行浏览地图&lt;/p>
-&lt;p>游戏开始后，玩家可以拾取地图上的武器，包括步枪和火箭筒，进行对抗&lt;/p>
-&lt;p>HUD上记录了击杀数和被击败的次数，通过人头数量决定最后的胜者。&lt;/p>
-&lt;p>相关内容参考 &lt;a href="https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter">相关课程&lt;/a>，UE5.5进行开发。相关开发笔记可以参见&lt;a href="https://wstfdxfh.github.io/posts/UnrealEngine/UnrealOnline/">Unreal网络多人开发&lt;/a>和&lt;a href="https://wstfdxfh.github.io/posts/UnrealEngine/UnrealVersionControl/">Unreal版本控制&lt;/a>等&lt;/p>
-&lt;p>&lt;a href="https://github.com/wstfdxfh/UnealOnlineDemo/releases/tag/v1.0.0">下载链接&lt;/a>&lt;/p>
-&lt;p>&lt;strong>注意&lt;/strong>，游玩时，需要两台不同的电脑主机，各自登录不同的Steam账号；&lt;/p>
-&lt;p>点击开始界面的Host主持游戏作为Listen Server，另一台点击加入后作为Client&lt;/p>
-&lt;p>因为使用Steam的公用ID，在高峰期可能会出现连接缓慢或者无法加入的问题。&lt;/p>
-&lt;p>附多人游戏截图：&lt;/p>
-&lt;!-- raw HTML omitted -->
-&lt;h2 id="改进笔记">改进笔记&lt;/h2>
-&lt;p>以下将改进的部分内容列在下方：&lt;/p>
-&lt;p>源代码中，使用一个自定义的RocketMovementComponent解决火箭弹会在接触自己的时候爆炸的问题，而改进后只需要使用&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="n">AProjectile&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">BeginPlay&lt;/span>&lt;span class="p">()&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Super&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">BeginPlay&lt;/span>&lt;span class="p">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Tracer&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">TracerComponent&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">UGameplayStatics&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">SpawnEmitterAttached&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Tracer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">CollisionBox&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">NAME_None&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">GetActorLocation&lt;/span>&lt;span class="p">(),&lt;/span> &lt;span class="n">GetActorRotation&lt;/span>&lt;span class="p">(),&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">EAttachLocation&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">KeepWorldPosition&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">HasAuthority&lt;/span>&lt;span class="p">())&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">CollisionBox&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">OnComponentHit&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">AddDynamic&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">AProjectile&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">OnHit&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">CollisionBox&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">IgnoreActorWhenMoving&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Owner&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">true&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>通过添加&lt;code>CollisionBox-&amp;gt;IgnoreActorWhenMoving(Owner, true);&lt;/code>实现&lt;/p></description></item><item><title>OddTanks</title><link>https://wstfdxfh.github.io/posts/myworks/oddtanks/</link><pubDate>Mon, 28 Apr 2025 23:05:02 +0800</pubDate><guid>https://wstfdxfh.github.io/posts/myworks/oddtanks/</guid><description>&lt;h2 id="坦克大战">坦克大战&lt;/h2>
-&lt;p>基于UE5的坦克射击游戏，来自教程 udemy.com/course/unrealcourse/&lt;/p>
-&lt;p>下载 &lt;a href="https://github.com/wstfdxfh/Oddtanks">https://github.com/wstfdxfh/Oddtanks&lt;/a>&lt;/p>
-&lt;p>和原教程中最终成品的主要区别在于：&lt;/p>
-&lt;ul>
-&lt;li>炮塔转动或者坦克移动时，发射的炮弹会发生随机偏差，更难瞄准敌人&lt;/li>
-&lt;li>使用一个射灯照出我方坦克的可能落弹点&lt;/li>
-&lt;/ul>
-&lt;p>&lt;img alt="image-20250428230817419" loading="lazy" src="https://wstfdxfh.github.io/posts/myworks/oddtanks/image-20250428230817419.png">&lt;/p>
-&lt;p>其中，炮弹散射的实现方法如下：&lt;/p>
-&lt;p>首先，在BasePawn.h中加入相关变量：&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 记录最大偏移角度
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="n">UPROPERTY&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">EditAnywhere&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Category&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;Combat&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">float&lt;/span> &lt;span class="n">MaxSpreadAngle&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mf">5.f&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 当前实时最大偏转角度（度数），由 Tick 更新
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="n">UPROPERTY&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">VisibleAnywhere&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Category&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;Combat&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">float&lt;/span> &lt;span class="n">CurrentMaxSpread&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mf">0.f&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">FTransform&lt;/span> &lt;span class="n">LastTransform&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">bool&lt;/span> &lt;span class="n">IsMoving&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">false&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>随后在&lt;code>BasePawn&lt;/code>的Tick函数中，检测有没有发生移动&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;span class="lnt">18
-&lt;/span>&lt;span class="lnt">19
-&lt;/span>&lt;span class="lnt">20
-&lt;/span>&lt;span class="lnt">21
-&lt;/span>&lt;span class="lnt">22
-&lt;/span>&lt;span class="lnt">23
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="n">ABasePawn&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Tick&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">float&lt;/span> &lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Super&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Tick&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 判断当前炮塔或者本体是否在移动或者转动
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">FTransform&lt;/span> &lt;span class="n">TurretMeshTransform&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">TurretMesh&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">GetComponentTransform&lt;/span>&lt;span class="p">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">IsMoving&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="o">!&lt;/span>&lt;span class="n">TurretMeshTransform&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetRotation&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">Equals&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">LastTransform&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetRotation&lt;/span>&lt;span class="p">(),&lt;/span> &lt;span class="mf">0.2&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">||&lt;/span> &lt;span class="o">!&lt;/span>&lt;span class="n">TurretMeshTransform&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetLocation&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">Equals&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">LastTransform&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetLocation&lt;/span>&lt;span class="p">(),&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">LastTransform&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">TurretMeshTransform&lt;/span>&lt;span class="p">;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">IsMoving&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">CurrentMaxSpread&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FMath&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">FInterpTo&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">CurrentMaxSpread&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">MaxSpreadAngle&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">CurrentMaxSpread&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FMath&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">FInterpTo&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">CurrentMaxSpread&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DeltaTime&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Cast&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">ATank&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">))&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UE_LOG&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">LogTemp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Display&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">TEXT&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;CurrentMaxSpread: %f&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">CurrentMaxSpread&lt;/span>&lt;span class="p">)&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>这里Equals函数就是指出两个变量是否小到了一定的误差，第二个参数就是相应的误差，这里不使用&lt;code>==&lt;/code>运算符的原因是，因为采用了插值处理炮塔的旋转，所以在鼠标不移动后的很长时间内，炮塔都不会完全停止转动。&lt;/p></description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>MyWorks on 李睿杰的博客</title>
+    <link>https://wstfdxfh.github.io/posts/myworks/</link>
+    <description>Recent content in MyWorks on 李睿杰的博客</description>
+    <generator>Hugo -- 0.145.0</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 16 Jul 2025 14:31:30 +0800</lastBuildDate>
+    <atom:link href="https://wstfdxfh.github.io/posts/myworks/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MultiPlayerDemo</title>
+      <link>https://wstfdxfh.github.io/posts/myworks/multiplayerdemo/</link>
+      <pubDate>Wed, 16 Jul 2025 14:31:30 +0800</pubDate>
+      <guid>https://wstfdxfh.github.io/posts/myworks/multiplayerdemo/</guid>
+      <description>&lt;p&gt;一款多人设计游戏的Demo，使用UnrealOnlineSubSystemSteam实现互联网双人联机&lt;/p&gt;
+&lt;p&gt;游戏包含开始界面，等待大厅和正式游戏关卡，在关卡开始之前，玩家可以飞行浏览地图&lt;/p&gt;
+&lt;p&gt;游戏开始后，玩家可以拾取地图上的武器，包括步枪和火箭筒，进行对抗&lt;/p&gt;
+&lt;p&gt;HUD上记录了击杀数和被击败的次数，通过人头数量决定最后的胜者。&lt;/p&gt;
+&lt;p&gt;相关内容参考 &lt;a href=&#34;https://www.udemy.com/course/unreal-engine-5-cpp-multiplayer-shooter&#34;&gt;相关课程&lt;/a&gt;，UE5.5进行开发。相关开发笔记可以参见&lt;a href=&#34;../../posts/UnrealEngine/UnrealOnline/&#34;&gt;Unreal网络多人开发&lt;/a&gt;和&lt;a href=&#34;../../posts/UnrealEngine/UnrealVersionControl/&#34;&gt;Unreal版本控制&lt;/a&gt;等&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/wstfdxfh/UnealOnlineDemo/releases/tag/v1.0.0&#34;&gt;下载链接&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt;，游玩时，需要两台不同的电脑主机，各自登录不同的Steam账号；&lt;/p&gt;
+&lt;p&gt;点击开始界面的Host主持游戏作为Listen Server，另一台点击加入后作为Client&lt;/p&gt;
+&lt;p&gt;因为使用Steam的公用ID，在高峰期可能会出现连接缓慢或者无法加入的问题。&lt;/p&gt;
+&lt;p&gt;附多人游戏截图：&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;h2 id=&#34;改进笔记&#34;&gt;改进笔记&lt;/h2&gt;
+&lt;p&gt;以下将改进的部分内容列在下方：&lt;/p&gt;
+&lt;p&gt;源代码中，使用一个自定义的RocketMovementComponent解决火箭弹会在接触自己的时候爆炸的问题，而改进后只需要使用&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;AProjectile&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;BeginPlay&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;Super&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;BeginPlay&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Tracer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;       &lt;span class=&#34;n&#34;&gt;TracerComponent&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;UGameplayStatics&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;SpawnEmitterAttached&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Tracer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;CollisionBox&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;NAME_None&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;GetActorLocation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;GetActorRotation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(),&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                                                                &lt;span class=&#34;n&#34;&gt;EAttachLocation&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;KeepWorldPosition&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;HasAuthority&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;())&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;       &lt;span class=&#34;n&#34;&gt;CollisionBox&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;OnComponentHit&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;AddDynamic&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;AProjectile&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;OnHit&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;       &lt;span class=&#34;n&#34;&gt;CollisionBox&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;IgnoreActorWhenMoving&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Owner&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;通过添加&lt;code&gt;CollisionBox-&amp;gt;IgnoreActorWhenMoving(Owner, true);&lt;/code&gt;实现&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>OddTanks</title>
+      <link>https://wstfdxfh.github.io/posts/myworks/oddtanks/</link>
+      <pubDate>Mon, 28 Apr 2025 23:05:02 +0800</pubDate>
+      <guid>https://wstfdxfh.github.io/posts/myworks/oddtanks/</guid>
+      <description>&lt;h2 id=&#34;坦克大战&#34;&gt;坦克大战&lt;/h2&gt;
+&lt;p&gt;基于UE5的坦克射击游戏，来自教程 udemy.com/course/unrealcourse/&lt;/p&gt;
+&lt;p&gt;下载 &lt;a href=&#34;https://github.com/wstfdxfh/Oddtanks&#34;&gt;https://github.com/wstfdxfh/Oddtanks&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;和原教程中最终成品的主要区别在于：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;炮塔转动或者坦克移动时，发射的炮弹会发生随机偏差，更难瞄准敌人&lt;/li&gt;
+&lt;li&gt;使用一个射灯照出我方坦克的可能落弹点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img alt=&#34;image-20250428230817419&#34; loading=&#34;lazy&#34; src=&#34;../../posts/myworks/oddtanks/image-20250428230817419.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;其中，炮弹散射的实现方法如下：&lt;/p&gt;
+&lt;p&gt;首先，在BasePawn.h中加入相关变量：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// 记录最大偏移角度
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;UPROPERTY&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;EditAnywhere&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Category&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Combat&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;MaxSpreadAngle&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;5.f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// 当前实时最大偏转角度（度数），由 Tick 更新 
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;UPROPERTY&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;VisibleAnywhere&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Category&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;Combat&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;CurrentMaxSpread&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;FTransform&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;LastTransform&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;bool&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;IsMoving&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;false&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;随后在&lt;code&gt;BasePawn&lt;/code&gt;的Tick函数中，检测有没有发生移动&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ABasePawn&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Tick&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;float&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;Super&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Tick&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;c1&#34;&gt;// 判断当前炮塔或者本体是否在移动或者转动
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;n&#34;&gt;FTransform&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;TurretMeshTransform&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;TurretMesh&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetComponentTransform&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;IsMoving&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;TurretMeshTransform&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetRotation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;().&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Equals&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;LastTransform&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetRotation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(),&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.2&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;          &lt;span class=&#34;o&#34;&gt;||&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;!&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;TurretMeshTransform&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetLocation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;().&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Equals&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;LastTransform&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;GetLocation&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(),&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;LastTransform&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;TurretMeshTransform&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;IsMoving&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;       &lt;span class=&#34;n&#34;&gt;CurrentMaxSpread&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;FMath&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;FInterpTo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;CurrentMaxSpread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;MaxSpreadAngle&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;else&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;       &lt;span class=&#34;n&#34;&gt;CurrentMaxSpread&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;FMath&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;FInterpTo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;CurrentMaxSpread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;DeltaTime&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;Cast&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ATank&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;this&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;       &lt;span class=&#34;n&#34;&gt;UE_LOG&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;LogTemp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Display&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;TEXT&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;CurrentMaxSpread: %f&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;CurrentMaxSpread&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;这里Equals函数就是指出两个变量是否小到了一定的误差，第二个参数就是相应的误差，这里不使用&lt;code&gt;==&lt;/code&gt;运算符的原因是，因为采用了插值处理炮塔的旋转，所以在鼠标不移动后的很长时间内，炮塔都不会完全停止转动。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
