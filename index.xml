@@ -27,7 +27,7 @@
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;平移矩阵&lt;/strong&gt;：基于齐次坐标，我们将平移量 $(t_x, t_y, t_z)$ 放在矩阵的最后一列。&lt;/p&gt;
 $$
-   T = \begin{bmatrix} 1 &amp; 0 &amp; 0 &amp; t_x \\\\ 0 &amp; 1 &amp; 0 &amp; t_y \\ 0 &amp; 0 &amp; 1 &amp; t_z \\ 0 &amp; 0 &amp; 0 &amp; 1 \end{bmatrix}
+   T = \begin{bmatrix} 1 &amp; 0 &amp; 0 &amp; t_x \\ 0 &amp; 1 &amp; 0 &amp; t_y \\ 0 &amp; 0 &amp; 1 &amp; t_z \\ 0 &amp; 0 &amp; 0 &amp; 1 \end{bmatrix}
    $$&lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;缩放矩阵&lt;/strong&gt;：缩放因子 $(s_x, s_y, s_z)$ 位于矩阵的对角线上。&lt;/p&gt;</description>
