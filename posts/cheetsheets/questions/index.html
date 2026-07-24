@@ -1,0 +1,2416 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>UECheetSheet | 李睿杰的博客</title>
+<meta name="keywords" content="">
+<meta name="description" content="高频面试问题
+1. C&#43;&#43;虚函数的实现原理是什么？虚函数表（vtable）是怎么工作的？
+高频指数：★★★★★ | 来源：腾讯/网易/米哈游/库洛 几乎必问
+解答：
+虚函数是C&#43;&#43;实现运行时多态的核心机制。当基类中将某个函数声明为virtual时，编译器会为该类生成一张虚函数表（vtable），其中存放了该类所有虚函数的函数指针。
+核心原理：
+
+虚函数表（vtable）：每个含有虚函数的类都有一张vtable，存储在只读数据段（.rodata）。它本质上是一个函数指针数组，里面存放着该类各虚函数的实际地址。vtable在编译期创建，与类绑定。
+虚表指针（vptr）：每个对象的内存布局最前面都隐藏了一个指向vtable的指针（vptr），在构造函数中被初始化。vptr与对象绑定，同一个类的不同对象共享同一张vtable。
+动态绑定过程：通过基类指针或引用调用虚函数时，程序在运行时通过对象的vptr找到vtable，再从vtable中查找目标虚函数的实际地址，从而调用到派生类重写后的版本。
+
+常见追问：
+
+构造函数能否为虚函数？ 不能。因为构造时对象尚未完成初始化，vtable还未建立，无法通过vptr找到虚函数。
+析构函数为何要设为虚函数？ 如果通过基类指针删除派生类对象，非虚析构函数只会调用基类的析构，导致派生类资源泄漏。
+虚函数能否内联？ 当编译器能在编译期确定调用对象的具体类型时可以内联；表现多态性时（运行期）不可以内联。
+
+
+2. C&#43;&#43;智能指针有哪些？各自的使用场景和原理？
+高频指数：★★★★★ | 来源：腾讯/米哈游/深蓝互动 等
+解答：
+C&#43;&#43;11 引入了三种智能指针来自动管理堆内存生命周期，避免内存泄漏：
+
+  
+      
+          类型
+          特点
+          使用场景
+      
+  
+  
+      
+          unique_ptr
+          独占所有权，不可拷贝，可移动
+          资源由单一所有者管理
+      
+      
+          shared_ptr
+          共享所有权，引用计数
+          多个对象共享同一资源
+      
+      
+          weak_ptr
+          不增加引用计数，解决循环引用
+          打破shared_ptr循环引用
+      
+  
+
+shared_ptr 的原理： 内部维护一个控制块，包含强引用计数和弱引用计数。每次拷贝时强引用计数&#43;1，析构时-1，当强引用计数归零时释放资源，当弱引用计数也归零时释放控制块。
+常见追问：
+
+shared_ptr 是否线程安全？ 引用计数的增减是原子操作（线程安全），但指向对象本身的读写不是线程安全的。
+循环引用举例？ A持有B的shared_ptr，B也持有A的shared_ptr，两者引用计数永远不会归零。解决方案是将其中一方改为weak_ptr。
+UE4的智能指针？ UE4有自己的TSharedPtr、TWeakPtr、TUniquePtr体系，原理类似但与标准库独立。
+
+
+3. vector和list有什么区别？各自适用什么场景？
+高频指数：★★★★★ | 来源：库洛/腾讯/米哈游 等
+解答：
+
+  
+      
+          特性
+          std::vector
+          std::list
+      
+  
+  
+      
+          底层结构
+          动态数组（连续内存）
+          双向链表（离散内存）
+      
+      
+          随机访问
+          O(1)
+          O(n)
+      
+      
+          尾部插入/删除
+          均摊 O(1)
+          O(1)
+      
+      
+          中间插入/删除
+          O(n)（需移动元素）
+          O(1)（已知迭代器位置）
+      
+      
+          缓存友好性
+          极好（连续内存，cache命中率高）
+          差（节点分散，cache不友好）
+      
+      
+          内存开销
+          低（仅数据&#43;少量管理信息）
+          高（每个节点额外存储前驱/后继指针）
+      
+  
+
+适用场景：">
+<meta name="author" content="李睿杰">
+<link rel="canonical" href="http://localhost:1313/posts/cheetsheets/questions/">
+<link crossorigin="anonymous" href="../../../assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/cheetsheets/questions/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="李睿杰的博客 (Alt + H)">李睿杰的博客</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/archives/" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/cheetsheets/">CheetSheets</a></div>
+    <h1 class="post-title entry-hint-parent">
+      UECheetSheet
+      <span class="entry-hint" title="Draft">
+        <svg xmlns="http://www.w3.org/2000/svg" height="35" viewBox="0 -960 960 960" fill="currentColor">
+          <path
+            d="M160-410v-60h300v60H160Zm0-165v-60h470v60H160Zm0-165v-60h470v60H160Zm360 580v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q9 9 13 20t4 22q0 11-4.5 22.5T862.09-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
+        </svg>
+      </span>
+    </h1>
+    <div class="post-meta"><span title='2025-12-17 22:04:02 +0800 CST'>December 17, 2025</span>&nbsp;·&nbsp;13 min&nbsp;·&nbsp;2642 words&nbsp;·&nbsp;李睿杰
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e9%ab%98%e9%a2%91%e9%9d%a2%e8%af%95%e9%97%ae%e9%a2%98" aria-label="高频面试问题">高频面试问题</a><ul>
+                        
+                <li>
+                    <a href="#1-c%e8%99%9a%e5%87%bd%e6%95%b0%e7%9a%84%e5%ae%9e%e7%8e%b0%e5%8e%9f%e7%90%86%e6%98%af%e4%bb%80%e4%b9%88%e8%99%9a%e5%87%bd%e6%95%b0%e8%a1%a8vtable%e6%98%af%e6%80%8e%e4%b9%88%e5%b7%a5%e4%bd%9c%e7%9a%84" aria-label="1. C&#43;&#43;虚函数的实现原理是什么？虚函数表（vtable）是怎么工作的？">1. C++虚函数的实现原理是什么？虚函数表（vtable）是怎么工作的？</a></li>
+                <li>
+                    <a href="#2-c%e6%99%ba%e8%83%bd%e6%8c%87%e9%92%88%e6%9c%89%e5%93%aa%e4%ba%9b%e5%90%84%e8%87%aa%e7%9a%84%e4%bd%bf%e7%94%a8%e5%9c%ba%e6%99%af%e5%92%8c%e5%8e%9f%e7%90%86" aria-label="2. C&#43;&#43;智能指针有哪些？各自的使用场景和原理？">2. C++智能指针有哪些？各自的使用场景和原理？</a></li>
+                <li>
+                    <a href="#3-vector%e5%92%8clist%e6%9c%89%e4%bb%80%e4%b9%88%e5%8c%ba%e5%88%ab%e5%90%84%e8%87%aa%e9%80%82%e7%94%a8%e4%bb%80%e4%b9%88%e5%9c%ba%e6%99%af" aria-label="3. vector和list有什么区别？各自适用什么场景？">3. vector和list有什么区别？各自适用什么场景？</a></li>
+                <li>
+                    <a href="#4-%e8%af%b7%e6%8f%8f%e8%bf%b0%e5%9b%be%e5%bd%a2%e6%b8%b2%e6%9f%93%e7%ae%a1%e7%ba%bfrendering-pipeline%e7%9a%84%e4%b8%bb%e8%a6%81%e9%98%b6%e6%ae%b5" aria-label="4. 请描述图形渲染管线（Rendering Pipeline）的主要阶段">4. 请描述图形渲染管线（Rendering Pipeline）的主要阶段</a></li>
+                <li>
+                    <a href="#5-%e5%b8%a7%e5%90%8c%e6%ad%a5%e5%92%8c%e7%8a%b6%e6%80%81%e5%90%8c%e6%ad%a5%e7%9a%84%e5%8c%ba%e5%88%ab%e6%98%af%e4%bb%80%e4%b9%88%e5%90%84%e8%87%aa%e7%9a%84%e4%bc%98%e7%bc%ba%e7%82%b9" aria-label="5. 帧同步和状态同步的区别是什么？各自的优缺点？">5. 帧同步和状态同步的区别是什么？各自的优缺点？</a></li>
+                <li>
+                    <a href="#6-newdelete-%e5%92%8c-mallocfree-%e6%9c%89%e4%bb%80%e4%b9%88%e5%8c%ba%e5%88%ab" aria-label="6. new/delete 和 malloc/free 有什么区别？">6. new/delete 和 malloc/free 有什么区别？</a></li>
+                <li>
+                    <a href="#7-tcp%e4%b8%89%e6%ac%a1%e6%8f%a1%e6%89%8b%e4%b8%8e%e5%9b%9b%e6%ac%a1%e6%8c%a5%e6%89%8b%e7%9a%84%e8%bf%87%e7%a8%8b%e6%98%af%e4%bb%80%e4%b9%88%e4%b8%ba%e4%bb%80%e4%b9%88%e6%b8%b8%e6%88%8f%e7%bb%8f%e5%b8%b8%e4%bd%bf%e7%94%a8udp" aria-label="7. TCP三次握手与四次挥手的过程是什么？为什么游戏经常使用UDP？">7. TCP三次握手与四次挥手的过程是什么？为什么游戏经常使用UDP？</a></li>
+                <li>
+                    <a href="#8-%e4%bb%80%e4%b9%88%e6%98%afdrawcall%e5%a6%82%e4%bd%95%e4%bc%98%e5%8c%96drawcall" aria-label="8. 什么是DrawCall？如何优化DrawCall？">8. 什么是DrawCall？如何优化DrawCall？</a></li>
+                <li>
+                    <a href="#9-%e5%90%91%e9%87%8f%e7%9a%84%e7%82%b9%e4%b9%98%e5%92%8c%e5%8f%89%e4%b9%98%e5%9c%a8%e6%b8%b8%e6%88%8f%e5%bc%80%e5%8f%91%e4%b8%ad%e6%9c%89%e5%93%aa%e4%ba%9b%e5%ba%94%e7%94%a8" aria-label="9. 向量的点乘和叉乘在游戏开发中有哪些应用？">9. 向量的点乘和叉乘在游戏开发中有哪些应用？</a></li>
+                <li>
+                    <a href="#10-%e8%bf%9b%e7%a8%8b%e5%92%8c%e7%ba%bf%e7%a8%8b%e7%9a%84%e5%8c%ba%e5%88%ab%e6%98%af%e4%bb%80%e4%b9%88%e6%b8%b8%e6%88%8f%e4%b8%ad%e5%a4%9a%e7%ba%bf%e7%a8%8b%e6%9c%89%e5%93%aa%e4%ba%9b%e5%ba%94%e7%94%a8" aria-label="10. 进程和线程的区别是什么？游戏中多线程有哪些应用？">10. 进程和线程的区别是什么？游戏中多线程有哪些应用？</a></li>
+                <li>
+                    <a href="#11-%e8%ae%be%e8%ae%a1%e6%a8%a1%e5%bc%8f%e5%9c%a8%e6%b8%b8%e6%88%8f%e5%bc%80%e5%8f%91%e4%b8%ad%e6%9c%89%e5%93%aa%e4%ba%9b%e5%b8%b8%e8%a7%81%e5%ba%94%e7%94%a8" aria-label="11. 设计模式在游戏开发中有哪些常见应用？">11. 设计模式在游戏开发中有哪些常见应用？</a></li>
+                <li>
+                    <a href="#12-%e4%bb%80%e4%b9%88%e6%98%afgc%e5%9e%83%e5%9c%be%e5%9b%9e%e6%94%b6%e5%a6%82%e4%bd%95%e5%9c%a8%e6%b8%b8%e6%88%8f%e4%b8%ad%e5%87%8f%e5%b0%91gc%e7%9a%84%e5%bd%b1%e5%93%8d" aria-label="12. 什么是GC（垃圾回收）？如何在游戏中减少GC的影响？">12. 什么是GC（垃圾回收）？如何在游戏中减少GC的影响？</a></li>
+                <li>
+                    <a href="#13-%e5%88%a4%e6%96%ad%e4%b8%80%e4%b8%aa%e7%82%b9%e6%98%af%e5%90%a6%e5%9c%a8%e4%b8%89%e8%a7%92%e5%bd%a2%e5%86%85%e9%83%a8%e6%9c%89%e5%93%aa%e4%ba%9b%e6%96%b9%e6%b3%95" aria-label="13. 判断一个点是否在三角形内部有哪些方法？">13. 判断一个点是否在三角形内部有哪些方法？</a></li>
+                <li>
+                    <a href="#14-c-%e4%b8%ad%e7%9a%84%e5%9b%9b%e7%a7%8d%e7%b1%bb%e5%9e%8b%e8%bd%ac%e6%8d%a2cast%e5%88%86%e5%88%ab%e6%9c%89%e4%bb%80%e4%b9%88%e4%bd%9c%e7%94%a8" aria-label="14. C&#43;&#43; 中的四种类型转换（cast）分别有什么作用？">14. C++ 中的四种类型转换（cast）分别有什么作用？</a></li>
+                <li>
+                    <a href="#15-%e6%b8%b8%e6%88%8f%e6%80%a7%e8%83%bd%e4%bc%98%e5%8c%96%e6%9c%89%e5%93%aa%e4%ba%9b%e5%b8%b8%e8%a7%81%e6%80%9d%e8%b7%af%e5%92%8c%e6%96%b9%e6%b3%95" aria-label="15. 游戏性能优化有哪些常见思路和方法？">15. 游戏性能优化有哪些常见思路和方法？</a></li>
+                <li>
+                    <a href="#16-c%e4%b8%ad%e7%9a%84%e7%a7%bb%e5%8a%a8%e8%af%ad%e4%b9%89%e5%92%8c%e5%8f%b3%e5%80%bc%e5%bc%95%e7%94%a8%e6%98%af%e4%bb%80%e4%b9%88%e6%9c%89%e4%bb%80%e4%b9%88%e7%94%a8" aria-label="16. C&#43;&#43;中的移动语义和右值引用是什么？有什么用？">16. C++中的移动语义和右值引用是什么？有什么用？</a></li>
+                <li>
+                    <a href="#17-%e5%a0%86heap%e5%92%8c%e6%a0%88stack%e6%9c%89%e4%bb%80%e4%b9%88%e5%8c%ba%e5%88%ab" aria-label="17. 堆（Heap）和栈（Stack）有什么区别？">17. 堆（Heap）和栈（Stack）有什么区别？</a></li>
+                <li>
+                    <a href="#18-%e4%bb%80%e4%b9%88%e6%98%af%e5%86%85%e5%ad%98%e5%af%b9%e9%bd%90%e4%b8%ba%e4%bb%80%e4%b9%88%e9%9c%80%e8%a6%81%e5%86%85%e5%ad%98%e5%af%b9%e9%bd%90" aria-label="18. 什么是内存对齐？为什么需要内存对齐？">18. 什么是内存对齐？为什么需要内存对齐？</a></li>
+                <li>
+                    <a href="#19-%e6%b7%b1%e6%8b%b7%e8%b4%9d%e5%92%8c%e6%b5%85%e6%8b%b7%e8%b4%9d%e6%9c%89%e4%bb%80%e4%b9%88%e5%8c%ba%e5%88%ab" aria-label="19. 深拷贝和浅拷贝有什么区别？">19. 深拷贝和浅拷贝有什么区别？</a></li>
+                <li>
+                    <a href="#20-unordered_map-%e7%9a%84%e5%ba%95%e5%b1%82%e5%ae%9e%e7%8e%b0%e5%8e%9f%e7%90%86%e6%98%af%e4%bb%80%e4%b9%88%e5%92%8c-map-%e6%9c%89%e4%bb%80%e4%b9%88%e5%8c%ba%e5%88%ab" aria-label="20. unordered_map 的底层实现原理是什么？和 map 有什么区别？">20. unordered_map 的底层实现原理是什么？和 map 有什么区别？</a></li>
+                <li>
+                    <a href="#21-struct-%e5%92%8c-class-%e5%9c%a8c%e4%b8%ad%e6%9c%89%e4%bb%80%e4%b9%88%e5%8c%ba%e5%88%ab" aria-label="21. struct 和 class 在C&#43;&#43;中有什么区别？">21. struct 和 class 在C++中有什么区别？</a></li>
+                <li>
+                    <a href="#22-aa-star%e5%af%bb%e8%b7%af%e7%ae%97%e6%b3%95%e7%9a%84%e5%8e%9f%e7%90%86%e6%98%af%e4%bb%80%e4%b9%88" aria-label="22. A*（A-Star）寻路算法的原理是什么？">22. A*（A-Star）寻路算法的原理是什么？</a></li>
+                <li>
+                    <a href="#23-%e6%b8%b8%e6%88%8f%e4%b8%ad%e7%a2%b0%e6%92%9e%e6%a3%80%e6%b5%8b%e6%9c%89%e5%93%aa%e4%ba%9b%e5%b8%b8%e8%a7%81%e6%96%b9%e6%b3%95%e5%a6%82%e4%bd%95%e4%bc%98%e5%8c%96" aria-label="23. 游戏中碰撞检测有哪些常见方法？如何优化？">23. 游戏中碰撞检测有哪些常见方法？如何优化？</a></li>
+                <li>
+                    <a href="#24-%e6%b8%b8%e6%88%8fai%e4%b8%ad%e7%9a%84%e8%a1%8c%e4%b8%ba%e6%a0%91%e5%92%8c%e6%9c%89%e9%99%90%e7%8a%b6%e6%80%81%e6%9c%bafsm%e6%9c%89%e4%bb%80%e4%b9%88%e5%8c%ba%e5%88%ab" aria-label="24. 游戏AI中的行为树和有限状态机（FSM）有什么区别？">24. 游戏AI中的行为树和有限状态机（FSM）有什么区别？</a></li>
+                <li>
+                    <a href="#25-%e4%bb%80%e4%b9%88%e6%98%af%e5%af%b9%e8%b1%a1%e6%b1%a0object-pool%e4%b8%ba%e4%bb%80%e4%b9%88%e6%b8%b8%e6%88%8f%e4%b8%ad%e5%b9%bf%e6%b3%9b%e4%bd%bf%e7%94%a8" aria-label="25. 什么是对象池（Object Pool）？为什么游戏中广泛使用？">25. 什么是对象池（Object Pool）？为什么游戏中广泛使用？</a></li>
+                <li>
+                    <a href="#26-%e4%bb%80%e4%b9%88%e6%98%af-ecs-%e6%9e%b6%e6%9e%84%e5%92%8c%e4%bc%a0%e7%bb%9f-oop-%e6%9c%89%e4%bb%80%e4%b9%88%e5%8c%ba%e5%88%ab" aria-label="26. 什么是 ECS 架构？和传统 OOP 有什么区别？">26. 什么是 ECS 架构？和传统 OOP 有什么区别？</a></li>
+                <li>
+                    <a href="#27-%e7%ba%a2%e9%bb%91%e6%a0%91%e7%9a%84%e7%89%b9%e7%82%b9%e6%98%af%e4%bb%80%e4%b9%88%e4%b8%ba%e4%bb%80%e4%b9%88-stdmap-%e7%94%a8%e7%ba%a2%e9%bb%91%e6%a0%91%e8%80%8c%e4%b8%8d%e6%98%afavl%e6%a0%91" aria-label="27. 红黑树的特点是什么？为什么 std::map 用红黑树而不是AVL树？">27. 红黑树的特点是什么？为什么 std::map 用红黑树而不是AVL树？</a></li>
+                <li>
+                    <a href="#28-c-%e4%b8%ad%e5%a6%82%e4%bd%95%e6%a3%80%e6%b5%8b%e5%92%8c%e9%81%bf%e5%85%8d%e5%86%85%e5%ad%98%e6%b3%84%e6%bc%8f" aria-label="28. C&#43;&#43; 中如何检测和避免内存泄漏？">28. C++ 中如何检测和避免内存泄漏？</a></li>
+                <li>
+                    <a href="#29-%e4%bb%80%e4%b9%88%e6%98%af-lodlevel-of-detail%e6%b8%b8%e6%88%8f%e4%b8%ad%e5%a6%82%e4%bd%95%e4%bd%bf%e7%94%a8" aria-label="29. 什么是 LOD（Level of Detail）？游戏中如何使用？">29. 什么是 LOD（Level of Detail）？游戏中如何使用？</a></li>
+                <li>
+                    <a href="#30-%e6%9e%84%e9%80%a0%e5%87%bd%e6%95%b0%e5%92%8c%e6%9e%90%e6%9e%84%e5%87%bd%e6%95%b0%e7%9a%84%e8%b0%83%e7%94%a8%e9%a1%ba%e5%ba%8f%e6%98%af%e4%bb%80%e4%b9%88%e5%90%ab%e7%bb%a7%e6%89%bf%e5%92%8c%e7%bb%84%e5%90%88" aria-label="30. 构造函数和析构函数的调用顺序是什么？（含继承和组合）">30. 构造函数和析构函数的调用顺序是什么？（含继承和组合）</a></li>
+                <li>
+                    <a href="#31-%e5%a6%82%e4%bd%95%e8%ae%be%e8%ae%a1%e7%bc%96%e8%be%91%e5%99%a8%e7%9a%84%e6%92%a4%e9%94%80%e9%87%8d%e5%81%9aundoredo%e7%b3%bb%e7%bb%9f" aria-label="31. 如何设计编辑器的撤销/重做（Undo/Redo）系统？">31. 如何设计编辑器的撤销/重做（Undo/Redo）系统？</a></li>
+                <li>
+                    <a href="#32-%e5%ba%8f%e5%88%97%e5%8c%96%e4%b8%8e%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96%e6%98%af%e4%bb%80%e4%b9%88%e5%b7%a5%e5%85%b7%e9%93%be%e4%b8%ad%e6%80%8e%e4%b9%88%e7%94%a8" aria-label="32. 序列化与反序列化是什么？工具链中怎么用？">32. 序列化与反序列化是什么？工具链中怎么用？</a></li>
+                <li>
+                    <a href="#33-c-%e5%a6%82%e4%bd%95%e5%ae%9e%e7%8e%b0%e7%ae%80%e5%8d%95%e7%9a%84%e5%8f%8d%e5%b0%84%e7%b3%bb%e7%bb%9f%e5%9c%a8%e7%bc%96%e8%be%91%e5%99%a8%e4%b8%ad%e6%9c%89%e4%bb%80%e4%b9%88%e7%94%a8" aria-label="33. C&#43;&#43; 如何实现简单的反射系统？在编辑器中有什么用？">33. C++ 如何实现简单的反射系统？在编辑器中有什么用？</a></li>
+                <li>
+                    <a href="#34-%e5%9c%ba%e6%99%af%e9%a2%98%e4%b8%ba%e7%ad%96%e5%88%92%e8%ae%be%e8%ae%a1%e4%b8%80%e4%b8%aa%e6%8a%80%e8%83%bd%e7%bc%96%e8%be%91%e5%99%a8%e4%bd%a0%e4%bc%9a%e6%80%8e%e4%b9%88%e5%81%9a" aria-label="34. 场景题：为策划设计一个&quot;技能编辑器&quot;，你会怎么做？">34. 场景题：为策划设计一个&quot;技能编辑器&quot;，你会怎么做？</a></li>
+                <li>
+                    <a href="#35-ai--%e5%a4%a7%e6%a8%a1%e5%9e%8b%e5%9c%a8%e6%b8%b8%e6%88%8f%e5%86%85%e5%ae%b9%e7%94%9f%e4%ba%a7%e4%b8%ad%e6%9c%89%e4%bb%80%e4%b9%88%e5%ba%94%e7%94%a8" aria-label="35. AI / 大模型在游戏内容生产中有什么应用？">35. AI / 大模型在游戏内容生产中有什么应用？</a></li>
+                <li>
+                    <a href="#36-%e6%9e%84%e5%bb%ba%e4%b8%80%e6%ac%a1%e5%ae%8c%e6%95%b4%e5%8c%85%e4%bd%93%e9%9c%80%e8%a6%81-2-%e5%b0%8f%e6%97%b6%e4%bd%a0%e6%80%8e%e4%b9%88%e4%bc%98%e5%8c%96" aria-label="36. 构建一次完整包体需要 2 小时，你怎么优化？">36. 构建一次完整包体需要 2 小时，你怎么优化？</a></li>
+                <li>
+                    <a href="#37-c-%e4%b8%ad%e5%a6%82%e4%bd%95%e5%9c%a8%e4%b8%8d%e9%98%bb%e5%a1%9e-ui-%e7%9a%84%e6%83%85%e5%86%b5%e4%b8%8b%e6%89%a7%e8%a1%8c%e8%80%97%e6%97%b6%e4%bb%bb%e5%8a%a1" aria-label="37. C&#43;&#43; 中如何在不阻塞 UI 的情况下执行耗时任务？">37. C++ 中如何在不阻塞 UI 的情况下执行耗时任务？</a></li>
+                <li>
+                    <a href="#38-%e4%bb%80%e4%b9%88%e6%98%af-ai-agent%e5%92%8c%e6%99%ae%e9%80%9a-llm-%e5%af%b9%e8%af%9d%e6%9c%89%e4%bb%80%e4%b9%88%e5%8c%ba%e5%88%ab" aria-label="38. 什么是 AI Agent？和普通 LLM 对话有什么区别？">38. 什么是 AI Agent？和普通 LLM 对话有什么区别？</a></li>
+                <li>
+                    <a href="#39-%e4%bb%80%e4%b9%88%e6%98%af-rag%e5%9c%a8%e6%b8%b8%e6%88%8f%e5%b7%a5%e5%85%b7%e4%b8%ad%e6%9c%89%e4%bb%80%e4%b9%88%e7%94%a8" aria-label="39. 什么是 RAG？在游戏工具中有什么用？">39. 什么是 RAG？在游戏工具中有什么用？</a></li>
+                <li>
+                    <a href="#40-%e5%9c%ba%e6%99%af%e9%a2%98%e5%9c%a8%e7%bc%96%e8%be%91%e5%99%a8%e4%b8%ad%e9%9b%86%e6%88%90-ai-%e5%8a%a9%e6%89%8b%e7%ad%96%e5%88%92%e7%94%a8%e8%87%aa%e7%84%b6%e8%af%ad%e8%a8%80%e6%93%8d%e4%bd%9c%e5%b7%a5%e5%85%b7%e6%80%8e%e4%b9%88%e8%ae%be%e8%ae%a1" aria-label="40. 场景题：在编辑器中集成 AI 助手，策划用自然语言操作工具，怎么设计？">40. 场景题：在编辑器中集成 AI 助手，策划用自然语言操作工具，怎么设计？</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h1 id="高频面试问题">高频面试问题<a hidden class="anchor" aria-hidden="true" href="#高频面试问题">#</a></h1>
+<h2 id="1-c虚函数的实现原理是什么虚函数表vtable是怎么工作的">1. C++虚函数的实现原理是什么？虚函数表（vtable）是怎么工作的？<a hidden class="anchor" aria-hidden="true" href="#1-c虚函数的实现原理是什么虚函数表vtable是怎么工作的">#</a></h2>
+<p><strong>高频指数：★★★★★</strong> | 来源：腾讯/网易/米哈游/库洛 几乎必问</p>
+<p><strong>解答：</strong></p>
+<p>虚函数是C++实现运行时多态的核心机制。当基类中将某个函数声明为<code>virtual</code>时，编译器会为该类生成一张<strong>虚函数表（vtable）</strong>，其中存放了该类所有虚函数的函数指针。</p>
+<p><strong>核心原理：</strong></p>
+<ul>
+<li><strong>虚函数表（vtable）</strong>：每个含有虚函数的类都有一张vtable，存储在只读数据段（.rodata）。它本质上是一个函数指针数组，里面存放着该类各虚函数的实际地址。vtable在<strong>编译期</strong>创建，与类绑定。</li>
+<li><strong>虚表指针（vptr）</strong>：每个对象的内存布局最前面都隐藏了一个指向vtable的指针（vptr），在构造函数中被初始化。vptr与对象绑定，同一个类的不同对象共享同一张vtable。</li>
+<li><strong>动态绑定过程</strong>：通过基类指针或引用调用虚函数时，程序在运行时通过对象的vptr找到vtable，再从vtable中查找目标虚函数的实际地址，从而调用到派生类重写后的版本。</li>
+</ul>
+<p><strong>常见追问：</strong></p>
+<ul>
+<li><strong>构造函数能否为虚函数？</strong> 不能。因为构造时对象尚未完成初始化，vtable还未建立，无法通过vptr找到虚函数。</li>
+<li><strong>析构函数为何要设为虚函数？</strong> 如果通过基类指针删除派生类对象，非虚析构函数只会调用基类的析构，导致派生类资源泄漏。</li>
+<li><strong>虚函数能否内联？</strong> 当编译器能在编译期确定调用对象的具体类型时可以内联；表现多态性时（运行期）不可以内联。</li>
+</ul>
+<hr>
+<h2 id="2-c智能指针有哪些各自的使用场景和原理">2. C++智能指针有哪些？各自的使用场景和原理？<a hidden class="anchor" aria-hidden="true" href="#2-c智能指针有哪些各自的使用场景和原理">#</a></h2>
+<p><strong>高频指数：★★★★★</strong> | 来源：腾讯/米哈游/深蓝互动 等</p>
+<p><strong>解答：</strong></p>
+<p>C++11 引入了三种智能指针来自动管理堆内存生命周期，避免内存泄漏：</p>
+<table>
+  <thead>
+      <tr>
+          <th>类型</th>
+          <th>特点</th>
+          <th>使用场景</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>unique_ptr</code></td>
+          <td>独占所有权，不可拷贝，可移动</td>
+          <td>资源由单一所有者管理</td>
+      </tr>
+      <tr>
+          <td><code>shared_ptr</code></td>
+          <td>共享所有权，引用计数</td>
+          <td>多个对象共享同一资源</td>
+      </tr>
+      <tr>
+          <td><code>weak_ptr</code></td>
+          <td>不增加引用计数，解决循环引用</td>
+          <td>打破<code>shared_ptr</code>循环引用</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>shared_ptr 的原理：</strong> 内部维护一个控制块，包含强引用计数和弱引用计数。每次拷贝时强引用计数+1，析构时-1，当强引用计数归零时释放资源，当弱引用计数也归零时释放控制块。</p>
+<p><strong>常见追问：</strong></p>
+<ul>
+<li><strong>shared_ptr 是否线程安全？</strong> 引用计数的增减是原子操作（线程安全），但指向对象本身的读写不是线程安全的。</li>
+<li><strong>循环引用举例？</strong> A持有B的shared_ptr，B也持有A的shared_ptr，两者引用计数永远不会归零。解决方案是将其中一方改为weak_ptr。</li>
+<li><strong>UE4的智能指针？</strong> UE4有自己的<code>TSharedPtr</code>、<code>TWeakPtr</code>、<code>TUniquePtr</code>体系，原理类似但与标准库独立。</li>
+</ul>
+<hr>
+<h2 id="3-vector和list有什么区别各自适用什么场景">3. vector和list有什么区别？各自适用什么场景？<a hidden class="anchor" aria-hidden="true" href="#3-vector和list有什么区别各自适用什么场景">#</a></h2>
+<p><strong>高频指数：★★★★★</strong> | 来源：库洛/腾讯/米哈游 等</p>
+<p><strong>解答：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th>std::vector</th>
+          <th>std::list</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>底层结构</td>
+          <td>动态数组（连续内存）</td>
+          <td>双向链表（离散内存）</td>
+      </tr>
+      <tr>
+          <td>随机访问</td>
+          <td>O(1)</td>
+          <td>O(n)</td>
+      </tr>
+      <tr>
+          <td>尾部插入/删除</td>
+          <td>均摊 O(1)</td>
+          <td>O(1)</td>
+      </tr>
+      <tr>
+          <td>中间插入/删除</td>
+          <td>O(n)（需移动元素）</td>
+          <td>O(1)（已知迭代器位置）</td>
+      </tr>
+      <tr>
+          <td>缓存友好性</td>
+          <td>极好（连续内存，cache命中率高）</td>
+          <td>差（节点分散，cache不友好）</td>
+      </tr>
+      <tr>
+          <td>内存开销</td>
+          <td>低（仅数据+少量管理信息）</td>
+          <td>高（每个节点额外存储前驱/后继指针）</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>适用场景：</strong></p>
+<ul>
+<li><strong>vector</strong>：需要频繁随机访问、尾部增删、或数据量确定的场景。游戏中大部分场景优先选择vector。</li>
+<li><strong>list</strong>：需要在序列中间频繁插入/删除，且不需要随机访问的场景。</li>
+</ul>
+<p><strong>常见追问：</strong></p>
+<ul>
+<li><strong>vector扩容机制？</strong> 当size超过capacity时，分配新的更大内存（通常2倍），将旧元素拷贝/移动到新内存，然后释放旧内存。这个过程会导致所有迭代器失效。</li>
+<li><strong>顺序遍历谁更快？</strong> vector更快，因为连续内存对CPU缓存行极其友好，预取机制可以大幅减少cache miss。</li>
+</ul>
+<hr>
+<h2 id="4-请描述图形渲染管线rendering-pipeline的主要阶段">4. 请描述图形渲染管线（Rendering Pipeline）的主要阶段<a hidden class="anchor" aria-hidden="true" href="#4-请描述图形渲染管线rendering-pipeline的主要阶段">#</a></h2>
+<p><strong>高频指数：★★★★★</strong> | 来源：几乎所有游戏公司必考</p>
+<p><strong>解答：</strong></p>
+<p>渲染管线是将三维场景数据最终转化为屏幕上二维图像的完整流程，可分为三个大阶段：</p>
+<p><strong>（1）应用阶段（CPU端）</strong></p>
+<p>由CPU负责：场景管理、可见性判断（视锥体剔除、遮挡剔除等）、设置渲染状态、提交Draw Call给GPU。</p>
+<p><strong>（2）几何阶段（GPU端）</strong></p>
+<ul>
+<li><strong>顶点着色器</strong>：对每个顶点执行变换（模型空间→世界空间→观察空间→裁剪空间），可进行光照计算、顶点动画等。</li>
+<li><strong>图元装配</strong>：将顶点组装成三角形等图元。</li>
+<li><strong>几何着色器（可选）</strong>：可以增删图元。</li>
+<li><strong>裁剪</strong>：丢弃视锥体外的图元，裁切部分可见的图元。</li>
+<li><strong>屏幕映射</strong>：将裁剪空间坐标通过透视除法和视口变换映射到屏幕坐标。</li>
+</ul>
+<p><strong>（3）光栅化阶段（GPU端）</strong></p>
+<ul>
+<li><strong>三角形遍历/光栅化</strong>：判断哪些像素被三角形覆盖，对顶点属性进行插值。</li>
+<li><strong>片段/像素着色器</strong>：计算每个片段的颜色（纹理采样、光照计算等）。</li>
+<li><strong>测试与混合</strong>：深度测试、模板测试、Alpha混合等，最终写入帧缓冲。</li>
+</ul>
+<p><strong>常见追问：</strong></p>
+<ul>
+<li><strong>坐标空间变换顺序？</strong> 模型空间 → 世界空间(M矩阵) → 观察空间(V矩阵) → 裁剪空间(P矩阵) → NDC(透视除法) → 屏幕空间(视口变换)。</li>
+<li><strong>Early-Z是什么？</strong> GPU在片段着色之前提前做深度测试，跳过被遮挡的片段，减少不必要的着色计算。</li>
+</ul>
+<hr>
+<h2 id="5-帧同步和状态同步的区别是什么各自的优缺点">5. 帧同步和状态同步的区别是什么？各自的优缺点？<a hidden class="anchor" aria-hidden="true" href="#5-帧同步和状态同步的区别是什么各自的优缺点">#</a></h2>
+<p><strong>高频指数：★★★★★</strong> | 来源：腾讯/网易/深蓝 等游戏公司高频</p>
+<p><strong>解答：</strong></p>
+<p>这是网络游戏中两种主流的多人同步方案：</p>
+<p><strong>帧同步（Lockstep / Deterministic Lockstep）</strong></p>
+<ul>
+<li><strong>原理</strong>：所有客户端以相同的初始状态运行相同的逻辑，服务器只转发玩家的操作输入。只要逻辑完全确定性（相同输入→相同输出），各客户端的游戏状态就会保持一致。</li>
+<li><strong>优点</strong>：带宽消耗小（只传输操作指令）；天然支持回放和战斗校验。</li>
+<li><strong>缺点</strong>：要求逻辑严格确定性（浮点数一致性、随机数种子同步等）；一人卡顿全员等待（或需额外优化）；断线重连需要从头模拟所有帧。</li>
+<li><strong>适用</strong>：RTS、MOBA、格斗等（如《王者荣耀》）。</li>
+</ul>
+<p><strong>状态同步（State Synchronization）</strong></p>
+<ul>
+<li><strong>原理</strong>：服务器运行核心游戏逻辑，是游戏世界的权威。客户端将操作发送到服务器，服务器计算结果后将状态广播给所有客户端。</li>
+<li><strong>优点</strong>：对客户端逻辑一致性要求低；断线重连简单（直接同步当前状态）；防作弊能力强。</li>
+<li><strong>缺点</strong>：带宽消耗较大（需要同步大量状态数据）；开发复杂度高（需要客户端预测、服务端回滚等机制来掩盖延迟）。</li>
+<li><strong>适用</strong>：MMO、FPS等（如《原神》、《守望先锋》）。</li>
+</ul>
+<p><strong>常见追问：</strong></p>
+<ul>
+<li><strong>客户端预测和服务端回滚？</strong> 客户端不等服务器响应直接执行操作（预测），收到服务器结果后如有偏差则回滚纠正（和解），提升操作手感。</li>
+<li><strong>如何处理网络波动？</strong> 延迟补偿、插值平滑、缓冲帧等技术。</li>
+</ul>
+<hr>
+<h2 id="6-newdelete-和-mallocfree-有什么区别">6. new/delete 和 malloc/free 有什么区别？<a hidden class="anchor" aria-hidden="true" href="#6-newdelete-和-mallocfree-有什么区别">#</a></h2>
+<p><strong>高频指数：★★★★☆</strong> | 来源：腾讯/网易/米哈游/库洛</p>
+<p><strong>解答：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>对比维度</th>
+          <th>new/delete</th>
+          <th>malloc/free</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>本质</td>
+          <td>C++运算符（操作符重载）</td>
+          <td>C语言标准库函数</td>
+      </tr>
+      <tr>
+          <td>类型安全</td>
+          <td>返回对象指针，类型安全</td>
+          <td>返回void*，需要强制转换</td>
+      </tr>
+      <tr>
+          <td>构造/析构</td>
+          <td>自动调用构造函数/析构函数</td>
+          <td>仅分配/释放内存，不调用</td>
+      </tr>
+      <tr>
+          <td>分配失败</td>
+          <td>抛出<code>std::bad_alloc</code>异常</td>
+          <td>返回NULL</td>
+      </tr>
+      <tr>
+          <td>大小计算</td>
+          <td>自动计算所需大小</td>
+          <td>需手动传入字节数</td>
+      </tr>
+      <tr>
+          <td>可重载</td>
+          <td>可以被重载（operator new）</td>
+          <td>不可重载</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>游戏开发相关延伸：</strong></p>
+<ul>
+<li>游戏引擎通常会重载<code>operator new</code>来使用自定义内存分配器（如内存池），以减少内存碎片和分配开销。</li>
+<li>UE4/UE5中使用<code>FMemory::Malloc</code>等自定义内存管理接口，通常不直接使用标准的new/malloc。</li>
+</ul>
+<hr>
+<h2 id="7-tcp三次握手与四次挥手的过程是什么为什么游戏经常使用udp">7. TCP三次握手与四次挥手的过程是什么？为什么游戏经常使用UDP？<a hidden class="anchor" aria-hidden="true" href="#7-tcp三次握手与四次挥手的过程是什么为什么游戏经常使用udp">#</a></h2>
+<p><strong>高频指数：★★★★☆</strong> | 来源：腾讯/网易/米哈游 等</p>
+<p><strong>解答：</strong></p>
+<p><strong>三次握手（建立连接）：</strong></p>
+<ol>
+<li>客户端发送SYN报文（SYN=1, seq=x），进入SYN_SENT状态。</li>
+<li>服务端收到后回复SYN+ACK（SYN=1, ACK=1, seq=y, ack=x+1），进入SYN_RCVD状态。</li>
+<li>客户端回复ACK（ACK=1, seq=x+1, ack=y+1），双方进入ESTABLISHED状态。</li>
+</ol>
+<p><strong>四次挥手（断开连接）：</strong></p>
+<ol>
+<li>主动方发送FIN，进入FIN_WAIT_1。</li>
+<li>被动方回复ACK，进入CLOSE_WAIT（主动方进入FIN_WAIT_2）。</li>
+<li>被动方发送FIN，进入LAST_ACK。</li>
+<li>主动方回复ACK，进入TIME_WAIT（等待2MSL后关闭），被动方收到后关闭。</li>
+</ol>
+<p><strong>为什么游戏常用UDP？</strong></p>
+<p>TCP的可靠传输（重传、排序）会引入额外延迟。对于实时性要求极高的游戏（FPS、MOBA），过期的数据包没有重传价值（例如，上一帧的位置信息已无意义）。因此游戏通常基于UDP自行实现可靠性控制：只对关键数据（如技能释放）做可靠传输，对位置同步等高频但容忍丢失的数据直接使用不可靠传输，从而在延迟和可靠性之间取得平衡。常见方案如KCP协议。</p>
+<hr>
+<h2 id="8-什么是drawcall如何优化drawcall">8. 什么是DrawCall？如何优化DrawCall？<a hidden class="anchor" aria-hidden="true" href="#8-什么是drawcall如何优化drawcall">#</a></h2>
+<p><strong>高频指数：★★★★☆</strong> | 来源：腾讯/网易 Unity/UE方向</p>
+<p><strong>解答：</strong></p>
+<p><strong>DrawCall</strong> 是CPU向GPU发出的一次绘制指令。每次DrawCall前，CPU需要设置渲染状态（材质、纹理、Shader参数等），然后提交命令给GPU。DrawCall本身的开销不在于GPU绘制，而在于<strong>CPU端的状态切换和命令提交</strong>。当DrawCall数量过多时，CPU成为瓶颈。</p>
+<p><strong>优化手段：</strong></p>
+<ul>
+<li><strong>批处理（Batching）</strong>：将使用相同材质的多个物体合并为一次DrawCall。
+<ul>
+<li>静态合批：不移动的物体预先合并网格。</li>
+<li>动态合批：引擎运行时自动合并小型网格（有顶点数限制）。</li>
+<li>GPU Instancing：同一网格不同位置/参数的大批量绘制。</li>
+</ul>
+</li>
+<li><strong>图集/纹理合并（Texture Atlas）</strong>：将多张小纹理合并为一张大纹理，使多个UI元素或物体共用同一材质。</li>
+<li><strong>减少材质种类</strong>：尽量让场景物体共享材质。</li>
+<li><strong>视锥体剔除（Frustum Culling）</strong>：不渲染摄像机看不到的物体。</li>
+<li><strong>遮挡剔除（Occlusion Culling）</strong>：不渲染被其他物体完全遮挡的物体。</li>
+<li><strong>LOD（Level of Detail）</strong>：远处物体使用低精度模型，减少顶点和DrawCall。</li>
+</ul>
+<hr>
+<h2 id="9-向量的点乘和叉乘在游戏开发中有哪些应用">9. 向量的点乘和叉乘在游戏开发中有哪些应用？<a hidden class="anchor" aria-hidden="true" href="#9-向量的点乘和叉乘在游戏开发中有哪些应用">#</a></h2>
+<p><strong>高频指数：★★★★☆</strong> | 来源：腾讯/网易/米哈游/库洛</p>
+<p><strong>解答：</strong></p>
+<p><strong>点乘（Dot Product）：a·b = |a||b|cosθ</strong></p>
+<p>点乘结果是标量，反映两个向量的方向关系。</p>
+<ul>
+<li><strong>判断前后关系</strong>：点乘 &gt; 0 表示同侧（目标在前方），&lt; 0 表示反侧（目标在后方），= 0 表示垂直。</li>
+<li><strong>计算夹角</strong>：cosθ = (a·b) / (|a||b|)，用于FOV判定、敌人视野检测。</li>
+<li><strong>投影</strong>：一个向量在另一个向量方向上的分量长度。</li>
+<li><strong>光照计算</strong>：Lambert光照模型中，漫反射强度 = max(0, N·L)。</li>
+</ul>
+<p><strong>叉乘（Cross Product）：a×b = |a||b|sinθ · n</strong></p>
+<p>叉乘结果是向量，垂直于原来两个向量构成的平面。</p>
+<ul>
+<li><strong>判断左右关系</strong>：通过叉乘结果的方向（正/负）判断目标在自身的左侧还是右侧，用于转向逻辑。</li>
+<li><strong>计算法线</strong>：三角形两条边的叉乘得到面法线。</li>
+<li><strong>判断点在三角形内</strong>：用叉乘法判断点是否在三条边的同一侧。</li>
+<li><strong>计算面积</strong>：|a×b| / 2 = 三角形面积。</li>
+<li><strong>旋转轴</strong>：用于求两个方向之间的旋转轴。</li>
+</ul>
+<hr>
+<h2 id="10-进程和线程的区别是什么游戏中多线程有哪些应用">10. 进程和线程的区别是什么？游戏中多线程有哪些应用？<a hidden class="anchor" aria-hidden="true" href="#10-进程和线程的区别是什么游戏中多线程有哪些应用">#</a></h2>
+<p><strong>高频指数：★★★★☆</strong> | 来源：腾讯/网易/完美世界 等</p>
+<p><strong>解答：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>对比维度</th>
+          <th>进程</th>
+          <th>线程</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>定义</td>
+          <td>资源分配的基本单位</td>
+          <td>CPU调度的基本单位</td>
+      </tr>
+      <tr>
+          <td>内存空间</td>
+          <td>独立地址空间</td>
+          <td>共享所属进程的地址空间</td>
+      </tr>
+      <tr>
+          <td>通信方式</td>
+          <td>管道、共享内存、消息队列等IPC</td>
+          <td>直接读写共享内存（需同步）</td>
+      </tr>
+      <tr>
+          <td>创建开销</td>
+          <td>大（需分配独立资源）</td>
+          <td>小</td>
+      </tr>
+      <tr>
+          <td>安全性</td>
+          <td>进程间互不影响</td>
+          <td>一个线程崩溃可能影响整个进程</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>游戏中多线程的典型应用：</strong></p>
+<ul>
+<li><strong>渲染线程</strong>：将渲染命令的生成与提交分离到独立线程，避免阻塞主逻辑。</li>
+<li><strong>资源加载</strong>：异步加载纹理、模型、音频等资源，防止主线程卡顿。</li>
+<li><strong>物理模拟</strong>：复杂的物理计算（碰撞检测、刚体模拟）放入独立线程。</li>
+<li><strong>网络通信</strong>：网络收发在独立线程中进行，避免网络延迟阻塞游戏逻辑。</li>
+<li><strong>AI计算</strong>：大量AI的寻路和决策可以并行计算。</li>
+</ul>
+<p><strong>常见追问：</strong></p>
+<ul>
+<li><strong>线程同步手段？</strong> 互斥锁（mutex）、信号量（semaphore）、条件变量、原子操作等。</li>
+<li><strong>什么是死锁？</strong> 两个或多个线程各持有对方所需的锁，互相等待导致永久阻塞。避免死锁的方法包括固定加锁顺序、使用trylock、设置超时等。</li>
+</ul>
+<hr>
+<h2 id="11-设计模式在游戏开发中有哪些常见应用">11. 设计模式在游戏开发中有哪些常见应用？<a hidden class="anchor" aria-hidden="true" href="#11-设计模式在游戏开发中有哪些常见应用">#</a></h2>
+<p><strong>高频指数：★★★★☆</strong> | 来源：网易/腾讯/库洛/米哈游</p>
+<p><strong>解答：</strong></p>
+<p>游戏开发中最常考的几种设计模式：</p>
+<p><strong>单例模式（Singleton）：</strong> 确保一个类只有一个实例，并提供全局访问点。游戏中常用于管理器类，如AudioManager、GameManager。面试时常要求手写线程安全的单例（双重检查锁定 + volatile/atomic，或C++11的局部静态变量天然线程安全）。</p>
+<p><strong>观察者模式（Observer）：</strong> 一对多的依赖关系，当一个对象状态变化时自动通知所有依赖者。游戏中广泛用于事件系统，如角色血量变化通知UI更新。</p>
+<p><strong>状态模式（State）：</strong> 将对象的行为封装在不同的状态类中，根据当前状态执行不同的逻辑。典型应用是角色的动画状态机（Idle、Run、Jump、Attack等状态切换）。</p>
+<p><strong>工厂模式（Factory）：</strong> 定义创建对象的接口，让子类决定实例化哪个类。游戏中用于创建不同类型的敌人、道具、特效等。</p>
+<p><strong>组件模式（Component）：</strong> 通过组合而非继承来扩展功能，将功能拆分为独立组件挂载到实体上。这是Unity和UE引擎的核心架构思想（Entity-Component 或 Actor-Component）。</p>
+<p><strong>对象池模式（Object Pool）：</strong> 预先创建一批对象，需要时从池中取出使用完后归还，避免频繁创建/销毁带来的GC压力和性能开销。典型用于子弹、特效粒子、敌人等高频创建销毁的对象。</p>
+<hr>
+<h2 id="12-什么是gc垃圾回收如何在游戏中减少gc的影响">12. 什么是GC（垃圾回收）？如何在游戏中减少GC的影响？<a hidden class="anchor" aria-hidden="true" href="#12-什么是gc垃圾回收如何在游戏中减少gc的影响">#</a></h2>
+<p><strong>高频指数：★★★★☆</strong> | 来源：Unity方向/UE方向均会问</p>
+<p><strong>解答：</strong></p>
+<p><strong>GC（Garbage Collection）</strong> 是一种自动内存管理机制，运行时自动检测并回收不再被引用的对象所占用的内存。C#（Unity使用）和Lua等语言依赖GC管理内存。</p>
+<p><strong>GC的问题：</strong> GC运行时可能造成帧率波动（GC Spike），因为它需要暂停或拖慢程序执行来遍历和回收内存。对于实时游戏来说这是不可接受的。</p>
+<p><strong>减少GC影响的策略：</strong></p>
+<ul>
+<li><strong>对象池</strong>：复用对象而非频繁创建/销毁（子弹、特效、敌人等）。</li>
+<li><strong>避免频繁分配临时对象</strong>：如在Update中不要每帧new对象或拼接字符串。</li>
+<li><strong>使用值类型</strong>：在C#中优先使用struct而非class来减少堆内存分配。</li>
+<li><strong>缓存组件引用</strong>：避免在每帧调用<code>GetComponent</code>等产生隐式分配的API。</li>
+<li><strong>预分配容器</strong>：List、Dictionary等预设容量，避免运行时扩容。</li>
+<li><strong>主动触发GC</strong>：在非关键时刻（如Loading界面）手动调用GC。</li>
+</ul>
+<p><strong>UE方向追问：</strong> UE4/UE5有自己的GC系统（标记-清除），通过<code>UPROPERTY</code>宏让反射系统追踪UObject的引用关系，可以通过调节GC频率、减少UObject数量等方式优化。</p>
+<hr>
+<h2 id="13-判断一个点是否在三角形内部有哪些方法">13. 判断一个点是否在三角形内部有哪些方法？<a hidden class="anchor" aria-hidden="true" href="#13-判断一个点是否在三角形内部有哪些方法">#</a></h2>
+<p><strong>高频指数：★★★★☆</strong> | 来源：腾讯/米哈游/网易 图形学基础题</p>
+<p><strong>解答：</strong></p>
+<p>常见的三种方法：</p>
+<p><strong>方法一：叉乘法（同侧法）</strong></p>
+<p>对三角形的三条边AB、BC、CA，分别计算该边向量与该边起点到待判点P的向量的叉乘。如果三个叉乘结果的符号（方向）相同，则P在三角形内部。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Cross(AB, AP) 与 Cross(BC, BP) 与 Cross(CA, CP) 符号一致 → P在内部
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>方法二：重心坐标法</strong></p>
+<p>将点P表示为三角形三个顶点的加权组合：P = αA + βB + γC，其中 α + β + γ = 1。如果 α、β、γ 均在 [0, 1] 范围内，则P在三角形内。重心坐标法同时可以用于属性插值（颜色、UV、法线等），是光栅化阶段的核心。</p>
+<p><strong>方法三：面积法</strong></p>
+<p>计算三角形ABP、BCP、ACP的面积之和，若等于三角形ABC的面积，则P在内部。面积可通过叉乘的模来计算。</p>
+<p><strong>游戏实际应用：</strong> 光栅化中判断像素是否在三角形内、碰撞检测中的射线-三角形相交判定（Möller-Trumbore算法）等。</p>
+<hr>
+<h2 id="14-c-中的四种类型转换cast分别有什么作用">14. C++ 中的四种类型转换（cast）分别有什么作用？<a hidden class="anchor" aria-hidden="true" href="#14-c-中的四种类型转换cast分别有什么作用">#</a></h2>
+<p><strong>高频指数：★★★★☆</strong> | 来源：腾讯/网易/完美/库洛</p>
+<p><strong>解答：</strong></p>
+<p>C++提供了四种命名的类型转换运算符，取代C风格的强制类型转换，使意图更明确、更安全：</p>
+<p><strong>static_cast：</strong> 编译时执行的常规类型转换。用于基本类型之间的转换（int→float）、有继承关系的指针/引用转换（向上转换安全，向下转换不做运行时检查，需要程序员保证安全性）、void*转具体类型等。</p>
+<p><strong>dynamic_cast：</strong> 运行时类型检查的安全向下转换。只能用于含有虚函数的多态类型。如果转换失败，指针返回nullptr，引用抛出<code>std::bad_cast</code>异常。底层依赖RTTI（运行时类型信息）。</p>
+<p><strong>const_cast：</strong> 添加或移除const/volatile限定符。这是唯一能去除const属性的转换方式。通常用于与不接受const参数的旧接口兼容。</p>
+<p><strong>reinterpret_cast：</strong> 最低级别的位模式重新解释，在不相关的类型之间做&quot;硬转换&quot;。非常不安全，几乎不进行任何检查。游戏中偶尔用于底层内存操作、序列化等。</p>
+<p><strong>游戏开发追问：</strong> <code>dynamic_cast</code>有运行时开销（需要遍历继承链），游戏中如果频繁使用会影响性能。因此UE4用自己的<code>Cast&lt;T&gt;()</code>函数（基于UObject类型系统），比标准的dynamic_cast更高效。</p>
+<hr>
+<h2 id="15-游戏性能优化有哪些常见思路和方法">15. 游戏性能优化有哪些常见思路和方法？<a hidden class="anchor" aria-hidden="true" href="#15-游戏性能优化有哪些常见思路和方法">#</a></h2>
+<p><strong>高频指数：★★★★★</strong> | 来源：几乎所有游戏公司的综合性提问</p>
+<p><strong>解答：</strong></p>
+<p>游戏性能优化是一个综合性话题，面试中可以从以下维度展开：</p>
+<p><strong>CPU端优化：</strong></p>
+<ul>
+<li>减少DrawCall（批处理、合并网格、图集等，见第8题）。</li>
+<li>对象池减少频繁的内存分配和GC。</li>
+<li>使用高效的数据结构和算法，注意缓存友好性（如使用连续内存的数组而非链表）。</li>
+<li>空间分区（四叉树、八叉树、BVH等）加速碰撞检测和场景查询。</li>
+<li>多线程：将耗时计算（物理、AI、资源加载）放到子线程。</li>
+<li>减少Tick/Update中的开销，避免每帧做重复计算。</li>
+</ul>
+<p><strong>GPU端/渲染优化：</strong></p>
+<ul>
+<li>LOD：远处物体使用低精度模型和纹理。</li>
+<li>Mipmap：根据物体距离使用不同分辨率的纹理，提高缓存命中率。</li>
+<li>遮挡剔除 + 视锥体剔除：不渲染看不到的物体。</li>
+<li>减少Overdraw：控制透明物体的绘制、合理安排渲染顺序（先渲染不透明物体）。</li>
+<li>Shader优化：减少复杂的数学运算，使用低精度浮点。</li>
+<li>纹理压缩：使用ASTC、ETC2、BC等GPU原生压缩格式。</li>
+</ul>
+<p><strong>内存优化：</strong></p>
+<ul>
+<li>资源分级加载与卸载，使用流式加载（Streaming）。</li>
+<li>纹理压缩、网格压缩减少资源占用。</li>
+<li>使用Profiler工具（Unity Profiler / UE Insights / RenderDoc等）定位瓶颈。</li>
+<li>对象池和内存池减少碎片化。</li>
+</ul>
+<p><strong>网络优化：</strong></p>
+<ul>
+<li>减少同步数据量（差值同步、压缩、降频）。</li>
+<li>客户端预测 + 插值平滑，减少感知延迟。</li>
+<li>AOI（Area of Interest）：只同步玩家附近的实体状态。</li>
+</ul>
+<hr>
+<h2 id="16-c中的移动语义和右值引用是什么有什么用">16. C++中的移动语义和右值引用是什么？有什么用？<a hidden class="anchor" aria-hidden="true" href="#16-c中的移动语义和右值引用是什么有什么用">#</a></h2>
+<p><strong>高频指数：★★★★★</strong> | 来源：腾讯/米哈游/网易 等，C++11新特性必考题</p>
+<p><strong>解答：</strong></p>
+<p>C++11 引入了<strong>右值引用（T&amp;&amp;）<strong>和</strong>移动语义（Move Semantics）</strong>，核心目的是避免不必要的深拷贝，提升性能。</p>
+<p><strong>左值与右值：</strong></p>
+<ul>
+<li><strong>左值（lvalue）</strong>：有名字、能取地址的表达式，如 <code>int a = 10;</code> 中的 <code>a</code>。</li>
+<li><strong>右值（rvalue）</strong>：没有名字、不能取地址的临时值，如 <code>10</code>、<code>a + b</code>、函数返回的临时对象。</li>
+</ul>
+<p><strong>右值引用（T&amp;&amp;）：</strong> 可以绑定到右值上，从而&quot;接管&quot;临时对象的资源，而不是拷贝。</p>
+<p><strong>移动构造函数与移动赋值运算符：</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Buffer</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span><span class="o">*</span> <span class="n">data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">size_t</span> <span class="n">size</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 移动构造：直接&#34;偷&#34;走other的资源
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">Buffer</span><span class="p">(</span><span class="n">Buffer</span><span class="o">&amp;&amp;</span> <span class="n">other</span><span class="p">)</span> <span class="k">noexcept</span>
+</span></span><span class="line"><span class="cl">        <span class="o">:</span> <span class="n">data</span><span class="p">(</span><span class="n">other</span><span class="p">.</span><span class="n">data</span><span class="p">),</span> <span class="n">size</span><span class="p">(</span><span class="n">other</span><span class="p">.</span><span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">other</span><span class="p">.</span><span class="n">data</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>  <span class="c1">// 让源对象处于安全的空状态
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">other</span><span class="p">.</span><span class="n">size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>std::move 的作用：</strong> <code>std::move</code> 本身不移动任何东西，它只是将左值强制转换为右值引用，从而触发移动构造/移动赋值。</p>
+<p><strong>完美转发（Perfect Forwarding）：</strong> <code>std::forward&lt;T&gt;</code> 配合万能引用（T&amp;&amp;），在模板中保持参数的左/右值属性，避免多余拷贝。常用于工厂函数、<code>emplace_back</code> 等场景。</p>
+<p><strong>游戏开发中的典型场景：</strong></p>
+<ul>
+<li><code>std::vector</code> 扩容时，如果元素有 <code>noexcept</code> 移动构造，会用移动而非拷贝，性能差距巨大。</li>
+<li>大型资源对象（Mesh、Texture数据）的所有权转移。</li>
+</ul>
+<hr>
+<h2 id="17-堆heap和栈stack有什么区别">17. 堆（Heap）和栈（Stack）有什么区别？<a hidden class="anchor" aria-hidden="true" href="#17-堆heap和栈stack有什么区别">#</a></h2>
+<p><strong>高频指数：★★★★★</strong> | 来源：几乎所有公司基础必问</p>
+<p><strong>解答：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th>栈（Stack）</th>
+          <th>堆（Heap）</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>管理方式</td>
+          <td>编译器自动分配/释放</td>
+          <td>程序员手动分配/释放（new/delete）</td>
+      </tr>
+      <tr>
+          <td>分配速度</td>
+          <td>极快（仅移动栈指针）</td>
+          <td>较慢（需在堆中搜索合适内存块）</td>
+      </tr>
+      <tr>
+          <td>空间大小</td>
+          <td>较小（通常1~8MB）</td>
+          <td>较大（受限于虚拟内存）</td>
+      </tr>
+      <tr>
+          <td>内存碎片</td>
+          <td>无碎片（连续分配连续释放）</td>
+          <td>频繁分配释放容易产生碎片</td>
+      </tr>
+      <tr>
+          <td>生长方向</td>
+          <td>高地址 → 低地址</td>
+          <td>低地址 → 高地址</td>
+      </tr>
+      <tr>
+          <td>存放内容</td>
+          <td>局部变量、函数参数、返回地址</td>
+          <td>动态分配的对象、全局容器内容</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>游戏开发要点：</strong></p>
+<ul>
+<li>游戏帧循环中频繁创建的临时对象尽量放栈上，避免堆分配造成的性能开销和内存碎片。</li>
+<li>栈溢出（Stack Overflow）常见于深递归，如寻路算法未做深度限制。</li>
+<li>大数组（如 <code>float arr[1000000]</code>）不能放栈上，应该放堆上或用 <code>std::vector</code>。</li>
+</ul>
+<hr>
+<h2 id="18-什么是内存对齐为什么需要内存对齐">18. 什么是内存对齐？为什么需要内存对齐？<a hidden class="anchor" aria-hidden="true" href="#18-什么是内存对齐为什么需要内存对齐">#</a></h2>
+<p><strong>高频指数：★★★★☆</strong> | 来源：腾讯/网易/完美世界 等</p>
+<p><strong>解答：</strong></p>
+<p><strong>内存对齐（Memory Alignment）</strong>：编译器在分配结构体成员内存时，会按照对齐规则在成员之间插入填充字节（padding），使每个成员的起始地址是其大小（或指定对齐值）的整数倍。</p>
+<p><strong>对齐规则（以常见平台为例）：</strong></p>
+<ul>
+<li>每个成员的偏移量必须是 <code>min(成员大小, 对齐系数)</code> 的整数倍。</li>
+<li>结构体总大小必须是最大成员对齐值的整数倍。</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">A</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span>  <span class="n">a</span><span class="p">;</span>   <span class="c1">// 偏移0，大小1
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 3字节padding
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">int</span>   <span class="n">b</span><span class="p">;</span>   <span class="c1">// 偏移4，大小4
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">short</span> <span class="n">c</span><span class="p">;</span>   <span class="c1">// 偏移8，大小2
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 2字节padding
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span>  <span class="c1">// sizeof(A) = 12，而非 1+4+2=7
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">B</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span>   <span class="n">b</span><span class="p">;</span>   <span class="c1">// 偏移0
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">short</span> <span class="n">c</span><span class="p">;</span>   <span class="c1">// 偏移4
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">char</span>  <span class="n">a</span><span class="p">;</span>   <span class="c1">// 偏移6
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// 1字节padding
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span>  <span class="c1">// sizeof(B) = 8，通过调整顺序减少了padding
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>为什么需要：</strong></p>
+<ul>
+<li><strong>硬件要求</strong>：CPU按字长读取内存，未对齐的访问在某些架构上会触发异常（如ARM），在x86上会多读一次，降低性能。</li>
+<li><strong>Cache效率</strong>：对齐的数据更容易落在同一缓存行中，减少cache miss。</li>
+</ul>
+<p><strong>游戏开发相关：</strong></p>
+<ul>
+<li>设计高频使用的数据结构时，按成员大小从大到小排列可减少padding，节省内存。</li>
+<li>GPU的Constant Buffer / Uniform Buffer通常要求16字节对齐（<code>alignas(16)</code>）。</li>
+</ul>
+<hr>
+<h2 id="19-深拷贝和浅拷贝有什么区别">19. 深拷贝和浅拷贝有什么区别？<a hidden class="anchor" aria-hidden="true" href="#19-深拷贝和浅拷贝有什么区别">#</a></h2>
+<p><strong>高频指数：★★★★★</strong> | 来源：腾讯/网易/吉比特/深蓝互动 等</p>
+<p><strong>解答：</strong></p>
+<ul>
+<li><strong>浅拷贝（Shallow Copy）</strong>：只复制对象的值本身，如果成员包含指针，则只拷贝指针的地址值，两个对象共享同一块堆内存。</li>
+<li><strong>深拷贝（Deep Copy）</strong>：不仅拷贝值，还为指针成员重新分配内存，并复制指向的内容，两个对象各自拥有独立的内存。</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MyArray</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span><span class="o">*</span> <span class="n">data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">size</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 浅拷贝（编译器默认生成的拷贝构造就是这样）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// → 两个对象的data指向同一块内存
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// → 一个析构后，另一个变成悬空指针 → 双重释放（崩溃）
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 深拷贝
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">MyArray</span><span class="p">(</span><span class="k">const</span> <span class="n">MyArray</span><span class="o">&amp;</span> <span class="n">other</span><span class="p">)</span> <span class="o">:</span> <span class="n">size</span><span class="p">(</span><span class="n">other</span><span class="p">.</span><span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">data</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="p">[</span><span class="n">size</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="n">memcpy</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">other</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">size</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>Rule of Three/Five：</strong> 如果类需要自定义析构函数（管理资源），通常也需要自定义拷贝构造函数和拷贝赋值运算符（C++11后还包括移动构造和移动赋值）。</p>
+<p><strong>游戏中的关注点：</strong> 包含动态资源（纹理句柄、网格数据、动画片段）的游戏对象在复制时必须明确是深拷贝还是共享引用（引用计数），否则极易产生悬空指针或资源泄漏。</p>
+<hr>
+<h2 id="20-unordered_map-的底层实现原理是什么和-map-有什么区别">20. unordered_map 的底层实现原理是什么？和 map 有什么区别？<a hidden class="anchor" aria-hidden="true" href="#20-unordered_map-的底层实现原理是什么和-map-有什么区别">#</a></h2>
+<p><strong>高频指数：★★★★★</strong> | 来源：腾讯/网易/米哈游/字节 等</p>
+<p><strong>解答：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th>map</th>
+          <th>unordered_map</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>底层结构</td>
+          <td>红黑树</td>
+          <td>哈希表（数组 + 链表/红黑树）</td>
+      </tr>
+      <tr>
+          <td>元素有序性</td>
+          <td>按key自动排序</td>
+          <td>无序</td>
+      </tr>
+      <tr>
+          <td>查找/插入/删除</td>
+          <td>O(log n)</td>
+          <td>平均 O(1)，最差 O(n)</td>
+      </tr>
+      <tr>
+          <td>内存占用</td>
+          <td>每个节点含左右子指针+父指针+颜色</td>
+          <td>哈希桶数组 + 链表节点</td>
+      </tr>
+      <tr>
+          <td>要求</td>
+          <td>key需要实现 <code>operator&lt;</code></td>
+          <td>key需要hash函数和 <code>operator==</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>哈希表工作原理：</strong></p>
+<ol>
+<li>通过 hash 函数把 key 映射到桶（bucket）的索引。</li>
+<li>发生哈希冲突时，同一个桶内用链表（或在节点过多时转为红黑树）串联。</li>
+<li>当装载因子（元素数/桶数）超过阈值时触发 rehash：分配更大的桶数组，重新计算所有元素的桶位置。</li>
+</ol>
+<p><strong>常见追问：</strong></p>
+<ul>
+<li><strong>rehash的代价？</strong> 是 O(n) 的操作，游戏中如果已知容量可以 <code>reserve</code> 预分配，避免运行时rehash导致卡顿。</li>
+<li><strong>自定义类型做key？</strong> 需要提供 <code>std::hash</code> 特化和 <code>operator==</code>。</li>
+<li><strong>什么时候用map？</strong> 需要有序遍历、范围查询时用 map；只需要快速查找时用 unordered_map。</li>
+</ul>
+<hr>
+<h2 id="21-struct-和-class-在c中有什么区别">21. struct 和 class 在C++中有什么区别？<a hidden class="anchor" aria-hidden="true" href="#21-struct-和-class-在c中有什么区别">#</a></h2>
+<p><strong>高频指数：★★★★☆</strong> | 来源：多家公司C++基础题</p>
+<p><strong>解答：</strong></p>
+<p>在C++中，<code>struct</code> 和 <code>class</code> 几乎完全相同，都可以有成员变量、成员函数、构造函数、析构函数、继承、虚函数等。<strong>唯一的区别在于默认访问权限：</strong></p>
+<ul>
+<li><code>struct</code>：默认 <code>public</code></li>
+<li><code>class</code>：默认 <code>private</code></li>
+</ul>
+<p>包括继承时的默认权限也不同：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">A</span> <span class="o">:</span> <span class="n">B</span> <span class="p">{};</span>    <span class="c1">// 等价于 struct A : public B {};
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">class</span>  <span class="nc">C</span> <span class="o">:</span> <span class="n">B</span> <span class="p">{};</span>    <span class="c1">// 等价于 class  C : private B {};
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>实际使用习惯：</strong></p>
+<ul>
+<li><code>struct</code> 倾向用于纯数据结构（POD）、组件数据等，比如 <code>struct FVector { float X, Y, Z; };</code></li>
+<li><code>class</code> 用于有复杂行为的对象，强调封装。</li>
+<li>UE5 中大量使用 <code>struct</code>（如 <code>FHitResult</code>, <code>FTransform</code>）来表示值类型数据。</li>
+</ul>
+<hr>
+<h2 id="22-aa-star寻路算法的原理是什么">22. A*（A-Star）寻路算法的原理是什么？<a hidden class="anchor" aria-hidden="true" href="#22-aa-star寻路算法的原理是什么">#</a></h2>
+<p><strong>高频指数：★★★★★</strong> | 来源：腾讯/网易/米哈游/吉比特 游戏方向必考</p>
+<p><strong>解答：</strong></p>
+<p>A* 是游戏中最常用的寻路算法，结合了 Dijkstra 算法的准确性和贪心搜索的效率。</p>
+<p><strong>核心公式：</strong> <code>f(n) = g(n) + h(n)</code></p>
+<ul>
+<li><code>g(n)</code>：从起点到当前节点 n 的已知实际代价。</li>
+<li><code>h(n)</code>：从节点 n 到终点的估计代价（启发函数）。</li>
+<li><code>f(n)</code>：经过节点 n 的总估计代价。</li>
+</ul>
+<p><strong>算法流程：</strong></p>
+<ol>
+<li>将起点加入 <strong>Open List</strong>（优先队列，按 f 值排序）。</li>
+<li>从 Open List 中取出 f 值最小的节点作为当前节点。</li>
+<li>如果当前节点是终点，回溯路径，结束。</li>
+<li>否则，将当前节点移入 <strong>Closed List</strong>（已访问集合）。</li>
+<li>遍历当前节点的所有邻居：
+<ul>
+<li>如果邻居在 Closed List 中，跳过。</li>
+<li>计算经过当前节点到达邻居的 g 值，如果更优则更新邻居的 g 值和父节点，放入 Open List。</li>
+</ul>
+</li>
+<li>重复步骤 2。</li>
+</ol>
+<p><strong>启发函数 h(n) 的选择：</strong></p>
+<ul>
+<li><strong>曼哈顿距离</strong>（四方向网格）：<code>|dx| + |dy|</code></li>
+<li><strong>欧几里得距离</strong>（任意方向）：<code>sqrt(dx² + dy²)</code></li>
+<li><strong>对角线距离</strong>（八方向网格）</li>
+</ul>
+<p><strong>关键性质：</strong> 只要 h(n) 不高估实际代价（即 h 是 admissible 的），A* 保证找到最短路径。</p>
+<p><strong>游戏中的追问：</strong></p>
+<ul>
+<li><strong>地图很大怎么办？</strong> 可以用分层寻路（HPA*）、NavMesh、或Jump Point Search (JPS) 优化。</li>
+<li><strong>与 Dijkstra 的关系？</strong> h(n)=0 时 A* 退化为 Dijkstra。</li>
+<li><strong>NavMesh 的优势？</strong> 不需要网格，在多边形之间寻路，更适合3D游戏的不规则地形。</li>
+</ul>
+<hr>
+<h2 id="23-游戏中碰撞检测有哪些常见方法如何优化">23. 游戏中碰撞检测有哪些常见方法？如何优化？<a hidden class="anchor" aria-hidden="true" href="#23-游戏中碰撞检测有哪些常见方法如何优化">#</a></h2>
+<p><strong>高频指数：★★★★★</strong> | 来源：网易/腾讯/完美世界 等，场景题高频</p>
+<p><strong>解答：</strong></p>
+<p>碰撞检测分为两个阶段：<strong>粗检测（Broad Phase）<strong>和</strong>精检测（Narrow Phase）</strong>。</p>
+<p><strong>Narrow Phase 常见碰撞体：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>碰撞体</th>
+          <th>原理</th>
+          <th>特点</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>AABB（轴对齐包围盒）</td>
+          <td>比较两个盒子在每个轴上的投影区间是否重叠</td>
+          <td>最快，但不能旋转</td>
+      </tr>
+      <tr>
+          <td>OBB（有向包围盒）</td>
+          <td>分离轴定理（SAT）：在15条候选分离轴上投影判断</td>
+          <td>支持旋转，更精确</td>
+      </tr>
+      <tr>
+          <td>球/圆碰撞</td>
+          <td>比较两球心距与半径和的大小</td>
+          <td>旋转无关，最简单</td>
+      </tr>
+      <tr>
+          <td>GJK 算法</td>
+          <td>通用凸体碰撞，基于闵可夫斯基差</td>
+          <td>精确，适用于任意凸形状</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Broad Phase 空间优化：</strong></p>
+<p>暴力方法对 N 个物体需要 O(N²) 次检测，空间划分可大幅减少：</p>
+<ul>
+<li><strong>四叉树（2D）/ 八叉树（3D）</strong>：将空间递归划分为4/8个子区域，只检测同一区域及相邻区域内的物体。</li>
+<li><strong>均匀网格（Grid）</strong>：将空间分成固定大小的格子，只检测同格子和相邻格子内的物体。简单高效，适合物体大小均匀的场景。</li>
+<li><strong>BVH（层次包围体）</strong>：自底向上构建包围盒树，动态场景下增量更新效率高。物理引擎（如 Box2D、PhysX）常用。</li>
+</ul>
+<p><strong>炸弹伤害范围的经典面试题：</strong> 场景中有上万个角色，炸弹爆炸时如何快速找到范围内的角色？先用空间划分定位到可能受影响的区域，再用圆形碰撞检测精确判断距离。</p>
+<hr>
+<h2 id="24-游戏ai中的行为树和有限状态机fsm有什么区别">24. 游戏AI中的行为树和有限状态机（FSM）有什么区别？<a hidden class="anchor" aria-hidden="true" href="#24-游戏ai中的行为树和有限状态机fsm有什么区别">#</a></h2>
+<p><strong>高频指数：★★★★☆</strong> | 来源：腾讯/网易/沐曈 等，AI方向必问</p>
+<p><strong>解答：</strong></p>
+<p><strong>有限状态机（FSM）：</strong></p>
+<ul>
+<li>由一组状态和状态之间的转换条件组成。</li>
+<li>在任何时刻，AI只处于一个状态（如 Idle → Patrol → Chase → Attack）。</li>
+<li>状态之间的转移通过条件触发。</li>
+<li><strong>优点</strong>：直观简单，适合简单AI逻辑。</li>
+<li><strong>缺点</strong>：状态多时转移关系呈爆炸式增长（N个状态最多 N×(N-1) 条转移），难以维护。</li>
+</ul>
+<p><strong>行为树（Behavior Tree）：</strong></p>
+<ul>
+<li>树状结构，从根节点开始每帧 Tick，自顶向下执行。</li>
+<li><strong>节点类型</strong>：
+<ul>
+<li><strong>组合节点</strong>：Sequence（依次执行，全成功才成功）、Selector（依次执行，一个成功就成功）。</li>
+<li><strong>装饰节点</strong>：Inverter（取反）、Repeater（重复）等。</li>
+<li><strong>叶子节点</strong>：Action（执行具体行为）、Condition（条件判断）。</li>
+</ul>
+</li>
+<li>每个节点返回三种状态之一：Success / Failure / Running。</li>
+<li><strong>优点</strong>：模块化、可复用、易扩展、可视化编辑友好。</li>
+<li><strong>缺点</strong>：每帧从根遍历有一定开销，需要黑板（Blackboard）共享数据。</li>
+</ul>
+<p><strong>游戏中的选择：</strong> 简单AI（如门、开关）用 FSM 即可；复杂AI（如MOBA怪物、开放世界NPC）优先用行为树。UE5 内置了行为树 + 黑板系统。守望先锋等大型项目也使用行为树方案。</p>
+<hr>
+<h2 id="25-什么是对象池object-pool为什么游戏中广泛使用">25. 什么是对象池（Object Pool）？为什么游戏中广泛使用？<a hidden class="anchor" aria-hidden="true" href="#25-什么是对象池object-pool为什么游戏中广泛使用">#</a></h2>
+<p><strong>高频指数：★★★★★</strong> | 来源：几乎所有游戏公司都会问到</p>
+<p><strong>解答：</strong></p>
+<p><strong>对象池</strong>：预先创建一批对象放入&quot;池&quot;中，需要使用时从池中取出，使用完毕后归还（重置状态），而不是每次都 new/delete。</p>
+<p><strong>为什么游戏需要对象池：</strong></p>
+<ol>
+<li><strong>避免频繁的堆分配/释放</strong>：new/delete 涉及系统调用和内存管理器的查找，开销大且不确定。</li>
+<li><strong>减少内存碎片</strong>：频繁分配释放不同大小的对象会导致碎片，对象池的内存是预先连续分配的。</li>
+<li><strong>避免GC卡顿</strong>（在C#/Lua等有GC的语言中）：减少对象创建就减少了GC压力。</li>
+<li><strong>提高 Cache 命中率</strong>：池中对象内存连续，遍历时CPU缓存更友好。</li>
+</ol>
+<p><strong>典型应用场景：</strong> 子弹、特效粒子、伤害数字飘字、小怪、UI列表项等频繁创建/销毁的游戏对象。</p>
+<p><strong>基本实现思路：</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">BulletPool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Bullet</span><span class="o">*&gt;</span> <span class="n">available</span><span class="p">;</span>  <span class="c1">// 空闲对象
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Bullet</span><span class="o">*</span> <span class="n">Acquire</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">available</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="k">new</span> <span class="nf">Bullet</span><span class="p">();</span>     <span class="c1">// 池不够时扩展
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Bullet</span><span class="o">*</span> <span class="n">b</span> <span class="o">=</span> <span class="n">available</span><span class="p">.</span><span class="n">back</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">available</span><span class="p">.</span><span class="n">pop_back</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">b</span><span class="o">-&gt;</span><span class="n">Reset</span><span class="p">();</span>                  <span class="c1">// 重置到初始状态
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">return</span> <span class="n">b</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">Release</span><span class="p">(</span><span class="n">Bullet</span><span class="o">*</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">b</span><span class="o">-&gt;</span><span class="n">SetActive</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">available</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>追问：</strong> 对象池大小怎么定？通常根据游戏实际峰值需求设定初始大小，支持动态扩展但设上限防止内存暴涨。</p>
+<hr>
+<h2 id="26-什么是-ecs-架构和传统-oop-有什么区别">26. 什么是 ECS 架构？和传统 OOP 有什么区别？<a hidden class="anchor" aria-hidden="true" href="#26-什么是-ecs-架构和传统-oop-有什么区别">#</a></h2>
+<p><strong>高频指数：★★★★☆</strong> | 来源：腾讯/米哈游/沐曈 等，引擎方向常问</p>
+<p><strong>解答：</strong></p>
+<p><strong>ECS = Entity-Component-System</strong>，是一种数据驱动的架构模式，将传统 OOP 中对象的&quot;数据&quot;和&quot;行为&quot;分离。</p>
+<table>
+  <thead>
+      <tr>
+          <th>概念</th>
+          <th>定义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Entity（实体）</td>
+          <td>只是一个ID（轻量标识符），没有数据也没有行为</td>
+      </tr>
+      <tr>
+          <td>Component（组件）</td>
+          <td>纯数据容器，如 PositionComponent{x,y,z}、HealthComponent{hp}</td>
+      </tr>
+      <tr>
+          <td>System（系统）</td>
+          <td>纯逻辑，遍历所有拥有特定组件组合的Entity并处理，如 MovementSystem 处理所有有 Position + Velocity 的Entity</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>与传统 OOP 的对比：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>传统 OOP</th>
+          <th>ECS</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>对象定义</td>
+          <td>由类的继承层次决定</td>
+          <td>由挂载的Component组合决定</td>
+      </tr>
+      <tr>
+          <td>数据与逻辑</td>
+          <td>耦合在同一个类中</td>
+          <td>完全分离（组件存数据，系统管逻辑）</td>
+      </tr>
+      <tr>
+          <td>扩展方式</td>
+          <td>继承（菱形继承问题）</td>
+          <td>组合（灵活添加/移除Component）</td>
+      </tr>
+      <tr>
+          <td>内存布局</td>
+          <td>对象分散在堆上</td>
+          <td>同类型Component连续存储，Cache友好</td>
+      </tr>
+      <tr>
+          <td>典型代表</td>
+          <td>UE4 的 AActor 体系</td>
+          <td>Unity DOTS、守望先锋</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>ECS的优势：</strong></p>
+<ul>
+<li><strong>Cache友好</strong>：同类Component紧凑排列，遍历时几乎零cache miss。</li>
+<li><strong>易于并行</strong>：System之间如果操作的Component不重叠，可以并行执行。</li>
+<li><strong>灵活组合</strong>：运行时动态添加/删除Component就能改变Entity的行为。</li>
+</ul>
+<p><strong>UE5 的做法：</strong> UE5 采用&quot;混合架构&quot;——基础是 OOP（AActor/UActorComponent），同时在 Mass Entity 框架中引入了 ECS 理念处理大规模实体。</p>
+<hr>
+<h2 id="27-红黑树的特点是什么为什么-stdmap-用红黑树而不是avl树">27. 红黑树的特点是什么？为什么 std::map 用红黑树而不是AVL树？<a hidden class="anchor" aria-hidden="true" href="#27-红黑树的特点是什么为什么-stdmap-用红黑树而不是avl树">#</a></h2>
+<p><strong>高频指数：★★★★☆</strong> | 来源：腾讯/网易/字节 等</p>
+<p><strong>解答：</strong></p>
+<p><strong>红黑树的五条性质：</strong></p>
+<ol>
+<li>每个节点是红色或黑色。</li>
+<li>根节点是黑色。</li>
+<li>每个叶子节点（NIL）是黑色。</li>
+<li>红色节点的子节点必须是黑色（不能有连续的红节点）。</li>
+<li>从任一节点到其所有后代叶子节点的简单路径上，黑色节点数量相同（黑高相同）。</li>
+</ol>
+<p>这些性质保证了<strong>最长路径不超过最短路径的两倍</strong>，因此查找、插入、删除都是 O(log n)。</p>
+<p><strong>红黑树 vs AVL树：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>红黑树</th>
+          <th>AVL树</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>平衡严格度</td>
+          <td>弱平衡（最长路径 ≤ 2×最短）</td>
+          <td>严格平衡（左右子树高差 ≤ 1）</td>
+      </tr>
+      <tr>
+          <td>查找效率</td>
+          <td>略低</td>
+          <td>略高</td>
+      </tr>
+      <tr>
+          <td>插入/删除</td>
+          <td>旋转次数少（最多2-3次）</td>
+          <td>旋转次数多</td>
+      </tr>
+      <tr>
+          <td>适用场景</td>
+          <td>插入/删除频繁</td>
+          <td>查找密集</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>为什么 map 选红黑树？</strong> STL的 map 需要频繁插入/删除，红黑树在这方面的维护成本更低，是工程上的最佳折中。</p>
+<p><strong>游戏中的应用：</strong> map/set 底层就是红黑树，常用于管理有序数据，如事件队列、定时器、排行榜的部分实现等。</p>
+<hr>
+<h2 id="28-c-中如何检测和避免内存泄漏">28. C++ 中如何检测和避免内存泄漏？<a hidden class="anchor" aria-hidden="true" href="#28-c-中如何检测和避免内存泄漏">#</a></h2>
+<p><strong>高频指数：★★★★★</strong> | 来源：几乎所有C++岗位必问</p>
+<p><strong>解答：</strong></p>
+<p><strong>什么是内存泄漏？</strong> 通过 new 分配的堆内存，程序不再持有其指针（或忘记 delete），导致这块内存永远无法被释放。长时间运行的游戏中内存泄漏会导致内存持续增长，最终崩溃。</p>
+<p><strong>常见泄漏场景：</strong></p>
+<ul>
+<li>new 之后忘记 delete。</li>
+<li>异常发生时跳过了 delete 语句。</li>
+<li>容器中存储裸指针，容器清空时未 delete。</li>
+<li>基类析构函数不是虚函数，通过基类指针 delete 派生类对象导致派生类部分未析构。</li>
+<li>循环引用（shared_ptr 互相持有）。</li>
+</ul>
+<p><strong>预防手段：</strong></p>
+<ul>
+<li><strong>RAII原则</strong>：资源获取即初始化，用智能指针（unique_ptr/shared_ptr）管理堆内存，作用域结束自动释放。</li>
+<li><strong>遵循 Rule of Five</strong>：自定义了析构就要自定义拷贝/移动操作。</li>
+<li><strong>使用容器管理对象</strong>：<code>vector&lt;unique_ptr&lt;T&gt;&gt;</code> 而非 <code>T*</code> 裸指针数组。</li>
+<li><strong>打破循环引用</strong>：用 weak_ptr。</li>
+</ul>
+<p><strong>检测工具：</strong></p>
+<ul>
+<li><strong>Valgrind（Linux）</strong>：运行时检测内存泄漏和越界。</li>
+<li><strong>AddressSanitizer（ASan）</strong>：编译器插桩，高效检测泄漏、越界、use-after-free。</li>
+<li><strong>Visual Studio CRT Debug</strong>：<code>_CrtDumpMemoryLeaks()</code> 在程序退出时报告未释放的内存块。</li>
+<li><strong>UE5 的内存追踪</strong>：<code>LLM</code>（Low Level Memory tracker）和 <code>Memreport</code> 命令可追踪各类别的内存分配。</li>
+</ul>
+<hr>
+<h2 id="29-什么是-lodlevel-of-detail游戏中如何使用">29. 什么是 LOD（Level of Detail）？游戏中如何使用？<a hidden class="anchor" aria-hidden="true" href="#29-什么是-lodlevel-of-detail游戏中如何使用">#</a></h2>
+<p><strong>高频指数：★★★★☆</strong> | 来源：网易/米哈游/腾讯 图形方向常问</p>
+<p><strong>解答：</strong></p>
+<p><strong>LOD（层次细节）</strong>：根据物体与摄像机的距离（或物体在屏幕上的占比），动态切换模型/纹理的精度等级。距离近时使用高精度模型，远时切换为低精度模型，以减少渲染开销。</p>
+<p><strong>常见 LOD 类型：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>类型</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Mesh LOD</strong></td>
+          <td>为同一物体准备多套不同面数的模型（LOD0最精细，LOD1/2/3依次简化），按距离切换</td>
+      </tr>
+      <tr>
+          <td><strong>Texture Mipmap</strong></td>
+          <td>纹理预计算多个缩小版本，GPU根据距离自动采样低分辨率版本，减少显存带宽和锯齿</td>
+      </tr>
+      <tr>
+          <td><strong>HLOD（Hierarchical LOD）</strong></td>
+          <td>UE5特性，远距离时将多个小物体合并为一个简化的代理网格（Proxy Mesh），大幅减少DrawCall</td>
+      </tr>
+      <tr>
+          <td><strong>Nanite（UE5虚拟几何体）</strong></td>
+          <td>自动化LOD系统，实时根据屏幕像素密度流式加载三角形集群，无需手动制作LOD</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>LOD切换的问题与优化：</strong></p>
+<ul>
+<li><strong>跳变（Popping）</strong>：切换瞬间模型突变，通过 <strong>Dithering（抖动过渡）</strong> 或 <strong>CrossFade</strong> 实现平滑过渡。</li>
+<li><strong>距离阈值设置</strong>：太近切换浪费性能，太远影响画质，需要根据物体的屏幕占比来判断。</li>
+</ul>
+<p><strong>面试追问：</strong></p>
+<ul>
+<li><strong>Mipmap的原理？</strong> 每一级是上一级长宽各缩小一半的纹理，GPU根据纹理像素与屏幕像素的比率选择合适层级，多了约1/3的显存。</li>
+<li><strong>和遮挡剔除的关系？</strong> LOD减少单个物体的渲染量，遮挡剔除（Occlusion Culling）减少需要渲染的物体数量，两者互补。</li>
+</ul>
+<hr>
+<h2 id="30-构造函数和析构函数的调用顺序是什么含继承和组合">30. 构造函数和析构函数的调用顺序是什么？（含继承和组合）<a hidden class="anchor" aria-hidden="true" href="#30-构造函数和析构函数的调用顺序是什么含继承和组合">#</a></h2>
+<p><strong>高频指数：★★★★★</strong> | 来源：几乎所有C++岗位基础题</p>
+<p><strong>解答：</strong></p>
+<p><strong>单继承的构造顺序：</strong></p>
+<ol>
+<li>基类构造函数</li>
+<li>成员变量构造函数（按声明顺序，不是初始化列表顺序）</li>
+<li>派生类构造函数体</li>
+</ol>
+<p><strong>析构顺序与构造完全相反：</strong></p>
+<ol>
+<li>派生类析构函数体</li>
+<li>成员变量析构（按声明的逆序）</li>
+<li>基类析构函数</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Base</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Base</span><span class="p">()</span>  <span class="p">{</span> <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Base构造&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="o">~</span><span class="n">Base</span><span class="p">()</span> <span class="p">{</span> <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Base析构&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Member</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Member</span><span class="p">()</span>  <span class="p">{</span> <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Member构造&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">~</span><span class="n">Member</span><span class="p">()</span> <span class="p">{</span> <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Member析构&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Derived</span> <span class="o">:</span> <span class="k">public</span> <span class="n">Base</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Member</span> <span class="n">m</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Derived</span><span class="p">()</span>  <span class="p">{</span> <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Derived构造&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">~</span><span class="n">Derived</span><span class="p">()</span> <span class="p">{</span> <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;Derived析构&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Derived d; 的输出：
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Base构造 → Member构造 → Derived构造
+</span></span></span><span class="line"><span class="cl"><span class="c1">// Derived析构 → Member析构 → Base析构
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>多继承：</strong> 基类按照声明顺序依次构造，析构反序。</p>
+<p><strong>虚继承：</strong> 虚基类在所有非虚基类之前构造，由最终派生类负责调用虚基类的构造函数。</p>
+<p><strong>常见追问：</strong></p>
+<ul>
+<li><strong>构造函数中能调用虚函数吗？</strong> 语法上可以，但不会表现多态——因为构造基类部分时 vptr 指向基类的 vtable，此时派生类尚未构造。</li>
+<li><strong>成员变量的构造顺序由什么决定？</strong> 由类中声明顺序决定，不是初始化列表的书写顺序。编译器通常会对不一致的情况发出警告。</li>
+<li><strong>为什么析构函数要声明为 virtual？</strong> 通过基类指针 delete 派生类对象时，非虚析构只调用基类析构，派生类资源泄漏。</li>
+</ul>
+<h2 id="31-如何设计编辑器的撤销重做undoredo系统">31. 如何设计编辑器的撤销/重做（Undo/Redo）系统？<a hidden class="anchor" aria-hidden="true" href="#31-如何设计编辑器的撤销重做undoredo系统">#</a></h2>
+<blockquote>
+<p><strong>面经来源：</strong> 米哈游工具设计场景题；设计模式常考。</p></blockquote>
+<p><strong>核心：命令模式（Command Pattern）</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">ICommand</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="kt">void</span> <span class="n">Execute</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">Undo</span><span class="p">()</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">CommandManager</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">ICommand</span><span class="o">&gt;&gt;</span> <span class="n">history</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="n">cur</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="n">Do</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">unique_ptr</span><span class="o">&lt;</span><span class="n">ICommand</span><span class="o">&gt;</span> <span class="n">cmd</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">history</span><span class="p">.</span><span class="n">resize</span><span class="p">(</span><span class="n">cur</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>   <span class="c1">// 丢弃 Redo 历史
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">cmd</span><span class="o">-&gt;</span><span class="n">Execute</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">history</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">cmd</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cur</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">Undo</span><span class="p">()</span> <span class="p">{</span> <span class="k">if</span> <span class="p">(</span><span class="n">cur</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="n">history</span><span class="p">[</span><span class="n">cur</span><span class="o">--</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">Undo</span><span class="p">();</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">Redo</span><span class="p">()</span> <span class="p">{</span> <span class="k">if</span> <span class="p">(</span><span class="n">cur</span><span class="o">+</span><span class="mi">1</span> <span class="o">&lt;</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">history</span><span class="p">.</span><span class="n">size</span><span class="p">())</span> <span class="n">history</span><span class="p">[</span><span class="o">++</span><span class="n">cur</span><span class="p">]</span><span class="o">-&gt;</span><span class="n">Execute</span><span class="p">();</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>具体命令示例——移动物体：</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MoveCmd</span> <span class="o">:</span> <span class="k">public</span> <span class="n">ICommand</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">GameObject</span><span class="o">*</span> <span class="n">obj</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Vector3</span> <span class="n">oldPos</span><span class="p">,</span> <span class="n">newPos</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">MoveCmd</span><span class="p">(</span><span class="n">GameObject</span><span class="o">*</span> <span class="n">o</span><span class="p">,</span> <span class="n">Vector3</span> <span class="n">from</span><span class="p">,</span> <span class="n">Vector3</span> <span class="n">to</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="o">:</span> <span class="n">obj</span><span class="p">(</span><span class="n">o</span><span class="p">),</span> <span class="n">oldPos</span><span class="p">(</span><span class="n">from</span><span class="p">),</span> <span class="n">newPos</span><span class="p">(</span><span class="n">to</span><span class="p">)</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">Execute</span><span class="p">()</span> <span class="k">override</span> <span class="p">{</span> <span class="n">obj</span><span class="o">-&gt;</span><span class="n">SetPosition</span><span class="p">(</span><span class="n">newPos</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">Undo</span><span class="p">()</span> <span class="k">override</span>    <span class="p">{</span> <span class="n">obj</span><span class="o">-&gt;</span><span class="n">SetPosition</span><span class="p">(</span><span class="n">oldPos</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>常见追问：</strong></p>
+<ul>
+<li><strong>复合命令：</strong> 多个操作打包成一个，Undo 时一起回退。</li>
+<li><strong>内存限制：</strong> 历史上限（如 100 步），超出淘汰最旧的。</li>
+<li><strong>引擎实现：</strong> UE 用 <code>FScopedTransaction</code>；Unity 用 <code>Undo.RecordObject()</code>。</li>
+</ul>
+<hr>
+<h2 id="32-序列化与反序列化是什么工具链中怎么用">32. 序列化与反序列化是什么？工具链中怎么用？<a hidden class="anchor" aria-hidden="true" href="#32-序列化与反序列化是什么工具链中怎么用">#</a></h2>
+<blockquote>
+<p><strong>面经来源：</strong> 米哈游&quot;场景保存和加载逻辑怎么实现&quot;&ldquo;保存的文件有错误怎么办&rdquo;。</p></blockquote>
+<p><strong>概念：</strong> 序列化 = 内存对象 → 可存储的字节流/文本；反序列化 = 反向。游戏中所有配置都需序列化存盘。</p>
+<p><strong>常见格式对比：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>格式</th>
+          <th>优点</th>
+          <th>缺点</th>
+          <th>用途</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>JSON</td>
+          <td>可读、Git 友好</td>
+          <td>慢、体积大</td>
+          <td>编辑器存盘</td>
+      </tr>
+      <tr>
+          <td>Binary</td>
+          <td>快、体积小</td>
+          <td>不可读、版本兼容难</td>
+          <td>运行时加载</td>
+      </tr>
+      <tr>
+          <td>Protobuf</td>
+          <td>高效、自带版本兼容</td>
+          <td>需 .proto 定义</td>
+          <td>网络传输</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>典型工具链流程：</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">策划在编辑器中编辑 → JSON 存盘 → 构建管线转二进制 → 运行时加载二进制
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>版本兼容（核心难题）：</strong> 数据结构变了（如新增字段），旧文件必须能正常加载：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">Deserialize</span><span class="p">(</span><span class="n">Reader</span><span class="o">&amp;</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">version</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">ReadInt</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">damage</span>  <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">ReadFloat</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cooldown</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">ReadFloat</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">version</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">range</span> <span class="o">=</span> <span class="n">r</span><span class="p">.</span><span class="n">ReadFloat</span><span class="p">();</span>   <span class="c1">// v2 新增
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">else</span>
+</span></span><span class="line"><span class="cl">        <span class="n">range</span> <span class="o">=</span> <span class="mf">5.0f</span><span class="p">;</span>            <span class="c1">// 旧数据给默认值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>常见追问：</strong></p>
+<ul>
+<li><strong>循环引用？</strong> 用 ID 引用替代指针。</li>
+<li><strong>和 Git 配合？</strong> 编辑用文本格式（diff 友好），运行时用二进制。</li>
+</ul>
+<hr>
+<h2 id="33-c-如何实现简单的反射系统在编辑器中有什么用">33. C++ 如何实现简单的反射系统？在编辑器中有什么用？<a hidden class="anchor" aria-hidden="true" href="#33-c-如何实现简单的反射系统在编辑器中有什么用">#</a></h2>
+<blockquote>
+<p><strong>面经来源：</strong> UE 面经&quot;UE4 反射的实现&quot;&ldquo;C++ 实现反射的方式&rdquo;。</p></blockquote>
+<p><strong>为什么需要反射？</strong> 编辑器属性面板（Inspector）要自动显示对象的所有可编辑属性。没反射，每加一个新类型就要手写 UI 代码。</p>
+<p><strong>简易实现（宏 + offsetof）：</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">PropertyInfo</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">name</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">typeName</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">size_t</span> <span class="n">offset</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">TypeInfo</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">className</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">PropertyInfo</span><span class="o">&gt;</span> <span class="n">properties</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">unordered_map</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">,</span> <span class="n">TypeInfo</span><span class="o">&gt;&amp;</span> <span class="n">Registry</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="n">std</span><span class="o">::</span><span class="n">unordered_map</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">,</span> <span class="n">TypeInfo</span><span class="o">&gt;</span> <span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cp">#define BEGIN_REFLECT(Cls)  static bool _r_##Cls = []() { TypeInfo info; info.className = #Cls;
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define PROP(Cls, M)        info.properties.push_back({#M, typeid(Cls::M).name(), offsetof(Cls, M)});
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define END_REFLECT(Cls)    Registry()[#Cls] = info; return true; }();
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">Monster</span> <span class="p">{</span> <span class="kt">float</span> <span class="n">health</span><span class="p">;</span> <span class="kt">float</span> <span class="n">attack</span><span class="p">;</span> <span class="kt">float</span> <span class="n">speed</span><span class="p">;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="n">BEGIN_REFLECT</span><span class="p">(</span><span class="n">Monster</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="n">PROP</span><span class="p">(</span><span class="n">Monster</span><span class="p">,</span> <span class="n">health</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="n">PROP</span><span class="p">(</span><span class="n">Monster</span><span class="p">,</span> <span class="n">attack</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl">    <span class="n">PROP</span><span class="p">(</span><span class="n">Monster</span><span class="p">,</span> <span class="n">speed</span><span class="p">)</span> 
+</span></span><span class="line"><span class="cl"><span class="n">END_REFLECT</span><span class="p">(</span><span class="n">Monster</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>属性面板遍历 <code>Registry()[&quot;Monster&quot;].properties</code>，通过 <code>offset</code> 读写成员值。</p>
+<p><strong>工业级方案：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>方案</th>
+          <th>引擎</th>
+          <th>原理</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>UHT</td>
+          <td>UE</td>
+          <td>解析 <code>UPROPERTY()</code> 生成反射代码</td>
+      </tr>
+      <tr>
+          <td>Mono 反射</td>
+          <td>Unity</td>
+          <td>C# 原生反射 + Attribute</td>
+      </tr>
+      <tr>
+          <td>libclang</td>
+          <td>新方案</td>
+          <td>编译前用 Clang AST 自动提取</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>常见追问：</strong></p>
+<ul>
+<li><strong>反射 + 序列化？</strong> 有了反射，可写通用 <code>Serialize(obj)</code> 自动遍历所有属性输出 JSON。</li>
+<li><strong>性能？</strong> 有额外开销，热路径不用；编辑器 UI 中可接受。</li>
+</ul>
+<hr>
+<h2 id="34-场景题为策划设计一个技能编辑器你会怎么做">34. 场景题：为策划设计一个&quot;技能编辑器&quot;，你会怎么做？<a hidden class="anchor" aria-hidden="true" href="#34-场景题为策划设计一个技能编辑器你会怎么做">#</a></h2>
+<blockquote>
+<p><strong>面经来源：</strong> 知乎/牛客游戏面经&quot;设计简易的游戏系统&quot;&ldquo;功能设计题&rdquo;。</p></blockquote>
+<p><strong>① 需求：</strong> 技能 = 时间轴上的动作序列（播放动画 → 等 0.3 秒 → 发射弹道 → 造成伤害），策划不写代码，拖拽配置。</p>
+<p><strong>② 数据模型：</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">ActionNode</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">type</span><span class="p">;</span>      <span class="c1">// &#34;PlayAnim&#34;, &#34;Wait&#34;, &#34;SpawnProjectile&#34;, &#34;DealDamage&#34;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">float</span> <span class="n">startTime</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">params</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">SkillConfig</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">name</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">ActionNode</span><span class="o">&gt;</span> <span class="n">actions</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>③ 可视化方案：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>方案</th>
+          <th>适用</th>
+          <th>优缺点</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>时间轴（Timeline）</td>
+          <td>线性流程</td>
+          <td>直观，但难表达分支</td>
+      </tr>
+      <tr>
+          <td>节点图（Node Graph）</td>
+          <td>复杂分支</td>
+          <td>灵活，但学习成本高</td>
+      </tr>
+  </tbody>
+</table>
+<p>可以两者结合：主流程用时间轴，分支用节点。</p>
+<p><strong>④ 关键技术点：</strong></p>
+<ul>
+<li><strong>预览：</strong> 编辑器内一键预览，不启动完整游戏。</li>
+<li><strong>热重载：</strong> 修改后不重启即可生效（详见下方）。</li>
+<li><strong>校验：</strong> 保存时检测无效配置（如引用不存在的动画）。</li>
+<li><strong>序列化：</strong> 存 JSON，构建时转二进制。</li>
+</ul>
+<p><strong>⑤ 在 UE 中实现技能配置热重载：</strong></p>
+<p>核心思路：<strong>监听文件变化 → 重新加载数据 → 广播通知 → 引用方刷新</strong></p>
+<p>cpp</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// ---- 技能配置管理器 ----
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">class</span> <span class="nc">FSkillConfigManager</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">TMap</span><span class="o">&lt;</span><span class="n">FName</span><span class="p">,</span> <span class="n">FSkillData</span><span class="o">&gt;</span> <span class="n">SkillCache</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">FDelegateHandle</span> <span class="n">WatchHandle</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 多播委托：技能数据变化时通知所有监听者
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">DECLARE_MULTICAST_DELEGATE_TwoParams</span><span class="p">(</span><span class="n">FOnSkillChanged</span><span class="p">,</span> <span class="n">FName</span><span class="p">,</span> <span class="k">const</span> <span class="n">FSkillData</span><span class="o">&amp;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">FOnSkillChanged</span> <span class="n">OnSkillDataChanged</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">Init</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// 1. 监听技能配置文件目录
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">auto</span><span class="o">&amp;</span> <span class="n">Watcher</span> <span class="o">=</span> <span class="n">IDirectoryWatcher</span><span class="o">::</span><span class="n">Get</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Watcher</span><span class="p">.</span><span class="n">RegisterDirectoryChangedCallback</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">SkillConfigDir</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">IDirectoryWatcher</span><span class="o">::</span><span class="n">FDirectoryChanged</span><span class="o">::</span><span class="n">CreateRaw</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                <span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">FSkillConfigManager</span><span class="o">::</span><span class="n">OnFileChanged</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="n">WatchHandle</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// 2. 文件变化时重新加载
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">OnFileChanged</span><span class="p">(</span><span class="k">const</span> <span class="n">TArray</span><span class="o">&lt;</span><span class="n">FFileChangeData</span><span class="o">&gt;&amp;</span> <span class="n">Changes</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span> <span class="nl">Change</span> <span class="p">:</span> <span class="n">Changes</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">Change</span><span class="p">.</span><span class="n">Filename</span><span class="p">.</span><span class="n">EndsWith</span><span class="p">(</span><span class="s">&#34;.json&#34;</span><span class="p">))</span> <span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">FName</span> <span class="n">SkillId</span> <span class="o">=</span> <span class="n">ExtractSkillId</span><span class="p">(</span><span class="n">Change</span><span class="p">.</span><span class="n">Filename</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="n">FSkillData</span> <span class="n">NewData</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="n">LoadSkillFromJson</span><span class="p">(</span><span class="n">Change</span><span class="p">.</span><span class="n">Filename</span><span class="p">,</span> <span class="n">NewData</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">SkillCache</span><span class="p">[</span><span class="n">SkillId</span><span class="p">]</span> <span class="o">=</span> <span class="n">NewData</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="c1">// 3. 广播通知
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                <span class="n">OnSkillDataChanged</span><span class="p">.</span><span class="n">Broadcast</span><span class="p">(</span><span class="n">SkillId</span><span class="p">,</span> <span class="n">NewData</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>cpp</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// ---- 技能组件：监听变化并实时刷新 ----
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="n">USkillComponent</span><span class="o">::</span><span class="n">BeginPlay</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">GSkillManager</span><span class="o">-&gt;</span><span class="n">OnSkillDataChanged</span><span class="p">.</span><span class="n">AddUObject</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">USkillComponent</span><span class="o">::</span><span class="n">OnSkillReloaded</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">USkillComponent</span><span class="o">::</span><span class="n">OnSkillReloaded</span><span class="p">(</span><span class="n">FName</span> <span class="n">SkillId</span><span class="p">,</span> <span class="k">const</span> <span class="n">FSkillData</span><span class="o">&amp;</span> <span class="n">NewData</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">SkillId</span> <span class="o">==</span> <span class="n">CurrentSkillId</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ApplySkillData</span><span class="p">(</span><span class="n">NewData</span><span class="p">);</span>  <span class="c1">// 立即生效，无需重启
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>也可以加一个控制台命令做手动触发：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">static</span> <span class="n">FAutoConsoleCommand</span> <span class="nf">ReloadCmd</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;ReloadSkills&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">TEXT</span><span class="p">(</span><span class="s">&#34;重新加载所有技能配置&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">FConsoleCommandDelegate</span><span class="o">::</span><span class="n">CreateLambda</span><span class="p">([]()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">GSkillManager</span><span class="o">-&gt;</span><span class="n">ReloadAll</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 编辑器按 ~ 输入 ReloadSkills 即可
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>热重载能生效的前提：数据和逻辑分离。</strong> 技能的行为由数据（JSON）驱动，运行时读取数据执行对应动作。改数据就能改行为，不需要重新编译 C++ 代码。如果技能逻辑硬编码在 C++ 里，就只能靠 Live Coding 热补丁，而且改不了类的内存布局。</p>
+<hr>
+<h2 id="35-ai--大模型在游戏内容生产中有什么应用">35. AI / 大模型在游戏内容生产中有什么应用？<a hidden class="anchor" aria-hidden="true" href="#35-ai--大模型在游戏内容生产中有什么应用">#</a></h2>
+<blockquote>
+<p><strong>面经来源：</strong> 米哈游面经&quot;大模型应用方面怎么做的，延迟如何&quot;。</p></blockquote>
+<p><strong>三个具体场景：</strong></p>
+<p><strong>场景一：AI 辅助关卡布局</strong> 策划给几个关键点（出生点、Boss 区），AI 自动补全怪物分布、障碍物摆放。可用 LLM 输出结构化 JSON 配置。</p>
+<p><strong>场景二：自然语言批量操作</strong> 策划说&quot;把所有火系技能冷却减 20%&quot;，AI Agent 自动查表 → 筛选 → 计算 → 生成修改预览 → 确认执行。</p>
+<p><strong>场景三：代码辅助</strong> Copilot/Claude 生成编辑器插件样板代码、单元测试，减少重复劳动。</p>
+<p><strong>落地注意事项：</strong></p>
+<ul>
+<li><strong>确定性：</strong> AI 生成的内容必须人工确认，不能直接写入正式数据。</li>
+<li><strong>延迟：</strong> 大模型推理慢，用异步方式——后台生成完成后通知。</li>
+<li><strong>成本：</strong> 频繁调用云端 API 有成本，简单任务优先用规则系统。</li>
+</ul>
+<hr>
+<h2 id="36-构建一次完整包体需要-2-小时你怎么优化">36. 构建一次完整包体需要 2 小时，你怎么优化？<a hidden class="anchor" aria-hidden="true" href="#36-构建一次完整包体需要-2-小时你怎么优化">#</a></h2>
+<blockquote>
+<p><strong>面经来源：</strong> UE 面经&quot;谈到 UBT 构建系统&quot;；网易面经&quot;每天生成 2T 打包数据&quot;。</p></blockquote>
+<p><strong>分四层回答（面试时逐层展开）：</strong></p>
+<p><strong>① 增量构建（最关键）</strong></p>
+<ul>
+<li>每个源文件算哈希，对比缓存，只重新处理变化的文件。</li>
+<li>需维护<strong>依赖图（DAG）</strong>：MaterialA 引用 TextureB，B 变了 A 也重建。</li>
+</ul>
+<p><strong>② 并行构建</strong></p>
+<ul>
+<li>贴图压缩、模型烘焙等独立任务，用线程池并行处理。</li>
+<li>大团队可用分布式构建（类似 IncrediBuild）。</li>
+</ul>
+<p><strong>③ 构建缓存共享</strong></p>
+<ul>
+<li>本地缓存：同一机器不重复处理。</li>
+<li>远程缓存：A 同事构建过的，B 直接拉取。</li>
+</ul>
+<p><strong>④ 流程优化</strong></p>
+<ul>
+<li>分模块打包：日常只构建当前模块。</li>
+<li>监控看板：记录每次各环节耗时，找瓶颈。</li>
+</ul>
+<p><strong>回答要点：</strong> 先问&quot;慢在哪一步&quot;（定位瓶颈），再从增量→并行→缓存→流程递进。</p>
+<hr>
+<h2 id="37-c-中如何在不阻塞-ui-的情况下执行耗时任务">37. C++ 中如何在不阻塞 UI 的情况下执行耗时任务？<a hidden class="anchor" aria-hidden="true" href="#37-c-中如何在不阻塞-ui-的情况下执行耗时任务">#</a></h2>
+<blockquote>
+<p><strong>面经来源：</strong> UE 面经&quot;Slate 慢吗为什么慢&quot;；米哈游面经&quot;线程和协程的区别&quot;。</p></blockquote>
+<p><strong>三种方案：</strong></p>
+<p><strong>方案一：std::async（最简单）</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">auto</span> <span class="n">future</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">async</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">launch</span><span class="o">::</span><span class="n">async</span><span class="p">,</span> <span class="p">[]()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">5000</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="n">processFile</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 主线程继续处理 UI，每帧检查 future 是否完成
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>方案二：工作线程 + 任务队列（工业级）</strong></p>
+<p>后台线程取任务执行；关键：后台线程<strong>不能直接改 UI</strong>，需投递回主线程：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// 后台线程
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">mainThreadQueue</span><span class="p">.</span><span class="n">Post</span><span class="p">([</span><span class="n">progress</span><span class="p">]()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">progressBar</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="n">progress</span><span class="p">);</span>  <span class="c1">// 在主线程安全更新
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 主线程每帧
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">OnTick</span><span class="p">()</span> <span class="p">{</span> <span class="n">mainThreadQueue</span><span class="p">.</span><span class="n">ProcessAll</span><span class="p">();</span> <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>方案三：分帧处理（轻量，无多线程复杂度）</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">bool</span> <span class="nf">Tick</span><span class="p">()</span> <span class="p">{</span>  <span class="c1">// 每帧调用
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">int</span> <span class="n">end</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">min</span><span class="p">(</span><span class="n">current</span> <span class="o">+</span> <span class="mi">50</span><span class="p">,</span> <span class="n">total</span><span class="p">);</span>  <span class="c1">// 每帧处理50个
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">current</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="n">processFile</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">current</span> <span class="o">=</span> <span class="n">end</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">current</span> <span class="o">&gt;=</span> <span class="n">total</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>对比：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>方案</th>
+          <th>适用</th>
+          <th>优点</th>
+          <th>注意</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>std::async</td>
+          <td>简单一次性任务</td>
+          <td>代码最少</td>
+          <td>手动检查完成</td>
+      </tr>
+      <tr>
+          <td>工作线程+队列</td>
+          <td>频繁后台任务</td>
+          <td>灵活可扩展</td>
+          <td>线程安全</td>
+      </tr>
+      <tr>
+          <td>分帧处理</td>
+          <td>不需真正并行</td>
+          <td>零多线程复杂度</td>
+          <td>单帧不能太耗时</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h2 id="38-什么是-ai-agent和普通-llm-对话有什么区别">38. 什么是 AI Agent？和普通 LLM 对话有什么区别？<a hidden class="anchor" aria-hidden="true" href="#38-什么是-ai-agent和普通-llm-对话有什么区别">#</a></h2>
+<blockquote>
+<p><strong>面经来源：</strong> 网易面经&quot;做智能NPC的&quot;部门；2025 校招 Agent 高频题。</p></blockquote>
+<p><strong>核心区别：</strong></p>
+<p><strong>普通 LLM：</strong> 一问一答，你问它答，无后续动作。</p>
+<p><strong>AI Agent：</strong> 自主循环系统，能 感知 → 规划 → 调用工具 → 记忆 → 反思：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">用户: &#34;帮我查哪些怪物掉火焰宝石&#34;
+</span></span><span class="line"><span class="cl">  LLM 思考 (Reasoning): 需要查配表
+</span></span><span class="line"><span class="cl">  → 调用工具 (Action): 搜索 drop_table WHERE item=&#34;火焰宝石&#34;
+</span></span><span class="line"><span class="cl">  → 得到结果 (Observation): [火焰巨人, 熔岩龙]
+</span></span><span class="line"><span class="cl">  → 回答: &#34;火焰巨人和熔岩龙掉落火焰宝石&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这就是 <strong>ReAct 模式</strong>（Reasoning + Acting 交替），面试常考。</p>
+<p><strong>游戏场景对比：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>普通 LLM</th>
+          <th>AI Agent</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>NPC</td>
+          <td>说一句回一句，无记忆</td>
+          <td>记住历史，自主行动</td>
+      </tr>
+      <tr>
+          <td>工具辅助</td>
+          <td>&ldquo;帮我写个技能描述&rdquo;</td>
+          <td>&ldquo;把火系技能冷却减20%&rdquo; → 自动查表+修改</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>一句话：</strong> LLM 是&quot;大脑&quot;，Agent 是&quot;有手有脚会干活的完整个体&quot;。</p>
+<p><strong>常见追问：</strong></p>
+<ul>
+<li><strong>Agent 和传统脚本自动化区别？</strong> 脚本是硬编码 if-else；Agent 用 LLM 做决策，能处理模糊指令。</li>
+</ul>
+<p>参考资料： <a href="https://www.bilibili.com/video/BV1TSg7zuEqR">https://www.bilibili.com/video/BV1TSg7zuEqR</a></p>
+<hr>
+<h2 id="39-什么是-rag在游戏工具中有什么用">39. 什么是 RAG？在游戏工具中有什么用？<a hidden class="anchor" aria-hidden="true" href="#39-什么是-rag在游戏工具中有什么用">#</a></h2>
+<blockquote>
+<p><strong>面经来源：</strong> 2025 校招高频题；阿里/字节大模型面试常考。</p></blockquote>
+<p><strong>RAG = 检索增强生成：</strong> 在 LLM 回答之前，先从外部知识库检索相关信息，塞进 Prompt 里，让 LLM 基于<strong>真实数据</strong>回答，避免幻觉。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">用户: &#34;火系法师冷却时间是多少？&#34;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">RAG 流程:
+</span></span><span class="line"><span class="cl">  ① 问题 → 向量化 (Embedding)
+</span></span><span class="line"><span class="cl">  ② 在技能配表向量库中检索最相关条目
+</span></span><span class="line"><span class="cl">  ③ 找到: {烈焰风暴, 元素:火, 冷却:12秒}
+</span></span><span class="line"><span class="cl">  ④ 检索结果 + 原问题一起发给 LLM
+</span></span><span class="line"><span class="cl">  ⑤ LLM 基于真实数据回答: &#34;冷却时间12秒&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>RAG vs 微调：</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>RAG</th>
+          <th>微调</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>数据更新</td>
+          <td>改知识库即时生效</td>
+          <td>要重新训练</td>
+      </tr>
+      <tr>
+          <td>成本</td>
+          <td>低</td>
+          <td>高（GPU）</td>
+      </tr>
+      <tr>
+          <td>幻觉</td>
+          <td>有来源可溯</td>
+          <td>仍可能编造</td>
+      </tr>
+  </tbody>
+</table>
+<p>游戏配表频繁变动，RAG 更合适。</p>
+<p><strong>工具中的应用：</strong></p>
+<ul>
+<li><strong>策划问答：</strong> &ldquo;哪些怪掉火焰宝石？&rdquo; → 从配表检索回答。</li>
+<li><strong>文档助手：</strong> 新人问&quot;编辑器怎么用？&quot; → 从 Wiki 检索回答。</li>
+<li><strong>Bug 辅助：</strong> 输入报错 → 从历史 Bug 库检索解决方案。</li>
+</ul>
+<hr>
+<h2 id="40-场景题在编辑器中集成-ai-助手策划用自然语言操作工具怎么设计">40. 场景题：在编辑器中集成 AI 助手，策划用自然语言操作工具，怎么设计？<a hidden class="anchor" aria-hidden="true" href="#40-场景题在编辑器中集成-ai-助手策划用自然语言操作工具怎么设计">#</a></h2>
+<blockquote>
+<p><strong>面经来源：</strong> 网易/米哈游场景题；2025 Agent 面试&quot;如何设计 Tool Calling&quot;。</p></blockquote>
+<p><strong>架构：自然语言 → 意图解析 → 工具调用 → 结果反馈</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">策划: &#34;把场景里所有树的高度缩放到1.5倍&#34;
+</span></span><span class="line"><span class="cl">  ↓
+</span></span><span class="line"><span class="cl">LLM 解析 (Function Calling):
+</span></span><span class="line"><span class="cl">  action: &#34;scale_objects&#34;
+</span></span><span class="line"><span class="cl">  filter: { type: &#34;tree&#34; }
+</span></span><span class="line"><span class="cl">  params: { axis: &#34;height&#34;, factor: 1.5 }
+</span></span><span class="line"><span class="cl">  ↓
+</span></span><span class="line"><span class="cl">编辑器 API 执行:
+</span></span><span class="line"><span class="cl">  查询 type==&#34;tree&#34; → 47棵 → scale.y *= 1.5 → 记入 Undo 栈
+</span></span><span class="line"><span class="cl">  ↓
+</span></span><span class="line"><span class="cl">反馈: &#34;已将47棵树高度缩放至1.5倍，可 Ctrl+Z 撤销。&#34;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>Function Calling 机制：</strong> 给 LLM 一组工具的 JSON Schema 描述，LLM 选择工具并填参数：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;tools&#34;</span><span class="p">:</span> <span class="p">[{</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;name&#34;</span><span class="p">:</span> <span class="s2">&#34;scale_objects&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;description&#34;</span><span class="p">:</span> <span class="s2">&#34;按条件筛选场景对象并缩放&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="nt">&#34;parameters&#34;</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;filter&#34;</span><span class="p">:</span> <span class="p">{</span><span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;object&#34;</span><span class="p">},</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;axis&#34;</span><span class="p">:</span> <span class="p">{</span><span class="nt">&#34;enum&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;x&#34;</span><span class="p">,</span><span class="s2">&#34;y&#34;</span><span class="p">,</span><span class="s2">&#34;z&#34;</span><span class="p">,</span><span class="s2">&#34;uniform&#34;</span><span class="p">]},</span>
+</span></span><span class="line"><span class="cl">      <span class="nt">&#34;factor&#34;</span><span class="p">:</span> <span class="p">{</span><span class="nt">&#34;type&#34;</span><span class="p">:</span> <span class="s2">&#34;number&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>三个关键设计点：</strong></p>
+<ol>
+<li><strong>安全确认：</strong> AI 先显示&quot;将修改 47 个对象&quot;，策划确认后才执行。</li>
+<li><strong>可撤销：</strong> 所有 AI 操作接入 Undo 系统。</li>
+<li><strong>上下文记忆：</strong> 策划说&quot;再把它们改成红色&quot;，AI 要理解&quot;它们&quot;指上次筛选的 47 棵树。</li>
+</ol>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/cheetsheets/realtimerendering/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>RealtimeRendering</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/cheetsheets/engine/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Engine</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share UECheetSheet on x"
+            href="https://x.com/intent/tweet/?text=UECheetSheet&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fquestions%2f&amp;hashtags=">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share UECheetSheet on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fquestions%2f&amp;title=UECheetSheet&amp;summary=UECheetSheet&amp;source=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fquestions%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share UECheetSheet on reddit"
+            href="https://reddit.com/submit?url=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fquestions%2f&title=UECheetSheet">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share UECheetSheet on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fquestions%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share UECheetSheet on whatsapp"
+            href="https://api.whatsapp.com/send?text=UECheetSheet%20-%20http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fquestions%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share UECheetSheet on telegram"
+            href="https://telegram.me/share/url?text=UECheetSheet&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fquestions%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share UECheetSheet on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=UECheetSheet&u=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fquestions%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">李睿杰的博客</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

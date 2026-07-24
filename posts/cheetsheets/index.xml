@@ -17,27 +17,27 @@
 &lt;h2 id=&#34;数学基础&#34;&gt;数学基础&lt;/h2&gt;
 &lt;h3 id=&#34;坐标表示&#34;&gt;坐标表示&lt;/h3&gt;
 &lt;p&gt;在三维计算机图形学中，我们通常使用**齐次坐标（Homogeneous Coordinates）**来表示点和向量。&lt;/p&gt;
-&lt;p&gt;三维空间点变换时为什么需要齐次坐标？&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;三维空间点变换时为什么需要齐次坐标？&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;这主要是为了解决“平移”运算的线性化问题。在普通的三维笛卡尔坐标系中，旋转和缩放可以通过 $3 \times 3$ 矩阵与向量相乘（线性变换）来实现，但平移仅仅是向量的加法，无法合并进同一个 $3 \times 3$ 矩阵乘法中。&lt;/p&gt;
 &lt;p&gt;通过引入第四个分量 $w$，将三维向量 $(x, y, z)$ 扩展为四维向量 $(x, y, z, w)$，我们就能够将平移、旋转和缩放全部统一到一个 $4 \times 4$ 的矩阵乘法运算中。对于点，通常设置 $w=1$，表示位置；对于方向向量，设置 $w=0$，意味着它不受平移影响（因为方向只有朝向和大小，没有具体位置）。这种统一性使得图形硬件（GPU）能够用一套通用的逻辑快速处理所有类型的变换。&lt;/p&gt;
-&lt;h3 id=&#34;物体变换矩阵&#34;&gt;物体变换矩阵&lt;/h3&gt;
-&lt;p&gt;物体变换通常涉及三个基础操作：平移（Translation）、旋转（Rotation）和缩放（Scale）。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;平移、缩放、旋转物体变换矩阵分别是？&lt;/strong&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;平移矩阵&lt;/strong&gt;：基于齐次坐标，我们将平移量 $(t_x, t_y, t_z)$ 放在矩阵的最后一列。&lt;/p&gt;
+&lt;h3 id=&#34;四元数基础&#34;&gt;四元数基础&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;定义&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;四元数是复数的扩展，形式为 $q = w + xi + yj + zk$。在计算机图形学中，用于表示旋转的四元数必须是单位四元数，即模长（Norm）为 1。使用单位四元数能保证在旋转运算过程中，物体仅发生方向改变而不会产生形变。&lt;/p&gt;
+&lt;p&gt;四元数通过“轴-角”对直观描述旋转。若绕单位向量轴 $\mathbf{u} = (u_x, u_y, u_z)$ 旋转角度 $\theta$，其四元数表示为：&lt;/p&gt;
 $$
-   T = \begin{bmatrix} 1 &amp; 0 &amp; 0 &amp; t_x \\ 0 &amp; 1 &amp; 0 &amp; t_y \\ 0 &amp; 0 &amp; 1 &amp; t_z \\ 0 &amp; 0 &amp; 0 &amp; 1 \end{bmatrix}
-   $$&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;缩放矩阵&lt;/strong&gt;：缩放因子 $(s_x, s_y, s_z)$ 位于矩阵的对角线上。&lt;/p&gt;</description>
+q = (\cos(\frac{\theta}{2}), \sin(\frac{\theta}{2})\mathbf{u})
+$$$$
+w = \cos(\frac{\theta}{2})
+$$$$
+(x, y, z) = \sin(\frac{\theta}{2}) \cdot (u_x, u_y, u_z).
+$$&lt;p&gt;&lt;strong&gt;向量旋转运算与共轭优化&lt;/strong&gt;&lt;/p&gt;</description>
     </item>
     <item>
       <title>CGAlgos</title>
       <link>https://wstfdxfh.github.io/posts/cheetsheets/cgalgos/</link>
       <pubDate>Sun, 23 Mar 2025 21:11:21 +0800</pubDate>
       <guid>https://wstfdxfh.github.io/posts/cheetsheets/cgalgos/</guid>
-      <description>&lt;p&gt;这篇文章介绍了几种常见的和游戏开发、计算机图形学密切相关的算法题&lt;/p&gt;
+      <description>&lt;p&gt;这篇文章介绍了几道常见的和游戏开发、计算机图形学密切相关的算法题&lt;/p&gt;
 &lt;h3 id=&#34;一个点是否在三角形内部&#34;&gt;一个点是否在三角形内部&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;可以使用叉乘的方法判断一个点是否在三角形内部。当三角形中所有边的对点和点P都位于该边的一侧时，就说明P在三角形内部，而判断是否位于一侧可以使用叉乘的符号是否相等来判断。&lt;/li&gt;
@@ -134,11 +134,8 @@ $$
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;h3 id=&#34;欧拉路径&#34;&gt;欧拉路径&lt;/h3&gt;
-&lt;ol&gt;
-&lt;li&gt;问题本质&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;题目要求“是否存在一条路径恰好经过所有有向边一次”，其实就是&lt;strong&gt;有向欧拉路径 (Eulerian Path) / 欧拉回路 (Eulerian Circuit)&lt;/strong&gt; 的判定与构造问题。&lt;/p&gt;</description>
+&lt;/div&gt;&lt;h3 id=&#34;两条线段是否相交&#34;&gt;两条线段是否相交&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;数学方法&lt;/strong&gt;&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

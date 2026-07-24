@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>Lua 面试速查 | 李睿杰的博客</title>
+<meta name="keywords" content="">
+<meta name="description" content="
+面向游戏客户端开发岗位，精炼整理 Lua 核心知识点。
+
+基础特性
+
+动态类型，变量无需声明类型：nil / boolean / number / string / function / table / userdata / thread
+默认全局变量，加 local 才是局部变量（推荐始终用 local）
+未赋值的变量值为 nil；将变量设为 nil 相当于删除它
+索引从 1 开始
+单行注释 --，多行注释 --[[ ... ]]
+字符串拼接用 ..，长度用 #
+
+
+
+1
+2
+3
+
+
+local a = 10
+local s = &#34;hello&#34; .. &#34; world&#34;  -- &#34;hello world&#34;
+print(#s)                        -- 11
+
+
+
+数据类型
+number
+Lua 5.3 起区分整数（integer）和浮点数（float），之前统一为 double。
+
+
+1
+2
+3
+4
+5
+6
+7
+
+
+local i = 10        -- integer
+local f = 3.14      -- float
+local h = 0xFF      -- 十六进制
+local e = 2e10      -- 科学计数法
+math.floor(3.7)     -- 3
+math.ceil(3.2)      -- 4
+math.max(1, 2, 3)   -- 3
+
+
+string
+不可变，内部实现为字节数组（可存 \0）。">
+<meta name="author" content="李睿杰">
+<link rel="canonical" href="http://localhost:1313/posts/cheetsheets/luanotes/">
+<link crossorigin="anonymous" href="../../../assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/cheetsheets/luanotes/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="李睿杰的博客 (Alt + H)">李睿杰的博客</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/archives/" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/cheetsheets/">CheetSheets</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Lua 面试速查
+      <span class="entry-hint" title="Draft">
+        <svg xmlns="http://www.w3.org/2000/svg" height="35" viewBox="0 -960 960 960" fill="currentColor">
+          <path
+            d="M160-410v-60h300v60H160Zm0-165v-60h470v60H160Zm0-165v-60h470v60H160Zm360 580v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q9 9 13 20t4 22q0 11-4.5 22.5T862.09-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
+        </svg>
+      </span>
+    </h1>
+    <div class="post-meta"><span title='2025-08-18 19:25:02 +0800 CST'>August 18, 2025</span>&nbsp;·&nbsp;7 min&nbsp;·&nbsp;1349 words&nbsp;·&nbsp;李睿杰
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e5%9f%ba%e7%a1%80%e7%89%b9%e6%80%a7" aria-label="基础特性">基础特性</a></li>
+                <li>
+                    <a href="#%e6%95%b0%e6%8d%ae%e7%b1%bb%e5%9e%8b" aria-label="数据类型">数据类型</a><ul>
+                        
+                <li>
+                    <a href="#number" aria-label="number">number</a></li>
+                <li>
+                    <a href="#string" aria-label="string">string</a></li>
+                <li>
+                    <a href="#table" aria-label="table">table</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e5%87%bd%e6%95%b0" aria-label="函数">函数</a><ul>
+                        
+                <li>
+                    <a href="#%e9%97%ad%e5%8c%85%e9%87%8d%e7%82%b9" aria-label="闭包（重点）">闭包（重点）</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e6%8e%a7%e5%88%b6%e7%bb%93%e6%9e%84" aria-label="控制结构">控制结构</a></li>
+                <li>
+                    <a href="#%e5%b8%83%e5%b0%94%e9%80%bb%e8%be%91" aria-label="布尔逻辑">布尔逻辑</a></li>
+                <li>
+                    <a href="#%e5%85%83%e8%a1%a8%e4%b8%8e%e5%85%83%e6%96%b9%e6%b3%95%e9%87%8d%e7%82%b9" aria-label="元表与元方法（重点）">元表与元方法（重点）</a></li>
+                <li>
+                    <a href="#%e9%9d%a2%e5%90%91%e5%af%b9%e8%b1%a1%e9%87%8d%e7%82%b9" aria-label="面向对象（重点）">面向对象（重点）</a><ul>
+                        
+                <li>
+                    <a href="#%e5%9f%ba%e6%9c%ac%e7%b1%bb" aria-label="基本类">基本类</a></li>
+                <li>
+                    <a href="#%e7%bb%a7%e6%89%bf" aria-label="继承">继承</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e5%8d%8f%e7%a8%8b%e9%87%8d%e7%82%b9" aria-label="协程（重点）">协程（重点）</a></li>
+                <li>
+                    <a href="#%e9%94%99%e8%af%af%e5%a4%84%e7%90%86" aria-label="错误处理">错误处理</a></li>
+                <li>
+                    <a href="#%e6%a8%a1%e5%9d%97%e4%b8%8e-require" aria-label="模块与 require">模块与 require</a></li>
+                <li>
+                    <a href="#%e5%9e%83%e5%9c%be%e5%9b%9e%e6%94%b6" aria-label="垃圾回收">垃圾回收</a></li>
+                <li>
+                    <a href="#%e5%ad%97%e7%ac%a6%e4%b8%b2%e6%a8%a1%e5%bc%8f%e5%8c%b9%e9%85%8d%e7%b1%bb%e6%ad%a3%e5%88%99" aria-label="字符串模式匹配（类正则）">字符串模式匹配（类正则）</a></li>
+                <li>
+                    <a href="#%e5%b8%b8%e7%94%a8%e6%a0%87%e5%87%86%e5%ba%93%e9%80%9f%e6%9f%a5" aria-label="常用标准库速查">常用标准库速查</a></li>
+                <li>
+                    <a href="#%e9%ab%98%e9%a2%91%e9%9d%a2%e8%af%95%e8%80%83%e7%82%b9" aria-label="高频面试考点">高频面试考点</a><ul>
+                        
+                <li>
+                    <a href="#1-local-%e4%b8%8e-global-%e6%80%a7%e8%83%bd" aria-label="1. local 与 global 性能">1. local 与 global 性能</a></li>
+                <li>
+                    <a href="#2-table-%e4%bd%9c%e4%b8%ba%e6%95%b0%e7%bb%84%e6%97%b6%e9%a2%84%e5%88%86%e9%85%8d" aria-label="2. table 作为数组时预分配">2. table 作为数组时预分配</a></li>
+                <li>
+                    <a href="#3--%e6%8b%bc%e6%8e%a5%e7%9a%84%e6%80%a7%e8%83%bd%e9%99%b7%e9%98%b1" aria-label="3. .. 拼接的性能陷阱">3. .. 拼接的性能陷阱</a></li>
+                <li>
+                    <a href="#4-%e5%88%a4%e6%96%ad-table-%e4%b8%ba%e7%a9%ba" aria-label="4. 判断 table 为空">4. 判断 table 为空</a></li>
+                <li>
+                    <a href="#5-%e6%b7%b1%e6%8b%b7%e8%b4%9d-table" aria-label="5. 深拷贝 table">5. 深拷贝 table</a></li>
+                <li>
+                    <a href="#6-%e5%8d%8f%e7%a8%8b%e4%b8%8e-asyncawait-%e6%a8%a1%e5%bc%8f" aria-label="6. 协程与 async/await 模式">6. 协程与 async/await 模式</a></li>
+                <li>
+                    <a href="#7-__index-%e9%93%be%e5%8e%9f%e5%9e%8b%e9%93%be" aria-label="7. __index 链（原型链）">7. __index 链（原型链）</a></li>
+                <li>
+                    <a href="#8-lua-%e4%b8%8e-cc-%e4%ba%a4%e4%ba%92lua-stack" aria-label="8. Lua 与 C/C&#43;&#43; 交互（Lua Stack）">8. Lua 与 C/C++ 交互（Lua Stack）</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e5%bf%ab%e9%80%9f%e5%af%b9%e6%af%94lua-vs-python" aria-label="快速对比：Lua vs Python">快速对比：Lua vs Python</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><blockquote>
+<p>面向游戏客户端开发岗位，精炼整理 Lua 核心知识点。</p></blockquote>
+<hr>
+<h2 id="基础特性">基础特性<a hidden class="anchor" aria-hidden="true" href="#基础特性">#</a></h2>
+<ul>
+<li><strong>动态类型</strong>，变量无需声明类型：<code>nil / boolean / number / string / function / table / userdata / thread</code></li>
+<li><strong>默认全局变量</strong>，加 <code>local</code> 才是局部变量（推荐始终用 local）</li>
+<li>未赋值的变量值为 <code>nil</code>；将变量设为 <code>nil</code> 相当于删除它</li>
+<li>索引从 <strong>1</strong> 开始</li>
+<li>单行注释 <code>--</code>，多行注释 <code>--[[ ... ]]</code></li>
+<li>字符串拼接用 <code>..</code>，长度用 <code>#</code></li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">10</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">s</span> <span class="o">=</span> <span class="s2">&#34;hello&#34;</span> <span class="o">..</span> <span class="s2">&#34; world&#34;</span>  <span class="c1">-- &#34;hello world&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">print</span><span class="p">(</span><span class="o">#</span><span class="n">s</span><span class="p">)</span>                        <span class="c1">-- 11</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="数据类型">数据类型<a hidden class="anchor" aria-hidden="true" href="#数据类型">#</a></h2>
+<h3 id="number">number<a hidden class="anchor" aria-hidden="true" href="#number">#</a></h3>
+<p>Lua 5.3 起区分整数（integer）和浮点数（float），之前统一为 double。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">10</span>        <span class="c1">-- integer</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">f</span> <span class="o">=</span> <span class="mf">3.14</span>      <span class="c1">-- float</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">h</span> <span class="o">=</span> <span class="mh">0xFF</span>      <span class="c1">-- 十六进制</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">e</span> <span class="o">=</span> <span class="mf">2e10</span>      <span class="c1">-- 科学计数法</span>
+</span></span><span class="line"><span class="cl"><span class="n">math.floor</span><span class="p">(</span><span class="mf">3.7</span><span class="p">)</span>     <span class="c1">-- 3</span>
+</span></span><span class="line"><span class="cl"><span class="n">math.ceil</span><span class="p">(</span><span class="mf">3.2</span><span class="p">)</span>      <span class="c1">-- 4</span>
+</span></span><span class="line"><span class="cl"><span class="n">math.max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>   <span class="c1">-- 3</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="string">string<a hidden class="anchor" aria-hidden="true" href="#string">#</a></h3>
+<p>不可变，内部实现为字节数组（可存 <code>\0</code>）。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">s</span> <span class="o">=</span> <span class="s2">&#34;hello&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">s</span><span class="p">:</span><span class="n">len</span><span class="p">()</span>              <span class="c1">-- 5，等价于 #s</span>
+</span></span><span class="line"><span class="cl"><span class="n">s</span><span class="p">:</span><span class="n">sub</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>          <span class="c1">-- &#34;hel&#34;（左闭右闭）</span>
+</span></span><span class="line"><span class="cl"><span class="n">s</span><span class="p">:</span><span class="n">upper</span><span class="p">()</span>            <span class="c1">-- &#34;HELLO&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">s</span><span class="p">:</span><span class="n">find</span><span class="p">(</span><span class="s2">&#34;ll&#34;</span><span class="p">)</span>         <span class="c1">-- 3  4</span>
+</span></span><span class="line"><span class="cl"><span class="n">s</span><span class="p">:</span><span class="n">gsub</span><span class="p">(</span><span class="s2">&#34;l&#34;</span><span class="p">,</span> <span class="s2">&#34;L&#34;</span><span class="p">)</span>     <span class="c1">-- &#34;heLLo&#34;  2</span>
+</span></span><span class="line"><span class="cl"><span class="n">s</span><span class="p">:</span><span class="n">rep</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&#34;,&#34;</span><span class="p">)</span>        <span class="c1">-- &#34;hello,hello&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">string.format</span><span class="p">(</span><span class="s2">&#34;%s=%d&#34;</span><span class="p">,</span> <span class="s2">&#34;x&#34;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>  <span class="c1">-- &#34;x=10&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">-- 多行字符串</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">ml</span> <span class="o">=</span> <span class="s">[[
+</span></span></span><span class="line"><span class="cl"><span class="s">line1
+</span></span></span><span class="line"><span class="cl"><span class="s">line2
+</span></span></span><span class="line"><span class="cl"><span class="s">]]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="table">table<a hidden class="anchor" aria-hidden="true" href="#table">#</a></h3>
+<p>Lua 唯一的数据结构，数组 + 字典合一。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">t</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&#34;val&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">t</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="n">t.name</span> <span class="o">=</span> <span class="s2">&#34;lua&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="c1">-- 数组操作</span>
+</span></span><span class="line"><span class="cl"><span class="n">table.insert</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s2">&#34;x&#34;</span><span class="p">)</span>       <span class="c1">-- 末尾插入</span>
+</span></span><span class="line"><span class="cl"><span class="n">table.insert</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&#34;x&#34;</span><span class="p">)</span>    <span class="c1">-- 指定位置插入</span>
+</span></span><span class="line"><span class="cl"><span class="n">table.remove</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>          <span class="c1">-- 删除返回被删元素</span>
+</span></span><span class="line"><span class="cl"><span class="n">table.sort</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="kr">function</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="kr">return</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span> <span class="kr">end</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">table.concat</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s2">&#34;, &#34;</span><span class="p">)</span>       <span class="c1">-- 拼接数组部分为字符串</span>
+</span></span><span class="line"><span class="cl"><span class="c1">-- 长度 #t 只统计数组部分（连续整数键）</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="函数">函数<a hidden class="anchor" aria-hidden="true" href="#函数">#</a></h2>
+<ul>
+<li>一等公民，可赋值给变量、作为参数/返回值</li>
+<li>支持<strong>多返回值</strong></li>
+<li>支持<strong>可变参数</strong> <code>...</code></li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="c1">-- 多返回值</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="kr">function</span> <span class="nf">swap</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="kr">return</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="kr">end</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">swap</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>   <span class="c1">-- x=2, y=1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">-- 可变参数</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="kr">function</span> <span class="nf">sum</span><span class="p">(...)</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">local</span> <span class="n">s</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="kr">in</span> <span class="n">ipairs</span><span class="p">({...})</span> <span class="kr">do</span> <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="n">v</span> <span class="kr">end</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">return</span> <span class="n">s</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span><span class="line"><span class="cl"><span class="n">print</span><span class="p">(</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>  <span class="c1">-- 6</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">-- 具名参数（用 table 模拟）</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="kr">function</span> <span class="nf">new</span><span class="p">(</span><span class="n">opts</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">return</span> <span class="n">opts.x</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span> <span class="n">opts.y</span> <span class="ow">or</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="闭包重点">闭包（重点）<a hidden class="anchor" aria-hidden="true" href="#闭包重点">#</a></h3>
+<p>函数 + 其引用的外部局部变量（upvalue）构成闭包。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">makeCounter</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">local</span> <span class="n">n</span> <span class="o">=</span> <span class="n">start</span> <span class="ow">or</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">inc</span> <span class="o">=</span> <span class="kr">function</span><span class="p">()</span> <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span> <span class="kr">end</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">get</span> <span class="o">=</span> <span class="kr">function</span><span class="p">()</span> <span class="kr">return</span> <span class="n">n</span> <span class="kr">end</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">c</span> <span class="o">=</span> <span class="n">makeCounter</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">c.inc</span><span class="p">();</span> <span class="n">c.inc</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">print</span><span class="p">(</span><span class="n">c.get</span><span class="p">())</span>  <span class="c1">-- 12</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p><strong>面试考点</strong>：upvalue 是共享引用，多个闭包可共享同一个 upvalue。</p></blockquote>
+<hr>
+<h2 id="控制结构">控制结构<a hidden class="anchor" aria-hidden="true" href="#控制结构">#</a></h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="c1">-- if</span>
+</span></span><span class="line"><span class="cl"><span class="kr">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="kr">then</span>
+</span></span><span class="line"><span class="cl">    <span class="n">print</span><span class="p">(</span><span class="s2">&#34;pos&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kr">elseif</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="kr">then</span>
+</span></span><span class="line"><span class="cl">    <span class="n">print</span><span class="p">(</span><span class="s2">&#34;neg&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kr">else</span>
+</span></span><span class="line"><span class="cl">    <span class="n">print</span><span class="p">(</span><span class="s2">&#34;zero&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">-- 数值 for</span>
+</span></span><span class="line"><span class="cl"><span class="kr">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">2</span> <span class="kr">do</span> <span class="n">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="kr">end</span>  <span class="c1">-- 1 3 5 7 9</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">-- 泛型 for（ipairs 数组，pairs 全表）</span>
+</span></span><span class="line"><span class="cl"><span class="kr">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="kr">in</span> <span class="n">ipairs</span><span class="p">({</span><span class="s2">&#34;a&#34;</span><span class="p">,</span><span class="s2">&#34;b&#34;</span><span class="p">,</span><span class="s2">&#34;c&#34;</span><span class="p">})</span> <span class="kr">do</span> <span class="n">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="kr">end</span>
+</span></span><span class="line"><span class="cl"><span class="kr">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="kr">in</span> <span class="n">pairs</span><span class="p">({</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">2</span><span class="p">})</span>    <span class="kr">do</span> <span class="n">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">-- while / repeat</span>
+</span></span><span class="line"><span class="cl"><span class="kr">while</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="kr">do</span> <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span> <span class="kr">end</span>
+</span></span><span class="line"><span class="cl"><span class="kr">repeat</span> <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span> <span class="kr">until</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">10</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p><code>ipairs</code> 遇到第一个 nil 停止；<code>pairs</code> 遍历所有键（顺序不确定）。</p></blockquote>
+<p><strong>Lua 无 <code>continue</code></strong>，可用 <code>goto</code> 模拟（Lua 5.2+）：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kr">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span> <span class="kr">do</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">3</span> <span class="kr">then</span> <span class="kr">goto</span> <span class="nl">continue</span> <span class="kr">end</span>
+</span></span><span class="line"><span class="cl">    <span class="n">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">::</span><span class="nl">continue</span><span class="p">::</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="布尔逻辑">布尔逻辑<a hidden class="anchor" aria-hidden="true" href="#布尔逻辑">#</a></h2>
+<p><strong>只有 <code>false</code> 和 <code>nil</code> 为假，其余（包括 <code>0</code> 和 <code>&quot;&quot;</code>）均为真。</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="c1">-- and / or 返回操作数，不一定是 bool</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">val</span> <span class="o">=</span> <span class="n">x</span> <span class="ow">or</span> <span class="s2">&#34;default&#34;</span>       <span class="c1">-- 三元默认值惯用法</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">res</span> <span class="o">=</span> <span class="n">cond</span> <span class="ow">and</span> <span class="s2">&#34;yes&#34;</span> <span class="ow">or</span> <span class="s2">&#34;no&#34;</span>  <span class="c1">-- 三元惯用法（注意 cond 为 false 时失效）</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="元表与元方法重点">元表与元方法（重点）<a hidden class="anchor" aria-hidden="true" href="#元表与元方法重点">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>元方法</th>
+          <th>作用</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>__index</code></td>
+          <td>访问不存在的键时触发，可以是函数或表</td>
+      </tr>
+      <tr>
+          <td><code>__newindex</code></td>
+          <td>给不存在的键赋值时触发</td>
+      </tr>
+      <tr>
+          <td><code>__add/__sub/__mul/__div/__mod</code></td>
+          <td>算术运算符重载</td>
+      </tr>
+      <tr>
+          <td><code>__eq / __lt / __le</code></td>
+          <td>比较运算符</td>
+      </tr>
+      <tr>
+          <td><code>__tostring</code></td>
+          <td><code>tostring()</code> 时触发</td>
+      </tr>
+      <tr>
+          <td><code>__call</code></td>
+          <td>把 table 当函数调用时触发</td>
+      </tr>
+      <tr>
+          <td><code>__len</code></td>
+          <td><code>#</code> 运算符</td>
+      </tr>
+      <tr>
+          <td><code>__gc</code></td>
+          <td>垃圾回收时触发（userdata/table Lua 5.4+）</td>
+      </tr>
+  </tbody>
+</table>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">mt</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__index</span> <span class="o">=</span> <span class="kr">function</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="kr">return</span> <span class="s2">&#34;default&#34;</span> <span class="kr">end</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__tostring</span> <span class="o">=</span> <span class="kr">function</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="kr">return</span> <span class="s2">&#34;MyObj&#34;</span> <span class="kr">end</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">__add</span> <span class="o">=</span> <span class="kr">function</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="kr">return</span> <span class="n">a.val</span> <span class="o">+</span> <span class="n">b.val</span> <span class="kr">end</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">setmetatable</span><span class="p">({</span><span class="n">val</span> <span class="o">=</span> <span class="mi">10</span><span class="p">},</span> <span class="n">mt</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">print</span><span class="p">(</span><span class="n">obj.missing</span><span class="p">)</span>       <span class="c1">-- &#34;default&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">print</span><span class="p">(</span><span class="n">tostring</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>     <span class="c1">-- &#34;MyObj&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">print</span><span class="p">(</span><span class="n">obj</span> <span class="o">+</span> <span class="p">{</span><span class="n">val</span> <span class="o">=</span> <span class="mi">5</span><span class="p">})</span>   <span class="c1">-- 15</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p><code>rawget(t, k)</code> / <code>rawset(t, k, v)</code> 绕过元方法直接操作。</p></blockquote>
+<hr>
+<h2 id="面向对象重点">面向对象（重点）<a hidden class="anchor" aria-hidden="true" href="#面向对象重点">#</a></h2>
+<p>Lua 通过元表模拟类和继承。</p>
+<h3 id="基本类">基本类<a hidden class="anchor" aria-hidden="true" href="#基本类">#</a></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">Animal</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="n">Animal.__index</span> <span class="o">=</span> <span class="n">Animal</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">function</span> <span class="nc">Animal</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">sound</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">local</span> <span class="n">self</span> <span class="o">=</span> <span class="n">setmetatable</span><span class="p">({},</span> <span class="n">Animal</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">self.name</span>  <span class="o">=</span> <span class="n">name</span>
+</span></span><span class="line"><span class="cl">    <span class="n">self.sound</span> <span class="o">=</span> <span class="n">sound</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">return</span> <span class="n">self</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">function</span> <span class="nc">Animal</span><span class="p">:</span><span class="nf">speak</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">print</span><span class="p">(</span><span class="n">self.name</span> <span class="o">..</span> <span class="s2">&#34; says &#34;</span> <span class="o">..</span> <span class="n">self.sound</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">cat</span> <span class="o">=</span> <span class="n">Animal.new</span><span class="p">(</span><span class="s2">&#34;Cat&#34;</span><span class="p">,</span> <span class="s2">&#34;meow&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">cat</span><span class="p">:</span><span class="n">speak</span><span class="p">()</span>  <span class="c1">-- Cat says meow</span>
+</span></span><span class="line"><span class="cl"><span class="c1">-- 注：a:method() 等价于 a.method(a)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="继承">继承<a hidden class="anchor" aria-hidden="true" href="#继承">#</a></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">Dog</span> <span class="o">=</span> <span class="n">setmetatable</span><span class="p">({},</span> <span class="p">{</span><span class="n">__index</span> <span class="o">=</span> <span class="n">Animal</span><span class="p">})</span>
+</span></span><span class="line"><span class="cl"><span class="n">Dog.__index</span> <span class="o">=</span> <span class="n">Dog</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">function</span> <span class="nc">Dog</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">local</span> <span class="n">self</span> <span class="o">=</span> <span class="n">Animal.new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&#34;woof&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">return</span> <span class="n">setmetatable</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">Dog</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">function</span> <span class="nc">Dog</span><span class="p">:</span><span class="nf">fetch</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">print</span><span class="p">(</span><span class="n">self.name</span> <span class="o">..</span> <span class="s2">&#34; fetches!&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">d</span> <span class="o">=</span> <span class="n">Dog.new</span><span class="p">(</span><span class="s2">&#34;Rex&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">d</span><span class="p">:</span><span class="n">speak</span><span class="p">()</span>   <span class="c1">-- 调用父类方法</span>
+</span></span><span class="line"><span class="cl"><span class="n">d</span><span class="p">:</span><span class="n">fetch</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="协程重点">协程（重点）<a hidden class="anchor" aria-hidden="true" href="#协程重点">#</a></h2>
+<p>单线程内的协作式并发，本质是<strong>可暂停/恢复的函数</strong>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">co</span> <span class="o">=</span> <span class="n">coroutine.create</span><span class="p">(</span><span class="kr">function</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">print</span><span class="p">(</span><span class="s2">&#34;start&#34;</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">local</span> <span class="n">c</span> <span class="o">=</span> <span class="n">coroutine.yield</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span>   <span class="c1">-- 暂停，返回 a+b</span>
+</span></span><span class="line"><span class="cl">    <span class="n">print</span><span class="p">(</span><span class="s2">&#34;resume with&#34;</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">return</span> <span class="s2">&#34;done&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">-- resume 返回: 成功标志 + yield/return 的值</span>
+</span></span><span class="line"><span class="cl"><span class="n">print</span><span class="p">(</span><span class="n">coroutine.resume</span><span class="p">(</span><span class="n">co</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>   <span class="c1">-- true  3</span>
+</span></span><span class="line"><span class="cl"><span class="n">print</span><span class="p">(</span><span class="n">coroutine.resume</span><span class="p">(</span><span class="n">co</span><span class="p">,</span> <span class="mi">99</span><span class="p">))</span>      <span class="c1">-- true  （print: resume with 99）</span>
+</span></span><span class="line"><span class="cl"><span class="n">print</span><span class="p">(</span><span class="n">coroutine.resume</span><span class="p">(</span><span class="n">co</span><span class="p">))</span>          <span class="c1">-- false  cannot resume dead coroutine</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><table>
+  <thead>
+      <tr>
+          <th>函数</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>coroutine.create(f)</code></td>
+          <td>创建协程，返回 thread</td>
+      </tr>
+      <tr>
+          <td><code>coroutine.resume(co, ...)</code></td>
+          <td>启动/继续，返回 <code>true/false + 值</code></td>
+      </tr>
+      <tr>
+          <td><code>coroutine.yield(...)</code></td>
+          <td>暂停，值传给 resume 调用方</td>
+      </tr>
+      <tr>
+          <td><code>coroutine.status(co)</code></td>
+          <td><code>running/suspended/normal/dead</code></td>
+      </tr>
+      <tr>
+          <td><code>coroutine.wrap(f)</code></td>
+          <td>返回函数，调用即 resume，出错直接报错</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>常见用途</strong>：生产者-消费者、异步回调扁平化、游戏中的技能/剧情序列。</p>
+<hr>
+<h2 id="错误处理">错误处理<a hidden class="anchor" aria-hidden="true" href="#错误处理">#</a></h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="c1">-- pcall：受保护调用，返回 bool + 错误信息</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">ok</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">pcall</span><span class="p">(</span><span class="kr">function</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">error</span><span class="p">(</span><span class="s2">&#34;something wrong&#34;</span><span class="p">)</span>  <span class="c1">-- error 可传任意值</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">print</span><span class="p">(</span><span class="n">ok</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>  <span class="c1">-- false  ...:2: something wrong</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">-- xpcall：可指定错误处理函数（加入调用栈信息）</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">ok2</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">xpcall</span><span class="p">(</span><span class="n">riskyFunc</span><span class="p">,</span> <span class="n">debug.traceback</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p><code>error(msg, level)</code> 中 level=1 指向调用 error 处，level=2 指向调用者。</p></blockquote>
+<hr>
+<h2 id="模块与-require">模块与 require<a hidden class="anchor" aria-hidden="true" href="#模块与-require">#</a></h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="c1">-- mymod.lua</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">M</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="kr">function</span> <span class="nc">M</span><span class="p">.</span><span class="nf">hello</span><span class="p">()</span> <span class="n">print</span><span class="p">(</span><span class="s2">&#34;hello from mod&#34;</span><span class="p">)</span> <span class="kr">end</span>
+</span></span><span class="line"><span class="cl"><span class="kr">return</span> <span class="n">M</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">-- main.lua</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">mod</span> <span class="o">=</span> <span class="n">require</span><span class="p">(</span><span class="s2">&#34;mymod&#34;</span><span class="p">)</span>   <span class="c1">-- 不加 .lua 后缀</span>
+</span></span><span class="line"><span class="cl"><span class="n">mod.hello</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="c1">-- require 结果被缓存在 package.loaded，多次 require 只执行一次</span>
+</span></span><span class="line"><span class="cl"><span class="n">package.loaded</span><span class="p">[</span><span class="s2">&#34;mymod&#34;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">nil</span>  <span class="c1">-- 清除缓存，强制重新加载</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>package.path</code> 控制搜索路径，用 <code>?</code> 作占位符：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">package.path</span> <span class="o">=</span> <span class="n">package.path</span> <span class="o">..</span> <span class="s2">&#34;;./libs/?.lua&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="垃圾回收">垃圾回收<a hidden class="anchor" aria-hidden="true" href="#垃圾回收">#</a></h2>
+<p>Lua 使用<strong>标记-清除</strong>（mark-and-sweep）GC，Lua 5.4 引入分代 GC。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="n">collectgarbage</span><span class="p">(</span><span class="s2">&#34;collect&#34;</span><span class="p">)</span>    <span class="c1">-- 强制 GC</span>
+</span></span><span class="line"><span class="cl"><span class="n">collectgarbage</span><span class="p">(</span><span class="s2">&#34;count&#34;</span><span class="p">)</span>      <span class="c1">-- 返回当前内存 KB</span>
+</span></span><span class="line"><span class="cl"><span class="n">collectgarbage</span><span class="p">(</span><span class="s2">&#34;stop&#34;</span><span class="p">)</span>       <span class="c1">-- 停止自动 GC</span>
+</span></span><span class="line"><span class="cl"><span class="n">collectgarbage</span><span class="p">(</span><span class="s2">&#34;restart&#34;</span><span class="p">)</span>    <span class="c1">-- 恢复自动 GC</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>弱表</strong>（weak table）：不阻止 GC 回收。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">cache</span> <span class="o">=</span> <span class="n">setmetatable</span><span class="p">({},</span> <span class="p">{</span><span class="n">__mode</span> <span class="o">=</span> <span class="s2">&#34;v&#34;</span><span class="p">})</span>  <span class="c1">-- 值弱引用</span>
+</span></span><span class="line"><span class="cl"><span class="c1">-- __mode = &#34;k&#34; 键弱引用；&#34;kv&#34; 键值都弱</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="字符串模式匹配类正则">字符串模式匹配（类正则）<a hidden class="anchor" aria-hidden="true" href="#字符串模式匹配类正则">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>模式</th>
+          <th>含义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>.</code></td>
+          <td>任意字符</td>
+      </tr>
+      <tr>
+          <td><code>%a</code></td>
+          <td>字母；<code>%d</code> 数字；<code>%s</code> 空白；<code>%w</code> 字母数字</td>
+      </tr>
+      <tr>
+          <td><code>%A</code> <code>%D</code> <code>%S</code></td>
+          <td>对应的取反</td>
+      </tr>
+      <tr>
+          <td><code>[abc]</code></td>
+          <td>字符集；<code>[^abc]</code> 取反</td>
+      </tr>
+      <tr>
+          <td><code>*</code> <code>+</code> <code>?</code></td>
+          <td>0+、1+、0 或 1</td>
+      </tr>
+      <tr>
+          <td><code>^</code> <code>$</code></td>
+          <td>行首、行尾</td>
+      </tr>
+      <tr>
+          <td><code>()</code></td>
+          <td>捕获组</td>
+      </tr>
+  </tbody>
+</table>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">s</span> <span class="o">=</span> <span class="s2">&#34;2024-01-15&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">y</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">s</span><span class="p">:</span><span class="n">match</span><span class="p">(</span><span class="s2">&#34;(%d+)-(%d+)-(%d+)&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">print</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>  <span class="c1">-- 2024  01  15</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">for</span> <span class="n">word</span> <span class="kr">in</span> <span class="p">(</span><span class="s2">&#34;hello world&#34;</span><span class="p">):</span><span class="n">gmatch</span><span class="p">(</span><span class="s2">&#34;%a+&#34;</span><span class="p">)</span> <span class="kr">do</span>
+</span></span><span class="line"><span class="cl">    <span class="n">print</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="常用标准库速查">常用标准库速查<a hidden class="anchor" aria-hidden="true" href="#常用标准库速查">#</a></h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="c1">-- math</span>
+</span></span><span class="line"><span class="cl"><span class="n">math.random</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>       <span class="c1">-- [1,6] 随机整数</span>
+</span></span><span class="line"><span class="cl"><span class="n">math.randomseed</span><span class="p">(</span><span class="n">os.time</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl"><span class="n">math.abs</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">)</span>            <span class="c1">-- 5</span>
+</span></span><span class="line"><span class="cl"><span class="n">math.huge</span>               <span class="c1">-- 正无穷</span>
+</span></span><span class="line"><span class="cl"><span class="n">math.pi</span>                 <span class="c1">-- 3.14159...</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">-- table</span>
+</span></span><span class="line"><span class="cl"><span class="n">table.move</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>  <span class="c1">-- Lua 5.3，复制元素</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">-- os</span>
+</span></span><span class="line"><span class="cl"><span class="n">os.time</span><span class="p">()</span>               <span class="c1">-- Unix 时间戳</span>
+</span></span><span class="line"><span class="cl"><span class="n">os.clock</span><span class="p">()</span>              <span class="c1">-- CPU 时间（性能测试用）</span>
+</span></span><span class="line"><span class="cl"><span class="n">os.date</span><span class="p">(</span><span class="s2">&#34;%Y-%m-%d&#34;</span><span class="p">)</span>     <span class="c1">-- 格式化日期</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">-- io</span>
+</span></span><span class="line"><span class="cl"><span class="n">io.write</span><span class="p">(</span><span class="s2">&#34;no newline&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">f</span> <span class="o">=</span> <span class="n">io.open</span><span class="p">(</span><span class="s2">&#34;a.txt&#34;</span><span class="p">,</span> <span class="s2">&#34;r&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="p">:</span><span class="n">read</span><span class="p">(</span><span class="s2">&#34;*a&#34;</span><span class="p">)</span>  <span class="c1">-- 读全部；&#34;*l&#34; 读行；&#34;*n&#34; 读数字</span>
+</span></span><span class="line"><span class="cl"><span class="n">f</span><span class="p">:</span><span class="n">close</span><span class="p">()</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="高频面试考点">高频面试考点<a hidden class="anchor" aria-hidden="true" href="#高频面试考点">#</a></h2>
+<h3 id="1-local-与-global-性能">1. local 与 global 性能<a hidden class="anchor" aria-hidden="true" href="#1-local-与-global-性能">#</a></h3>
+<p>局部变量存在寄存器（虚拟机栈），访问比全局变量快。热路径中应将频繁使用的全局函数缓存为 local：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">sin</span> <span class="o">=</span> <span class="n">math.sin</span>   <span class="c1">-- 避免每次查全局表</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2-table-作为数组时预分配">2. table 作为数组时预分配<a hidden class="anchor" aria-hidden="true" href="#2-table-作为数组时预分配">#</a></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">t</span> <span class="o">=</span> <span class="n">table.move</span><span class="p">({},</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1">-- 或直接 {}</span>
+</span></span><span class="line"><span class="cl"><span class="c1">-- 避免反复 rehash，可用下面方式预填充</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3--拼接的性能陷阱">3. <code>..</code> 拼接的性能陷阱<a hidden class="anchor" aria-hidden="true" href="#3--拼接的性能陷阱">#</a></h3>
+<p>大量拼接应用 <code>table.concat</code>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">parts</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="kr">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span> <span class="kr">do</span> <span class="n">parts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">tostring</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="kr">end</span>
+</span></span><span class="line"><span class="cl"><span class="kd">local</span> <span class="n">result</span> <span class="o">=</span> <span class="n">table.concat</span><span class="p">(</span><span class="n">parts</span><span class="p">,</span> <span class="s2">&#34;,&#34;</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="4-判断-table-为空">4. 判断 table 为空<a hidden class="anchor" aria-hidden="true" href="#4-判断-table-为空">#</a></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kr">if</span> <span class="n">next</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">==</span> <span class="kc">nil</span> <span class="kr">then</span> <span class="n">print</span><span class="p">(</span><span class="s2">&#34;empty&#34;</span><span class="p">)</span> <span class="kr">end</span>
+</span></span><span class="line"><span class="cl"><span class="c1">-- 不能用 #t == 0，因为 # 只统计数组部分</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="5-深拷贝-table">5. 深拷贝 table<a hidden class="anchor" aria-hidden="true" href="#5-深拷贝-table">#</a></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="kd">local</span> <span class="kr">function</span> <span class="nf">deepcopy</span><span class="p">(</span><span class="n">orig</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">local</span> <span class="n">copy</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="kr">in</span> <span class="n">pairs</span><span class="p">(</span><span class="n">orig</span><span class="p">)</span> <span class="kr">do</span>
+</span></span><span class="line"><span class="cl">        <span class="n">copy</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&#34;table&#34;</span> <span class="ow">and</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">or</span> <span class="n">v</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">end</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">return</span> <span class="n">setmetatable</span><span class="p">(</span><span class="n">copy</span><span class="p">,</span> <span class="n">getmetatable</span><span class="p">(</span><span class="n">orig</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="6-协程与-asyncawait-模式">6. 协程与 async/await 模式<a hidden class="anchor" aria-hidden="true" href="#6-协程与-asyncawait-模式">#</a></h3>
+<p>游戏中常用协程实现异步等待：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-lua" data-lang="lua"><span class="line"><span class="cl"><span class="c1">-- 框架侧：yield 后在下一帧/定时器中 resume</span>
+</span></span><span class="line"><span class="cl"><span class="kr">function</span> <span class="nf">waitFrames</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kr">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="kr">do</span> <span class="n">coroutine.yield</span><span class="p">()</span> <span class="kr">end</span>
+</span></span><span class="line"><span class="cl"><span class="kr">end</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="7-__index-链原型链">7. <code>__index</code> 链（原型链）<a hidden class="anchor" aria-hidden="true" href="#7-__index-链原型链">#</a></h3>
+<p>查找键时：自身表 → <code>__index</code>（表或函数）→ <code>__index</code> 的 <code>__index</code> → &hellip;，直到 nil。</p>
+<h3 id="8-lua-与-cc-交互lua-stack">8. Lua 与 C/C++ 交互（Lua Stack）<a hidden class="anchor" aria-hidden="true" href="#8-lua-与-cc-交互lua-stack">#</a></h3>
+<ul>
+<li>C 调用 Lua 或 Lua 调用 C 通过<strong>虚拟栈</strong>传递数据</li>
+<li>正索引从栈底 1 开始，负索引从栈顶 -1 开始</li>
+<li>常用 API：<code>lua_pushnumber</code>、<code>lua_tostring</code>、<code>luaL_newlib</code></li>
+</ul>
+<hr>
+<h2 id="快速对比lua-vs-python">快速对比：Lua vs Python<a hidden class="anchor" aria-hidden="true" href="#快速对比lua-vs-python">#</a></h2>
+<table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th>Lua</th>
+          <th>Python</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>索引起点</td>
+          <td>1</td>
+          <td>0</td>
+      </tr>
+      <tr>
+          <td>默认变量作用域</td>
+          <td><strong>全局</strong></td>
+          <td>局部</td>
+      </tr>
+      <tr>
+          <td>OOP</td>
+          <td>元表模拟</td>
+          <td>内置 class</td>
+      </tr>
+      <tr>
+          <td>多返回值</td>
+          <td>原生支持</td>
+          <td>tuple</td>
+      </tr>
+      <tr>
+          <td>协程</td>
+          <td>原生 coroutine</td>
+          <td>asyncio / generator</td>
+      </tr>
+      <tr>
+          <td>类型系统</td>
+          <td>动态，8种基本类型</td>
+          <td>动态，更丰富</td>
+      </tr>
+      <tr>
+          <td>嵌入性</td>
+          <td>极易嵌入 C/C++</td>
+          <td>较复杂</td>
+      </tr>
+      <tr>
+          <td>字符串不可变</td>
+          <td>✓</td>
+          <td>✓</td>
+      </tr>
+      <tr>
+          <td>三目运算符</td>
+          <td><code>a and b or c</code></td>
+          <td><code>b if a else c</code></td>
+      </tr>
+  </tbody>
+</table>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/cheetsheets/git/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Git</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/myworks/multiplayerdemo/">
+    <span class="title">Next »</span>
+    <br>
+    <span>MultiPlayerDemo</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Lua 面试速查 on x"
+            href="https://x.com/intent/tweet/?text=Lua%20%e9%9d%a2%e8%af%95%e9%80%9f%e6%9f%a5&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fluanotes%2f&amp;hashtags=">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Lua 面试速查 on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fluanotes%2f&amp;title=Lua%20%e9%9d%a2%e8%af%95%e9%80%9f%e6%9f%a5&amp;summary=Lua%20%e9%9d%a2%e8%af%95%e9%80%9f%e6%9f%a5&amp;source=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fluanotes%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Lua 面试速查 on reddit"
+            href="https://reddit.com/submit?url=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fluanotes%2f&title=Lua%20%e9%9d%a2%e8%af%95%e9%80%9f%e6%9f%a5">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Lua 面试速查 on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fluanotes%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Lua 面试速查 on whatsapp"
+            href="https://api.whatsapp.com/send?text=Lua%20%e9%9d%a2%e8%af%95%e9%80%9f%e6%9f%a5%20-%20http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fluanotes%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Lua 面试速查 on telegram"
+            href="https://telegram.me/share/url?text=Lua%20%e9%9d%a2%e8%af%95%e9%80%9f%e6%9f%a5&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fluanotes%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Lua 面试速查 on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=Lua%20%e9%9d%a2%e8%af%95%e9%80%9f%e6%9f%a5&u=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fluanotes%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">李睿杰的博客</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

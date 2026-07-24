@@ -159,26 +159,6 @@
 
 <article class="post-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">UEHelper
-    </h2>
-  </header>
-  <div class="entry-content">
-    <p>UEHelper: UE 编辑器效率插件 &#43; MCP 工具 本文演示一组客户端小工具，以帮助 Unreal Engine 的 Gameplay 开发者和游戏设计师方便地进行资产管理、关卡 Actor 管理、创建材质，以及相关批量操作的 UE 插件；
-将以上功能作为 MCP 服务，供大模型调用；
-通过将 UE 编辑器截图、UE 文档查询和 UE 源代码查询功能作为 MCP 服务，方便学习使用 UE 引擎，加快开发速度，其效果如下：
-Asset 快捷操作 本插件支持多种 Asset 快捷操作，包括快速给各种不同种类的 Asset 添加名称前缀、删除未使用的 Asset 等，其利用到的重要函数包括：
-获取目前选择的 Asset 数据
-1 TArray&lt;FAssetData&gt; SelectedAssetsData = UEditorUtilityLibrary::GetSelectedAssetData(); 寻找 Asset 的引用对象
-1 TArray&lt;FString&gt; AssetReferencers = UEditorAssetLibrary::FindPackageReferencersForAsset(AssetData.GetObjectPathString()) 删除 Asset 数据
-1 2 // 参数类型是 const TArray&lt;FAssetData&gt;&amp; AssetsToDelete int32 NumAssetsDeleted = ObjectTools::DeleteAssets(UnusedAssetsData); 修复重定向
-...</p>
-  </div>
-  <footer class="entry-footer"><span title='2026-02-21 15:04:45 +0800 CST'>February 21, 2026</span>&nbsp;·&nbsp;6 min&nbsp;·&nbsp;1074 words&nbsp;·&nbsp;李睿杰</footer>
-  <a class="entry-link" aria-label="post link to UEHelper" href="https://wstfdxfh.github.io/posts/unrealengine/uehelper/"></a>
-</article>
-
-<article class="post-entry"> 
-  <header class="entry-header">
     <h2 class="entry-hint-parent">UnrealVersionControl
     </h2>
   </header>

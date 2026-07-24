@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>UEProjects | 李睿杰的博客</title>
+<meta name="keywords" content="">
+<meta name="description" content="多人射击游戏项目介绍
+Blasters 是一款基于 Unreal Engine 5、以 C&#43;&#43; 为主开发的多人在线第三人称射击游戏 Demo，完整实现了生产级别的网络对战框架。以下是面试官通常最感兴趣的技术亮点：
+网络架构：采用 Listen Server 模式，严格遵循服务器权威（Server Authority）原则。AGameMode 完全服务器独占，所有伤害结算、比赛状态流转均在服务器最终裁定，客户端无法伪造结果。
+客户端预测：对开火、瞄准、装备武器等高频操作实现了&quot;本地立即执行 &#43; Server RPC 异步确认 &#43; Multicast 广播同步&quot;的完整预测链路，玩家操作零感知延迟。
+Server-Side Rewind（延迟补偿）：自研基于历史帧回滚的服务端延迟补偿系统，使用 TDoubleLinkedList&lt;FFramePackage&gt; 存储最多 4 秒的碰撞盒历史，覆盖 Hitscan（射线）、Projectile（弹道模拟）、Shotgun（多弹丸）三种弹道类型，并配套了高 Ping 熔断机制。
+时钟同步：实现基于 NTP 简化算法的客户端-服务器时钟校准，精确维护 ClientServerDelta，为延迟补偿的 HitTime 提供可靠基准。
+武器系统：支持步枪、火箭筒、手枪、冲锋枪、霰弹枪、狙击枪、榴弹发射器七种武器，具备完整的弹药管理、换弹、拾取、抛弃逻辑，弹药以 COND_OwnerOnly 复制防止信息泄露。
+多模式支持：自由乱斗与红蓝团队两种模式，通过 ABlasterGameState 同步团队分数，Team 属性驱动队友识别与模型颜色区分，ATeamsGameMode 处理组队重生逻辑。
+BUFF 系统：UBuffComponent 实现血量回复、护盾回复、速度提升、跳跃提升，均有协程式 Timer 驱动，服务器结算后通过 Replication 同步 HUD 反馈。
+HUD 健壮性：针对网络环境下对象初始化顺序不确定的问题，采用&quot;懒加载 &#43; PollInit() 轮询&quot;双重机制，确保 HUD 在任何加入时机（开局前/中途加入）都能正确初始化。
+
+难点一：客户端预测的实现
+整体回答
+客户端预测的核心思路是：本地玩家的操作不等待服务器确认，先在本地立即执行，同时发 Server RPC 告知服务器。这样玩家感受不到延迟，操作即时响应。项目中最典型的例子是开火和瞄准。
+在 CombatComponent.cpp 的 FireHitScanWeapon() 和 FireProjectileWeapon() 中，每次开火的调用链为：">
+<meta name="author" content="李睿杰">
+<link rel="canonical" href="http://localhost:1313/posts/cheetsheets/ueprojects/">
+<link crossorigin="anonymous" href="../../../assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/cheetsheets/ueprojects/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="李睿杰的博客 (Alt + H)">李睿杰的博客</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/archives/" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/cheetsheets/">CheetSheets</a></div>
+    <h1 class="post-title entry-hint-parent">
+      UEProjects
+      <span class="entry-hint" title="Draft">
+        <svg xmlns="http://www.w3.org/2000/svg" height="35" viewBox="0 -960 960 960" fill="currentColor">
+          <path
+            d="M160-410v-60h300v60H160Zm0-165v-60h470v60H160Zm0-165v-60h470v60H160Zm360 580v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q9 9 13 20t4 22q0 11-4.5 22.5T862.09-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
+        </svg>
+      </span>
+    </h1>
+    <div class="post-meta"><span title='2026-02-27 20:21:09 +0800 CST'>February 27, 2026</span>&nbsp;·&nbsp;6 min&nbsp;·&nbsp;1274 words&nbsp;·&nbsp;李睿杰
+
+</div>
+  </header> <div class="toc">
+    <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e5%a4%9a%e4%ba%ba%e5%b0%84%e5%87%bb%e6%b8%b8%e6%88%8f%e9%a1%b9%e7%9b%ae%e4%bb%8b%e7%bb%8d" aria-label="多人射击游戏项目介绍">多人射击游戏项目介绍</a></li>
+                <li>
+                    <a href="#%e9%9a%be%e7%82%b9%e4%b8%80%e5%ae%a2%e6%88%b7%e7%ab%af%e9%a2%84%e6%b5%8b%e7%9a%84%e5%ae%9e%e7%8e%b0" aria-label="难点一：客户端预测的实现">难点一：客户端预测的实现</a><ul>
+                        
+                <li>
+                    <a href="#%e6%95%b4%e4%bd%93%e5%9b%9e%e7%ad%94" aria-label="整体回答">整体回答</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%ae%e9%a2%84%e6%b5%8b%e5%87%ba%e9%94%99%e4%ba%86%e6%80%8e%e4%b9%88%e5%8a%9e%e5%ae%a2%e6%88%b7%e7%ab%af%e5%92%8c%e6%9c%8d%e5%8a%a1%e5%99%a8%e7%8a%b6%e6%80%81%e4%b8%8d%e4%b8%80%e8%87%b4%e6%97%b6%e5%a6%82%e4%bd%95%e5%a4%84%e7%90%86" aria-label="追问：预测出错了怎么办？客户端和服务器状态不一致时如何处理？">追问：预测出错了怎么办？客户端和服务器状态不一致时如何处理？</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%ae%e5%bc%80%e7%81%ab%e9%a2%84%e6%b5%8b%e9%87%8c%e5%bc%b9%e8%8d%af%e6%95%b0%e9%87%8f%e6%80%8e%e4%b9%88%e5%a4%84%e7%90%86" aria-label="追问：开火预测里弹药数量怎么处理？">追问：开火预测里弹药数量怎么处理？</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%aefiredelay-%e5%8f%82%e6%95%b0%e7%9a%84%e4%bd%9c%e7%94%a8%e6%98%af%e4%bb%80%e4%b9%88" aria-label="追问：FireDelay 参数的作用是什么？">追问：FireDelay 参数的作用是什么？</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e9%9a%be%e7%82%b9%e4%ba%8c%e5%bb%b6%e8%bf%9f%e8%a1%a5%e5%81%bfserver-side-rewind%e7%9a%84%e5%ae%9e%e7%8e%b0" aria-label="难点二：延迟补偿（Server-Side Rewind）的实现">难点二：延迟补偿（Server-Side Rewind）的实现</a><ul>
+                        
+                <li>
+                    <a href="#%e6%95%b4%e4%bd%93%e5%9b%9e%e7%ad%94-1" aria-label="整体回答">整体回答</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%ae%e4%b8%89%e7%a7%8d%e6%ad%a6%e5%99%a8%e7%b1%bb%e5%9e%8b%e7%9a%84%e5%bb%b6%e8%bf%9f%e8%a1%a5%e5%81%bf%e6%9c%89%e4%bb%80%e4%b9%88%e5%8c%ba%e5%88%ab" aria-label="追问：三种武器类型的延迟补偿有什么区别？">追问：三种武器类型的延迟补偿有什么区别？</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%aemaxrecordtime-%e8%ae%be-4-%e7%a7%92%e7%9a%84%e4%be%9d%e6%8d%ae%e6%98%af%e4%bb%80%e4%b9%88" aria-label="追问：MaxRecordTime 设 4 秒的依据是什么？">追问：MaxRecordTime 设 4 秒的依据是什么？</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%ae%e7%a2%b0%e6%92%9e%e7%9b%92%e5%a4%8d%e5%8e%9f%e6%97%b6%e6%9c%89%e6%b2%a1%e6%9c%89%e5%b9%b6%e5%8f%91%e5%ae%89%e5%85%a8%e9%97%ae%e9%a2%98" aria-label="追问：碰撞盒复原时有没有并发安全问题？">追问：碰撞盒复原时有没有并发安全问题？</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e9%9a%be%e7%82%b9%e4%b8%89%e5%bc%80%e5%a7%8b%e6%af%94%e8%b5%9b%e5%92%8c%e4%b8%ad%e9%80%94%e5%8a%a0%e5%85%a5%e6%97%b6%e7%9a%84%e5%90%84%e7%a7%8d%e5%bb%b6%e8%bf%9f%e5%88%9d%e5%a7%8b%e5%8c%96" aria-label="难点三：开始比赛和中途加入时的各种延迟初始化">难点三：开始比赛和中途加入时的各种延迟初始化</a><ul>
+                        
+                <li>
+                    <a href="#%e6%95%b4%e4%bd%93%e5%9b%9e%e7%ad%94-2" aria-label="整体回答">整体回答</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%aematchstate-%e6%98%af%e5%a6%82%e4%bd%95%e4%bb%8e%e6%9c%8d%e5%8a%a1%e5%99%a8%e5%90%8c%e6%ad%a5%e7%bb%99%e5%90%8e%e7%bb%ad%e5%8a%a0%e5%85%a5%e5%ae%a2%e6%88%b7%e7%ab%af%e7%9a%84" aria-label="追问：MatchState 是如何从服务器同步给后续加入客户端的？">追问：MatchState 是如何从服务器同步给后续加入客户端的？</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%ae%e4%b8%ba%e4%bb%80%e4%b9%88%e4%b8%8d%e7%9b%b4%e6%8e%a5%e7%94%a8-gamestate-%e5%90%8c%e6%ad%a5%e8%80%8c%e8%a6%81%e9%a2%9d%e5%a4%96%e8%b5%b0%e4%b8%80%e6%ac%a1-rpc" aria-label="追问：为什么不直接用 GameState 同步，而要额外走一次 RPC？">追问：为什么不直接用 GameState 同步，而要额外走一次 RPC？</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%aepollinit-%e7%9a%84%e8%bd%ae%e8%af%a2%e6%96%b9%e5%bc%8f%e6%9c%89%e6%80%a7%e8%83%bd%e9%97%ae%e9%a2%98%e5%90%97%e6%9c%89%e6%b2%a1%e6%9c%89%e6%9b%b4%e5%a5%bd%e7%9a%84%e6%9b%bf%e4%bb%a3%e6%96%b9%e6%a1%88" aria-label="追问：PollInit() 的轮询方式有性能问题吗？有没有更好的替代方案？">追问：PollInit() 的轮询方式有性能问题吗？有没有更好的替代方案？</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e9%9a%be%e7%82%b9%e5%9b%9b%e9%ab%98-ping-%e6%83%85%e5%86%b5%e4%b8%8b%e6%9c%8d%e5%8a%a1%e7%ab%af%e6%9d%83%e5%a8%81%e4%b8%8e%e5%ae%a2%e6%88%b7%e7%ab%af%e4%bf%a1%e4%bb%bb%e7%9a%84%e8%be%b9%e7%95%8c%e8%ae%be%e8%ae%a1" aria-label="难点四：高 Ping 情况下服务端权威与客户端信任的边界设计">难点四：高 Ping 情况下服务端权威与客户端信任的边界设计</a><ul>
+                        
+                <li>
+                    <a href="#%e6%95%b4%e4%bd%93%e5%9b%9e%e7%ad%94-3" aria-label="整体回答">整体回答</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%aegetpinginmilliseconds-%e8%bf%94%e5%9b%9e%e7%9a%84%e6%98%af%e4%bb%80%e4%b9%88%e5%ae%83%e6%98%af%e5%a6%82%e4%bd%95%e8%ae%a1%e7%ae%97%e7%9a%84" aria-label="追问：GetPingInMilliseconds() 返回的是什么？它是如何计算的？">追问：GetPingInMilliseconds() 返回的是什么？它是如何计算的？</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e9%97%ae%e9%a2%98ue-%e4%b8%ad%e6%80%8e%e4%b9%88%e5%ae%9e%e7%8e%b0%e5%bb%b6%e8%bf%9f%e7%bd%91%e7%bb%9c%e6%97%b6%e5%bb%b6%e7%9a%84%e8%ae%a1%e7%ae%97" aria-label="问题：UE 中怎么实现延迟（网络时延）的计算？">问题：UE 中怎么实现延迟（网络时延）的计算？</a><ul>
+                        
+                <li>
+                    <a href="#%e6%95%b4%e4%bd%93%e5%9b%9e%e7%ad%94-4" aria-label="整体回答">整体回答</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%ae%e4%b8%ba%e4%bb%80%e4%b9%88%e8%a6%81%e8%87%aa%e5%b7%b1%e5%ae%9e%e7%8e%b0%e6%97%b6%e9%92%9f%e5%90%8c%e6%ad%a5%e7%94%a8-ue-%e5%86%85%e7%bd%ae-ping-%e4%b8%8d%e5%a4%9f%e5%90%97" aria-label="追问：为什么要自己实现时钟同步，用 UE 内置 Ping 不够吗？">追问：为什么要自己实现时钟同步，用 UE 内置 Ping 不够吗？</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%ae%e6%af%8f-5-%e7%a7%92%e5%90%8c%e6%ad%a5%e4%b8%80%e6%ac%a1%e6%97%b6%e9%92%9f%e4%b8%ad%e9%97%b4%e7%9a%84%e8%af%af%e5%b7%ae%e6%80%8e%e4%b9%88%e5%a4%84%e7%90%86" aria-label="追问：每 5 秒同步一次时钟，中间的误差怎么处理？">追问：每 5 秒同步一次时钟，中间的误差怎么处理？</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e9%97%ae%e9%a2%98%e5%93%aa%e4%ba%9b%e7%b1%bb%e5%92%8c%e5%8f%98%e9%87%8f%e5%ad%98%e5%82%a8%e5%9c%a8%e6%9c%8d%e5%8a%a1%e5%99%a8%e5%93%aa%e4%ba%9b%e5%ad%98%e5%82%a8%e5%9c%a8%e6%9c%ac%e5%9c%b0%e5%93%aa%e4%ba%9b%e9%9c%80%e8%a6%81%e5%a4%8d%e5%88%b6" aria-label="问题：哪些类和变量存储在服务器，哪些存储在本地，哪些需要复制？">问题：哪些类和变量存储在服务器，哪些存储在本地，哪些需要复制？</a><ul>
+                        
+                <li>
+                    <a href="#%e6%95%b4%e4%bd%93%e5%9b%9e%e7%ad%94-5" aria-label="整体回答">整体回答</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%aeaplayercontroller-%e5%8f%aa%e5%ad%98%e5%9c%a8%e4%ba%8e%e6%8b%a5%e6%9c%89%e8%80%85%e9%82%a3%e5%85%b6%e4%bb%96%e7%8e%a9%e5%ae%b6%e7%9a%84-controller-%e6%8c%87%e9%92%88%e6%80%8e%e4%b9%88%e8%ae%bf%e9%97%ae" aria-label="追问：APlayerController 只存在于拥有者，那其他玩家的 Controller 指针怎么访问？">追问：APlayerController 只存在于拥有者，那其他玩家的 Controller 指针怎么访问？</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%aecond_owneronly-%e5%92%8c%e4%b8%8d%e5%8a%a0%e5%a4%8d%e5%88%b6%e6%9d%a1%e4%bb%b6%e6%9c%89%e4%bb%80%e4%b9%88%e5%8c%ba%e5%88%ab%e4%bb%80%e4%b9%88%e6%97%b6%e5%80%99%e8%af%a5%e7%94%a8%e5%93%aa%e7%a7%8d" aria-label="追问：COND_OwnerOnly 和不加复制条件有什么区别？什么时候该用哪种？">追问：COND_OwnerOnly 和不加复制条件有什么区别？什么时候该用哪种？</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e9%9a%be%e7%82%b9%e4%ba%94%e5%8a%a8%e7%94%bb-montage-%e5%9c%a8%e5%a4%9a%e4%ba%ba%e6%b8%b8%e6%88%8f%e4%b8%ad%e7%9a%84%e7%bd%91%e7%bb%9c%e5%90%8c%e6%ad%a5%e7%ad%96%e7%95%a5" aria-label="难点五：动画 Montage 在多人游戏中的网络同步策略">难点五：动画 Montage 在多人游戏中的网络同步策略</a><ul>
+                        
+                <li>
+                    <a href="#%e6%95%b4%e4%bd%93%e5%9b%9e%e7%ad%94-6" aria-label="整体回答">整体回答</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%ae%e5%8a%a8%e7%94%bb%e7%8a%b6%e6%80%81%e5%a6%82-bweaponequippedbaiming%e6%98%af%e6%80%8e%e4%b9%88%e4%bc%a0%e9%80%92%e7%bb%99-animinstance-%e7%9a%84" aria-label="追问：动画状态（如 bWeaponEquipped、bAiming）是怎么传递给 AnimInstance 的？">追问：动画状态（如 bWeaponEquipped、bAiming）是怎么传递给 AnimInstance 的？</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%ae%e5%8f%97%e5%87%bb%e5%8a%a8%e7%94%bbhit-react%e5%92%8c%e6%ad%bb%e4%ba%a1%e5%8a%a8%e7%94%bb%e6%98%af%e6%80%8e%e4%b9%88%e5%90%8c%e6%ad%a5%e7%9a%84" aria-label="追问：受击动画（Hit React）和死亡动画是怎么同步的？">追问：受击动画（Hit React）和死亡动画是怎么同步的？</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e9%97%ae%e9%a2%98%e5%85%adrpc-%e7%9a%84%e4%b8%89%e7%a7%8d%e7%b1%bb%e5%9e%8b%e6%9c%89%e4%bb%80%e4%b9%88%e5%8c%ba%e5%88%ab%e9%a1%b9%e7%9b%ae%e9%87%8c%e6%98%af%e6%80%8e%e4%b9%88%e9%80%89%e6%8b%a9-reliable-%e5%92%8c-unreliable-%e7%9a%84" aria-label="问题六：RPC 的三种类型有什么区别？项目里是怎么选择 Reliable 和 Unreliable 的？">问题六：RPC 的三种类型有什么区别？项目里是怎么选择 Reliable 和 Unreliable 的？</a><ul>
+                        
+                <li>
+                    <a href="#%e6%95%b4%e4%bd%93%e5%9b%9e%e7%ad%94-7" aria-label="整体回答">整体回答</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%aereliable-rpc-%e6%9c%89%e4%bb%80%e4%b9%88%e9%a3%8e%e9%99%a9%e4%b8%ba%e4%bb%80%e4%b9%88%e4%b8%8d%e6%8a%8a%e6%89%80%e6%9c%89-rpc-%e9%83%bd%e8%ae%be%e6%88%90-reliable" aria-label="追问：Reliable RPC 有什么风险？为什么不把所有 RPC 都设成 Reliable？">追问：Reliable RPC 有什么风险？为什么不把所有 RPC 都设成 Reliable？</a></li>
+                <li>
+                    <a href="#%e8%bf%bd%e9%97%aefvector_netquantize-%e5%92%8c%e6%99%ae%e9%80%9a-fvector-%e4%bd%9c%e4%b8%ba-rpc-%e5%8f%82%e6%95%b0%e6%9c%89%e4%bb%80%e4%b9%88%e5%8c%ba%e5%88%ab" aria-label="追问：FVector_NetQuantize 和普通 FVector 作为 RPC 参数有什么区别？">追问：FVector_NetQuantize 和普通 FVector 作为 RPC 参数有什么区别？</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="多人射击游戏项目介绍">多人射击游戏项目介绍<a hidden class="anchor" aria-hidden="true" href="#多人射击游戏项目介绍">#</a></h2>
+<p><strong>Blasters</strong> 是一款基于 Unreal Engine 5、以 C++ 为主开发的多人在线第三人称射击游戏 Demo，完整实现了生产级别的网络对战框架。以下是面试官通常最感兴趣的技术亮点：</p>
+<p><strong>网络架构</strong>：采用 Listen Server 模式，严格遵循服务器权威（Server Authority）原则。<code>AGameMode</code> 完全服务器独占，所有伤害结算、比赛状态流转均在服务器最终裁定，客户端无法伪造结果。</p>
+<p><strong>客户端预测</strong>：对开火、瞄准、装备武器等高频操作实现了&quot;本地立即执行 + Server RPC 异步确认 + Multicast 广播同步&quot;的完整预测链路，玩家操作零感知延迟。</p>
+<p><strong>Server-Side Rewind（延迟补偿）</strong>：自研基于历史帧回滚的服务端延迟补偿系统，使用 <code>TDoubleLinkedList&lt;FFramePackage&gt;</code> 存储最多 4 秒的碰撞盒历史，覆盖 Hitscan（射线）、Projectile（弹道模拟）、Shotgun（多弹丸）三种弹道类型，并配套了高 Ping 熔断机制。</p>
+<p><strong>时钟同步</strong>：实现基于 NTP 简化算法的客户端-服务器时钟校准，精确维护 <code>ClientServerDelta</code>，为延迟补偿的 HitTime 提供可靠基准。</p>
+<p><strong>武器系统</strong>：支持步枪、火箭筒、手枪、冲锋枪、霰弹枪、狙击枪、榴弹发射器七种武器，具备完整的弹药管理、换弹、拾取、抛弃逻辑，弹药以 <code>COND_OwnerOnly</code> 复制防止信息泄露。</p>
+<p><strong>多模式支持</strong>：自由乱斗与红蓝团队两种模式，通过 <code>ABlasterGameState</code> 同步团队分数，<code>Team</code> 属性驱动队友识别与模型颜色区分，<code>ATeamsGameMode</code> 处理组队重生逻辑。</p>
+<p><strong>BUFF 系统</strong>：<code>UBuffComponent</code> 实现血量回复、护盾回复、速度提升、跳跃提升，均有协程式 Timer 驱动，服务器结算后通过 Replication 同步 HUD 反馈。</p>
+<p><strong>HUD 健壮性</strong>：针对网络环境下对象初始化顺序不确定的问题，采用&quot;懒加载 + <code>PollInit()</code> 轮询&quot;双重机制，确保 HUD 在任何加入时机（开局前/中途加入）都能正确初始化。</p>
+<hr>
+<h2 id="难点一客户端预测的实现">难点一：客户端预测的实现<a hidden class="anchor" aria-hidden="true" href="#难点一客户端预测的实现">#</a></h2>
+<h3 id="整体回答">整体回答<a hidden class="anchor" aria-hidden="true" href="#整体回答">#</a></h3>
+<p>客户端预测的核心思路是：本地玩家的操作不等待服务器确认，先在本地立即执行，同时发 Server RPC 告知服务器。这样玩家感受不到延迟，操作即时响应。项目中最典型的例子是<strong>开火</strong>和<strong>瞄准</strong>。</p>
+<p>在 <code>CombatComponent.cpp</code> 的 <code>FireHitScanWeapon()</code> 和 <code>FireProjectileWeapon()</code> 中，每次开火的调用链为：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">LocalFire(HitTarget)              ← 本地立即执行：播放动画、生成枪口特效
+</span></span><span class="line"><span class="cl">ServerFire(HitTarget, FireDelay)  ← Server RPC：通知服务器进行权威验证
+</span></span><span class="line"><span class="cl">    └─ MulticastFire(HitTarget)   ← 服务器广播：同步给所有其他客户端
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>LocalFire</code> 和 <code>MulticastFire</code> 执行完全相同的逻辑（播放 Montage、生成弹壳等），区别仅在于执行时机。本地客户端提前执行一次预测，收到 Multicast 回来时通过动画状态检查或布尔标记来避免重复触发。</p>
+<p><strong>瞄准预测</strong>在 <code>SetAiming()</code> 里体现：先在本地直接设置 <code>bAiming = bIsAiming</code>，再调用 <code>ServerSetAiming</code>。这样 FOV 插值、移速修改等立即生效，而不是等一个完整 RTT 后才有反馈。</p>
+<hr>
+<h3 id="追问预测出错了怎么办客户端和服务器状态不一致时如何处理">追问：预测出错了怎么办？客户端和服务器状态不一致时如何处理？<a hidden class="anchor" aria-hidden="true" href="#追问预测出错了怎么办客户端和服务器状态不一致时如何处理">#</a></h3>
+<p>以瞄准为例：<code>bAiming</code> 的声明是 <code>ReplicatedUsing = OnRep_Aiming</code>。若服务器判定该操作不合法，会将权威值复制回客户端并触发 <code>OnRep_Aiming()</code>，其中做了一个关键处理：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">UCombatComponent</span><span class="o">::</span><span class="n">OnRep_Aiming</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">Character</span> <span class="o">&amp;&amp;</span> <span class="n">Character</span><span class="o">-&gt;</span><span class="n">IsLocallyControlled</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">bAiming</span> <span class="o">=</span> <span class="n">bAimButtonPressed</span><span class="p">;</span> <span class="c1">// 用本地按键真实状态纠正，而非盲目接受服务器值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>关键在于用 <code>bAimButtonPressed</code>（本地记录的最新按键真实状态）而非直接接受服务器推送的值——因为在网络往返期间本地状态可能已再次变化。这是&quot;预测 + 服务器校正&quot;的标准模式。</p>
+<blockquote>
+<p><strong>更优实现</strong>：UE 官方的 <code>CharacterMovementComponent</code> 对移动预测采用了更完整的方案——每帧输入打上单调递增的序号（<code>FNetworkPredictionData_Client::SavedMoves</code>），服务器校正时携带该序号，客户端收到后**重新模拟（Replay）**序号之后的所有帧，确保每一帧状态都能被精确校正而不产生视觉跳变。本项目对武器/瞄准状态的简单校正已经足够，但若要应用于位置预测，建议参考 CMC 的 <code>SavedMoves + PerformMovement</code> 重放机制，或使用 UE5 的 <code>NetworkPhysics</code> 插件中的 <code>FPhysicsReplicationAsyncInput</code> 方案。</p></blockquote>
+<hr>
+<h3 id="追问开火预测里弹药数量怎么处理">追问：开火预测里弹药数量怎么处理？<a hidden class="anchor" aria-hidden="true" href="#追问开火预测里弹药数量怎么处理">#</a></h3>
+<p>弹药数量 <code>CarriedAmmo</code> 的复制条件是 <code>COND_OwnerOnly</code>，只复制给武器拥有者，由服务器权威管理。客户端预测开火时<strong>不会</strong>立即扣减弹药，而是等服务器处理完毕后将正确值复制回来，触发 <code>OnRep_CarriedAmmo()</code> 更新 HUD。</p>
+<p>这样设计的考量是：弹药数量涉及反作弊（防止客户端伪造无限子弹），宁可 UI 有一帧 RTT 的滞后，也不能让客户端拥有弹药的写权限。而开枪的&quot;手感&quot;（动画、音效、准星扩散）通过本地预测已实现即时响应，两者分开处理，互不干扰。</p>
+<hr>
+<h3 id="追问firedelay-参数的作用是什么">追问：<code>FireDelay</code> 参数的作用是什么？<a hidden class="anchor" aria-hidden="true" href="#追问firedelay-参数的作用是什么">#</a></h3>
+<p><code>ServerFire</code> 携带 <code>FireDelay</code> 是为了服务器验证开火频率。服务器收到请求后会检查距上次开火的时间间隔是否符合该武器的射速（<code>FireDelay = 1.f / FireRate</code>），防止客户端通过修改本地计时器实现超速射击。这是在客户端预测框架下对服务器权威性的一个具体体现。</p>
+<hr>
+<h2 id="难点二延迟补偿server-side-rewind的实现">难点二：延迟补偿（Server-Side Rewind）的实现<a hidden class="anchor" aria-hidden="true" href="#难点二延迟补偿server-side-rewind的实现">#</a></h2>
+<h3 id="整体回答-1">整体回答<a hidden class="anchor" aria-hidden="true" href="#整体回答-1">#</a></h3>
+<p>延迟补偿的本质问题是：客户端准星对准目标并开枪，但请求到达服务器时，目标角色已因自身操作移动到了其他位置。若服务器用当前位置做碰撞检测，玩家会体验到&quot;明明打中了却没有伤害&quot;。</p>
+<p>解决方案是<strong>服务端历史帧回滚（Server-Side Rewind, SSR）</strong>：服务器为每个角色存储一段时间内的碰撞盒历史快照，收到命中请求时将碰撞盒&quot;时光倒流&quot;到客户端开枪时刻的位置，再做碰撞检测，以此裁定命中是否成立。</p>
+<p>具体实现在 <code>ULagCompensationComponent</code> 中：</p>
+<p><strong>数据结构</strong>：<code>TDoubleLinkedList&lt;FFramePackage&gt; FrameHistory</code>。每个 <code>FFramePackage</code> 存储一个时间戳和一个 <code>TMap&lt;FName, FBoxInformation&gt;</code>，记录该帧所有骨骼碰撞盒（<code>head</code>、<code>pelvis</code>、<code>spine</code> 等）的 <code>Location</code>、<code>Rotation</code>、<code>BoxExtent</code>。</p>
+<p><strong>记录</strong>：<code>TickComponent</code> 每帧调用 <code>SaveFramePackage()</code>，将当前帧状态压入链表头部，并清除超过 <code>MaxRecordTime</code>（4 秒）的尾部旧帧，保持链表长度稳定。</p>
+<p><strong>回滚流程（以 Hitscan 为例）</strong>：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">① 客户端在本地射线检测命中后，调用：
+</span></span><span class="line"><span class="cl">   ServerScoreRequest(HitCharacter, TraceStart, HitLocation, HitTime)
+</span></span><span class="line"><span class="cl">   其中 HitTime = GetServerTime()（经过时钟校准的服务器估算时间）
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">② 服务器 GetFrameToCheck() 在 HitCharacter 的 FrameHistory 里
+</span></span><span class="line"><span class="cl">   二分查找 HitTime 前后两帧，用线性插值（位置 FMath::Lerp，旋转 FQuat::Slerp）
+</span></span><span class="line"><span class="cl">   得到精确时刻的碰撞盒位置
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">③ ConfirmHit()：
+</span></span><span class="line"><span class="cl">   - 缓存当前所有碰撞盒位置
+</span></span><span class="line"><span class="cl">   - 将盒子移动到插值后的历史位置
+</span></span><span class="line"><span class="cl">   - 关闭 Mesh 的默认碰撞，只开启自定义 ECC_HitBox 通道
+</span></span><span class="line"><span class="cl">   - 优先做头部射线检测（headshot 判定），再做全身检测
+</span></span><span class="line"><span class="cl">   - 将碰撞盒复原到当前位置
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">④ 命中确认后，ApplyDamage 在服务器执行，具有权威性
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h3 id="追问三种武器类型的延迟补偿有什么区别">追问：三种武器类型的延迟补偿有什么区别？<a hidden class="anchor" aria-hidden="true" href="#追问三种武器类型的延迟补偿有什么区别">#</a></h3>
+<p><strong>Hitscan（即时射线武器，如步枪）</strong>：<code>ConfirmHit()</code> 使用 <code>World-&gt;LineTraceSingleByChannel</code>，在历史位置对 <code>ECC_HitBox</code> 通道做一次射线检测，是最简单直接的实现。</p>
+<p><strong>Projectile（弹道模拟武器，如火箭筒）</strong>：<code>ProjectileConfirmHit()</code> 使用 <code>UGameplayStatics::PredictProjectilePath</code>，传入客户端上报的初始速度和起始位置，在服务器上完整模拟一次弹道轨迹，判断其是否与历史位置的碰撞盒相交。这样即使是抛物线弹道也能精确还原。</p>
+<p><strong>Shotgun（霰弹枪）</strong>：每次射击产生多个弹丸，<code>ShotgunConfirmHit()</code> 接收 <code>TArray&lt;FVector_NetQuantize&gt;</code> 命中点列表和 <code>TArray&lt;ABlasterCharacter*&gt;</code> 命中角色列表，对每个角色分别查找对应的 <code>FramePackage</code>，独立统计 <code>HeadShots</code> 和 <code>BodyShots</code> 数量，存入 <code>FShotgunServerSideRewindResult</code>，最终按弹丸数乘以单发伤害结算总伤害。</p>
+<hr>
+<h3 id="追问maxrecordtime-设-4-秒的依据是什么">追问：<code>MaxRecordTime</code> 设 4 秒的依据是什么？<a hidden class="anchor" aria-hidden="true" href="#追问maxrecordtime-设-4-秒的依据是什么">#</a></h3>
+<p>这是一个存储开销与容忍延迟之间的权衡。记录时间越长，能容忍的玩家延迟越高，但内存开销也越大（每帧约 N 个角色 × M 个碰撞盒 × 帧率 × 秒数）。项目同时设置了 <code>HighPingThreshold = 50ms</code>（约 RTT 100ms）的高延迟熔断：Ping 超过阈值时通过 <code>HighPingDelegate</code> 广播，武器层订阅后可选择对该玩家禁用 SSR，退回到服务器当前位置判定。因此 4 秒的上限与高 Ping 熔断共同构成了防护体系，而不是单独作为唯一约束。</p>
+<blockquote>
+<p><strong>更优实现</strong>：商业项目（如 Valorant）通常会在服务器端<strong>主动测量</strong>每个客户端的 RTT，而不依赖客户端上报的 HitTime。做法是服务器记录 Server RPC 到达时间与 <code>PlayerController</code> 的 <code>ExactPing</code>，动态计算允许的最大回滚量（<code>MaxRollback = ServerPing * 1.2</code>，乘以一个容差系数），超出则拒绝，从根本上防止客户端伪造 <code>HitTime</code> 进行扩大回滚的作弊行为。</p></blockquote>
+<hr>
+<h3 id="追问碰撞盒复原时有没有并发安全问题">追问：碰撞盒复原时有没有并发安全问题？<a hidden class="anchor" aria-hidden="true" href="#追问碰撞盒复原时有没有并发安全问题">#</a></h3>
+<p>有潜在风险。在单线程游戏逻辑中，<code>ConfirmHit</code> 是在同一帧内完成&quot;移位 → 检测 → 复原&quot;的，正常情况下不会被打断。但如果同一帧内两个玩家同时对同一目标发起 <code>ServerScoreRequest</code>，两次回滚操作会串行执行（UE GameThread 是单线程），先执行的操作在复原之前，后执行的操作读到的是被修改过的状态——这在理论上是一个 Bug。严谨的做法是对每次回滚都使用<strong>独立的临时碰撞几何体</strong>（动态创建 <code>UBoxComponent</code> 或使用 <code>FPhysicsInterface</code> 的场景查询），不直接修改角色身上的碰撞盒，回滚完成后直接销毁临时体，完全规避状态污染问题。</p>
+<hr>
+<h2 id="难点三开始比赛和中途加入时的各种延迟初始化">难点三：开始比赛和中途加入时的各种延迟初始化<a hidden class="anchor" aria-hidden="true" href="#难点三开始比赛和中途加入时的各种延迟初始化">#</a></h2>
+<h3 id="整体回答-2">整体回答<a hidden class="anchor" aria-hidden="true" href="#整体回答-2">#</a></h3>
+<p>这个问题分两个层面：<strong>游戏状态（比赛阶段、倒计时）的同步</strong>，以及 <strong>HUD 在网络环境下的健壮初始化</strong>。</p>
+<p><strong>比赛状态同步</strong>存在一个经典问题：<code>AGameMode</code> 只存在于服务器，客户端无法访问它。无论玩家是开局前加入还是中途加入，都需要一次主动询问才能拿到当前阶段和剩余时间。</p>
+<p>解决方案是在 <code>ABlasterPlayerController::BeginPlay()</code> 里调用 <code>ServerCheckMatchState()</code>（Server RPC），服务器从 <code>GameMode</code> 读取 <code>WarmupTime</code>、<code>MatchTime</code>、<code>CooldownTime</code>、<code>LevelStartingTime</code>、<code>MatchState</code>，然后用 <code>ClientJoinMidgame</code>（Client RPC）发回客户端：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">ABlasterPlayerController</span><span class="o">::</span><span class="n">ClientJoinMidgame_Implementation</span><span class="p">(...)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">WarmupTime</span> <span class="o">=</span> <span class="n">Warmup</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">MatchTime</span> <span class="o">=</span> <span class="n">Match</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">LevelStartingTime</span> <span class="o">=</span> <span class="n">StartingTime</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">MatchState</span> <span class="o">=</span> <span class="n">StateOfMatch</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CooldownTime</span> <span class="o">=</span> <span class="n">Cooldown</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">OnMatchStateSet</span><span class="p">(</span><span class="n">MatchState</span><span class="p">,</span> <span class="n">bIsTeamsMatch</span><span class="p">);</span> <span class="c1">// 根据当前阶段显示正确的 HUD
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>之后客户端每帧在 <code>Tick</code> 里调用 <code>SetHUDTime()</code>，用 <code>GetServerTime() - LevelStartingTime</code> 推算剩余倒计时，保证时间显示与服务器一致。</p>
+<p><strong>HUD 延迟初始化</strong>更为棘手。网络环境下，<code>AHUD</code>、<code>UCharacterOverlay</code>、<code>APlayerState</code> 等对象的构造顺序并不确定，<code>BeginPlay</code> 时它们可能还是 <code>nullptr</code>。</p>
+<p>处理方式是&quot;<strong>懒加载 + 保底轮询</strong>&ldquo;的双重机制：</p>
+<p>所有 <code>SetHUD*</code> 函数开头都有如下懒加载：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">BlasterHUD</span> <span class="o">=</span> <span class="n">BlasterHUD</span> <span class="o">==</span> <span class="k">nullptr</span> <span class="o">?</span> <span class="n">Cast</span><span class="o">&lt;</span><span class="n">ABlasterHUD</span><span class="o">&gt;</span><span class="p">(</span><span class="n">GetHUD</span><span class="p">())</span> <span class="o">:</span> <span class="n">BlasterHUD</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>并在访问 Widget 子控件前进行 null 检查，避免崩溃。</p>
+<p><code>ABlasterCharacter</code> 里的 <code>PollInit()</code> 在 <code>Tick</code> 中持续轮询 <code>BlasterPlayerController</code> 和 <code>BlasterPlayerState</code> 是否已就绪，一旦就绪就完成 HUD 首次设置并停止轮询，彻底解决初始化时序问题。</p>
+<hr>
+<h3 id="追问matchstate-是如何从服务器同步给后续加入客户端的">追问：<code>MatchState</code> 是如何从服务器同步给后续加入客户端的？<a hidden class="anchor" aria-hidden="true" href="#追问matchstate-是如何从服务器同步给后续加入客户端的">#</a></h3>
+<p><code>MatchState</code> 在 <code>ABlasterPlayerController</code> 里声明为 <code>ReplicatedUsing = OnRep_MatchState</code>。对于<strong>初始连接</strong>，<code>ClientJoinMidgame</code> 是主动的直连通道；对于<strong>之后状态变化</strong>（如从 <code>WaitingToStart</code> 切换到 <code>InProgress</code>），Replication 系统触发 <code>OnRep_MatchState</code>，内部调用 <code>HandleMatchHasStarted</code> 或 <code>HandleCooldown</code>。两条路径最终汇聚到同一套 HUD 更新逻辑，保证了初始加入和运行时变化都能正确响应。</p>
+<hr>
+<h3 id="追问为什么不直接用-gamestate-同步而要额外走一次-rpc">追问：为什么不直接用 <code>GameState</code> 同步，而要额外走一次 RPC？<a hidden class="anchor" aria-hidden="true" href="#追问为什么不直接用-gamestate-同步而要额外走一次-rpc">#</a></h3>
+<p><code>AGameState</code> 确实会自动复制到所有客户端，<code>ABlasterGameState</code> 里也存着 <code>TopScoringPlayers</code>、<code>RedTeamScore</code>、<code>BlueTeamScore</code> 等。但有两个问题：第一，<code>GameState</code> 不包含 <code>GameMode</code> 里的配置参数（<code>WarmupTime</code>、<code>MatchTime</code> 这些是 Mode 的职责，不属于 State）；第二，玩家刚连接时 <code>GameState</code> 的初始复制可能还未到达，存在时序竞争。<code>ServerCheckMatchState + ClientJoinMidgame</code> 的一问一答模式精确控制了&quot;连接就绪后立刻发起一次询问&rdquo;，是对 Replication 时序不确定性的防御性补充。</p>
+<blockquote>
+<p><strong>更优实现</strong>：UE 提供了 <code>AGameStateBase::OnRep_ReplicatedHasBegunPlay()</code> 和 <code>APlayerController::ReceivedPlayer()</code> 这两个回调，时机比 <code>BeginPlay</code> 更晚、更可靠。对于 GameState 的配置参数问题，更规范的做法是将比赛配置（Warmup、MatchTime 等）抽成一个 <code>UPrimaryDataAsset</code>，通过 <code>GameMode</code> 在服务器初始化时写入 <code>GameState</code> 的 <code>Replicated</code> 字段，客户端监听 <code>OnRep</code> 回调即可，完全不需要额外的 RPC 往返。</p></blockquote>
+<hr>
+<h3 id="追问pollinit-的轮询方式有性能问题吗有没有更好的替代方案">追问：<code>PollInit()</code> 的轮询方式有性能问题吗？有没有更好的替代方案？<a hidden class="anchor" aria-hidden="true" href="#追问pollinit-的轮询方式有性能问题吗有没有更好的替代方案">#</a></h3>
+<p><code>PollInit()</code> 在 <code>Tick</code> 里每帧执行一次 null 检查，代价极低（只是指针判断），且在条件满足后立即停止轮询（通过布尔标记跳过后续 Tick 逻辑），实践中可以接受。</p>
+<blockquote>
+<p><strong>更优实现</strong>：更优雅的方案是使用<strong>委托（Delegate）驱动</strong>替代轮询。UE 的 <code>APlayerController</code> 有 <code>OnPossess</code> 回调，<code>APlayerState</code> 的首次复制可以通过重写 <code>CopyProperties</code> 或 <code>OnRep_Owner</code> 来感知。具体而言，可以在 <code>ABlasterCharacter::PossessedBy()</code> 和 <code>ABlasterCharacter::OnRep_PlayerState()</code> 两个时机分别绑定初始化逻辑，彻底消除轮询，改为事件驱动。</p></blockquote>
+<hr>
+<h2 id="难点四高-ping-情况下服务端权威与客户端信任的边界设计">难点四：高 Ping 情况下服务端权威与客户端信任的边界设计<a hidden class="anchor" aria-hidden="true" href="#难点四高-ping-情况下服务端权威与客户端信任的边界设计">#</a></h2>
+<h3 id="整体回答-3">整体回答<a hidden class="anchor" aria-hidden="true" href="#整体回答-3">#</a></h3>
+<p>这是一个设计层面的难点：SSR 给了客户端很大的&quot;权力&quot;——它发来的命中请求，服务器会回滚历史来承认。但如果延迟极高（超过 <code>MaxRecordTime</code>），或者回滚量过大影响其他玩家体验，就需要限制机制。项目做了两层防护：</p>
+<p><strong>第一层：<code>GetFrameToCheck</code> 里的硬性截断</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">OldestHistoryTime</span> <span class="o">&gt;</span> <span class="n">HitTime</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 延迟超过历史记录上限，直接拒绝
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="nf">FFramePackage</span><span class="p">();</span> <span class="c1">// 返回空，命中不予确认
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>若客户端上报的 <code>HitTime</code> 比历史记录中最老的帧还早，说明网络延迟已超过 <code>MaxRecordTime</code>，直接拒绝本次命中确认。</p>
+<p><strong>第二层：<code>CheckPing + ServerReportPingStatus + HighPingDelegate</code></strong></p>
+<p>客户端每隔 <code>CheckPingFrequency</code>（20 秒）读取 <code>PlayerState-&gt;GetPingInMilliseconds()</code>，与 <code>HighPingThreshold</code>（50ms，即约 RTT 100ms）比较。超过阈值时通过 <code>ServerReportPingStatus(true)</code> 上报服务器，服务器触发 <code>HighPingDelegate</code>，武器层订阅后可选择对该玩家禁用 SSR，退回到服务器当前位置判定（对高延迟玩家不利，但对被攻击方公平）。</p>
+<p>难点在于：<code>CheckPing</code> 只在客户端运行（<code>HasAuthority()</code> 时直接 <code>return</code>），而权威判断依赖客户端上报，存在被欺骗的可能。Demo 规模下这是可接受的权衡，但在商业项目中需要服务器自行测量 RTT。</p>
+<hr>
+<h3 id="追问getpinginmilliseconds-返回的是什么它是如何计算的">追问：<code>GetPingInMilliseconds()</code> 返回的是什么？它是如何计算的？<a hidden class="anchor" aria-hidden="true" href="#追问getpinginmilliseconds-返回的是什么它是如何计算的">#</a></h3>
+<p><code>APlayerState::GetPingInMilliseconds()</code> 是 UE 引擎内置属性，底层由 <code>UNetConnection::AverageLag</code> 驱动，引擎在每次 ACK 到达时更新该均值。它是一个估算的往返时延，以毫秒为单位，精度有限且存在平滑滞后。项目里 <code>HighPingThreshold = 50.f</code>，含义是单程约 50ms（即 RTT 约 100ms）时触发高延迟警告，是一个相对保守的阈值。</p>
+<blockquote>
+<p><strong>更优实现</strong>：商业项目中服务器应自行维护每个连接的精确 RTT。做法是在服务器的 <code>PlayerController::Tick</code> 里读取 <code>Cast&lt;UNetConnection&gt;(Player-&gt;GetNetConnection())-&gt;AverageLag</code>（单位秒），或更精确地通过自定义心跳包（类似本项目的时钟同步机制）在服务器侧记录发出与收到的时间差，完全不依赖客户端上报，杜绝篡改可能。</p></blockquote>
+<hr>
+<h2 id="问题ue-中怎么实现延迟网络时延的计算">问题：UE 中怎么实现延迟（网络时延）的计算？<a hidden class="anchor" aria-hidden="true" href="#问题ue-中怎么实现延迟网络时延的计算">#</a></h2>
+<h3 id="整体回答-4">整体回答<a hidden class="anchor" aria-hidden="true" href="#整体回答-4">#</a></h3>
+<p>项目实现了两套机制：<strong>自定义时钟同步</strong>（用于延迟补偿的精确 HitTime 基准）和 <strong>UE 内置 Ping 统计</strong>（用于高延迟策略判断）。</p>
+<p><strong>自定义时钟同步</strong>的核心是经典的 NTP 简化算法，实现在 <code>ABlasterPlayerController</code> 中：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">① 客户端在 ReceivedPlayer()（与服务器建立连接后尽早触发）
+</span></span><span class="line"><span class="cl">   以及之后每隔 TimeSyncFrequency（5秒），调用：
+</span></span><span class="line"><span class="cl">   ServerRequestServerTime(GetWorld()-&gt;GetTimeSeconds())
+</span></span><span class="line"><span class="cl">   携带本地发送时的时间戳 TimeOfClientRequest
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">② 服务器收到后立即记录 ServerTimeOfReceipt，然后调用：
+</span></span><span class="line"><span class="cl">   ClientReportServerTime(TimeOfClientRequest, ServerTimeOfReceipt)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">③ 客户端收到后计算：
+</span></span><span class="line"><span class="cl">   RoundTripTime    = GetWorld()-&gt;GetTimeSeconds() - TimeOfClientRequest
+</span></span><span class="line"><span class="cl">   SingleTripTime   = 0.5f * RoundTripTime          // 假设上下行对称
+</span></span><span class="line"><span class="cl">   CurrentServerTime = TimeServerReceivedClientRequest + SingleTripTime
+</span></span><span class="line"><span class="cl">   ClientServerDelta = CurrentServerTime - GetWorld()-&gt;GetTimeSeconds()
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">④ 之后 GetServerTime() = GetWorld()-&gt;GetTimeSeconds() + ClientServerDelta
+</span></span><span class="line"><span class="cl">   即本地时间 + 偏移量 = 服务器时间的实时估算
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>SingleTripTime</code> 就是计算出来的单程延迟，<code>GetServerTime()</code> 则是延迟补偿里 <code>HitTime</code> 的来源——客户端开枪时记录的 <code>HitTime = GetServerTime()</code>，传到服务器后在历史帧中回滚，回滚目标时刻已经扣除了传输延迟，因此定位的是客户端&quot;按下开火键那一刻&quot;服务器的真实状态。</p>
+<p><strong>UE 内置 Ping</strong>：<code>APlayerState::GetPingInMilliseconds()</code> 由引擎自动维护，用于 UI 显示和高延迟策略触发，无需手动计算。</p>
+<hr>
+<h3 id="追问为什么要自己实现时钟同步用-ue-内置-ping-不够吗">追问：为什么要自己实现时钟同步，用 UE 内置 Ping 不够吗？<a hidden class="anchor" aria-hidden="true" href="#追问为什么要自己实现时钟同步用-ue-内置-ping-不够吗">#</a></h3>
+<p>内置 Ping 是一个粗略的往返时延参考值，有两个根本缺陷：第一，它是定期更新的均值，不能精确反映某一时刻的偏差；第二，延迟补偿需要的不是单纯的往返时延，而是<strong>客户端时钟与服务器时钟之间的绝对偏移量 <code>ClientServerDelta</code></strong>。<code>GetServerTime()</code> 返回的是一个&quot;与服务器时钟校准过的本地时间&quot;，这是 Ping 值本质上无法提供的。两者职责不同：内置 Ping 用于展示和策略控制，时钟同步用于保证延迟补偿的精确性。</p>
+<hr>
+<h3 id="追问每-5-秒同步一次时钟中间的误差怎么处理">追问：每 5 秒同步一次时钟，中间的误差怎么处理？<a hidden class="anchor" aria-hidden="true" href="#追问每-5-秒同步一次时钟中间的误差怎么处理">#</a></h3>
+<p>项目中 <code>GetServerTime()</code> 用的是 <code>GetWorld()-&gt;GetTimeSeconds() + ClientServerDelta</code>，其中 <code>GetWorld()-&gt;GetTimeSeconds()</code> 是本地时间，每帧都在增长。只要本地时钟的走速与服务器接近（现代操作系统的时钟漂移通常在 ppm 级别，5 秒内误差 &lt; 0.5ms），5 秒刷新一次就足够精确。如果需要更高精度（如竞技级游戏），可以缩短 <code>TimeSyncFrequency</code>，或采用多次采样取中位数来过滤网络抖动，这也是标准 NTP 实现的做法。</p>
+<hr>
+<h2 id="问题哪些类和变量存储在服务器哪些存储在本地哪些需要复制">问题：哪些类和变量存储在服务器，哪些存储在本地，哪些需要复制？<a hidden class="anchor" aria-hidden="true" href="#问题哪些类和变量存储在服务器哪些存储在本地哪些需要复制">#</a></h2>
+<h3 id="整体回答-5">整体回答<a hidden class="anchor" aria-hidden="true" href="#整体回答-5">#</a></h3>
+<p>UE 多人游戏遵循服务器权威原则，不同类型对象的存在范围是固定的：</p>
+<p><strong>仅存在于服务器</strong></p>
+<p><code>AGameMode</code>（及其子类 <code>ABlasterGameMode</code>、<code>ATeamsGameMode</code>、<code>ALobbyGameMode</code>）完全服务器独占，客户端无实例。比赛时间配置、玩家消除逻辑、重生逻辑全部在这里。</p>
+<p><code>ULagCompensationComponent::FrameHistory</code>：该双向链表无 Replication，<code>ULagCompensationComponent</code> 本身也未调用 <code>SetIsReplicated(true)</code>，仅在服务器 Tick 并保存历史帧，用于服务器验证命中，客户端无需感知这些数据。</p>
+<p><code>ApplyDamage</code> 调用：伤害结算的权威在服务器，只在 <code>ServerScoreRequest_Implementation</code> 等 Server RPC 内部执行。</p>
+<p><strong>仅存在于本地客户端（拥有者）</strong></p>
+<p><code>ABlasterHUD</code> 及其所有 Widget（<code>CharacterOverlay</code>、<code>Announcement</code>、<code>ElimAnnouncement</code>）：HUD 只在拥有者客户端创建，<code>GetHUD()</code> 在服务器端返回 <code>nullptr</code>。</p>
+<p><code>UCombatComponent</code> 中的 <code>CrosshairVelocityFactor</code>、<code>CrosshairAimFactor</code>、<code>HitTarget</code>（射线检测结果）等：纯本地 UI 计算，<code>TickComponent</code> 里加了 <code>Character-&gt;IsLocallyControlled()</code> 守卫，非本地控制角色不执行。</p>
+<p><code>ABlasterPlayerController</code> 中的 <code>ClientServerDelta</code>、<code>SingleTripTime</code>：时钟偏移量只对本客户端有意义。</p>
+<p><strong>需要复制的关键变量</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>变量</th>
+          <th>所在类</th>
+          <th>复制条件</th>
+          <th>说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>Health</code></td>
+          <td><code>ABlasterCharacter</code></td>
+          <td>所有客户端</td>
+          <td>掉血后所有人可见</td>
+      </tr>
+      <tr>
+          <td><code>Shield</code></td>
+          <td><code>ABlasterCharacter</code></td>
+          <td>所有客户端</td>
+          <td>护盾状态同步</td>
+      </tr>
+      <tr>
+          <td><code>bDisableGameplay</code></td>
+          <td><code>ABlasterCharacter</code></td>
+          <td>所有客户端</td>
+          <td>比赛结束时禁用输入</td>
+      </tr>
+      <tr>
+          <td><code>bAiming</code></td>
+          <td><code>UCombatComponent</code></td>
+          <td>所有客户端</td>
+          <td>其他玩家看到瞄准姿势</td>
+      </tr>
+      <tr>
+          <td><code>EquippedWeapon</code></td>
+          <td><code>UCombatComponent</code></td>
+          <td>所有客户端</td>
+          <td>武器附着与显示</td>
+      </tr>
+      <tr>
+          <td><code>SecondaryWeapon</code></td>
+          <td><code>UCombatComponent</code></td>
+          <td>所有客户端</td>
+          <td>备用武器</td>
+      </tr>
+      <tr>
+          <td><code>CombatState</code></td>
+          <td><code>UCombatComponent</code></td>
+          <td>所有客户端</td>
+          <td>换弹/换枪状态同步</td>
+      </tr>
+      <tr>
+          <td><code>CarriedAmmo</code></td>
+          <td><code>UCombatComponent</code></td>
+          <td>仅拥有者（<code>COND_OwnerOnly</code>）</td>
+          <td>弹药数只有自己看到</td>
+      </tr>
+      <tr>
+          <td><code>MatchState</code></td>
+          <td><code>ABlasterPlayerController</code></td>
+          <td>Controller 的拥有者</td>
+          <td>比赛阶段</td>
+      </tr>
+      <tr>
+          <td><code>Score</code></td>
+          <td><code>APlayerState</code></td>
+          <td>所有客户端</td>
+          <td>内置，引擎处理</td>
+      </tr>
+      <tr>
+          <td><code>Defeats</code></td>
+          <td><code>ABlasterPlayerState</code></td>
+          <td>所有客户端</td>
+          <td>死亡数</td>
+      </tr>
+      <tr>
+          <td><code>Team</code></td>
+          <td><code>ABlasterPlayerState</code></td>
+          <td>所有客户端</td>
+          <td>队伍归属</td>
+      </tr>
+      <tr>
+          <td><code>TopScoringPlayers</code></td>
+          <td><code>ABlasterGameState</code></td>
+          <td>所有客户端</td>
+          <td>结算排行</td>
+      </tr>
+      <tr>
+          <td><code>RedTeamScore</code> / <code>BlueTeamScore</code></td>
+          <td><code>ABlasterGameState</code></td>
+          <td>所有客户端</td>
+          <td>队伍分数</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>对象存在范围规律总结</strong>：</p>
+<ul>
+<li><code>AGameMode</code>：仅服务器</li>
+<li><code>AGameState</code>：服务器 + 所有客户端（自动 Replicated）</li>
+<li><code>APlayerState</code>：服务器 + 所有客户端（自动 Replicated）</li>
+<li><code>APlayerController</code>：服务器 + 拥有者客户端（其他客户端无其他玩家的 Controller 实例）</li>
+<li><code>APawn / ACharacter</code>：服务器 + 所有客户端（Replicated，部分属性仅 <code>OwnerOnly</code>）</li>
+<li><code>AHUD</code>：仅拥有者客户端</li>
+<li>组件是否复制由 <code>SetIsReplicated(true)</code> 决定：<code>UCombatComponent</code> 和 <code>UBuffComponent</code> 开启了复制；<code>ULagCompensationComponent</code> 未开启，仅在服务器有效</li>
+</ul>
+<hr>
+<h3 id="追问aplayercontroller-只存在于拥有者那其他玩家的-controller-指针怎么访问">追问：<code>APlayerController</code> 只存在于拥有者，那其他玩家的 Controller 指针怎么访问？<a hidden class="anchor" aria-hidden="true" href="#追问aplayercontroller-只存在于拥有者那其他玩家的-controller-指针怎么访问">#</a></h3>
+<p>在<strong>服务器</strong>上，所有 <code>APlayerController</code> 都存在，服务器可以直接通过指针传递，如 <code>GameMode-&gt;PlayerEliminated(ElimmedCharacter, VictimController, AttackerController)</code>。</p>
+<p>在<strong>客户端</strong>上，其他玩家的 <code>Pawn-&gt;Controller</code> 是 <code>nullptr</code>，但 <code>Pawn-&gt;GetPlayerState()</code> 可以访问（<code>PlayerState</code> 全客户端复制）。因此跨玩家的信息访问应通过 <code>PlayerState</code> 而非 <code>Controller</code>，这也是 <code>ABlasterPlayerState</code> 上存着 <code>Defeats</code>、<code>Team</code> 等所有人都需要看到的数据的原因。</p>
+<hr>
+<h3 id="追问cond_owneronly-和不加复制条件有什么区别什么时候该用哪种">追问：<code>COND_OwnerOnly</code> 和不加复制条件有什么区别？什么时候该用哪种？<a hidden class="anchor" aria-hidden="true" href="#追问cond_owneronly-和不加复制条件有什么区别什么时候该用哪种">#</a></h3>
+<p>不加条件（即默认的 <code>COND_None</code>）表示该变量会复制给所有拥有该 Actor 引用的客户端，适合所有玩家都需要感知的状态（血量、动画状态、武器装备）。<code>COND_OwnerOnly</code> 只复制给该 Actor 的拥有者，适合涉及玩家私有信息的字段（弹药数、背包内容、技能冷却具体值），这样既防止信息泄露给对手，也减少了不必要的网络流量。</p>
+<p>UE 还提供了 <code>COND_SimulatedOnly</code>（只给非拥有者，如第三人称动画）、<code>COND_InitialOnly</code>（只在 Actor 首次复制时发送一次，适合只读配置）等条件，可以根据字段的语义精细化控制复制开销。</p>
+<blockquote>
+<p><strong>更优实践</strong>：对于变化频繁但精度要求不高的数值（如血量百分比用于血条显示），可以结合 <code>UPROPERTY(Replicated)</code> + 自定义 <code>NetSerialize</code>（实现 <code>FHitResult</code> 那样的压缩序列化）或使用 <code>FVector_NetQuantize</code> 系列类型，在保证视觉效果的同时显著压缩带宽。</p></blockquote>
+<hr>
+<h2 id="难点五动画-montage-在多人游戏中的网络同步策略">难点五：动画 Montage 在多人游戏中的网络同步策略<a hidden class="anchor" aria-hidden="true" href="#难点五动画-montage-在多人游戏中的网络同步策略">#</a></h2>
+<h3 id="整体回答-6">整体回答<a hidden class="anchor" aria-hidden="true" href="#整体回答-6">#</a></h3>
+<p>动画 Montage 的播放本身<strong>不会自动通过 Replication 同步</strong>，<code>PlayAnimMontage()</code> 只在本地执行，其他客户端不会自动收到通知。项目中所有需要其他玩家看到的动画（开火、换弹、受击、死亡）都必须通过 Multicast RPC 或 RepNotify 来手动驱动。</p>
+<p>项目的做法以开火动画为例，调用链如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">本地客户端（LocalFire）
+</span></span><span class="line"><span class="cl">  └─ Character-&gt;PlayFireMontage(bAiming)  ← 本地立即播放，无延迟
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">服务器（MulticastFire_Implementation）
+</span></span><span class="line"><span class="cl">  └─ Character-&gt;PlayFireMontage(bAiming)  ← 广播给所有其他客户端
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>PlayFireMontage</code> 内部调用 <code>AnimInstance-&gt;Montage_Play(FireWeaponMontage)</code>，同时根据 <code>bAiming</code> 跳转到对应的 Section（<code>RifleAim</code> 或 <code>RifleHip</code>）。这套机制保证了：本地玩家即时看到自己的开火动画（预测），其他玩家通过 Multicast 延迟一个 RTT 后看到。</p>
+<p>换弹动画则有所不同。换弹通过 <code>CombatState</code>（<code>ReplicatedUsing = OnRep_CombatState</code>）来驱动：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">UCombatComponent</span><span class="o">::</span><span class="n">OnRep_CombatState</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">switch</span> <span class="p">(</span><span class="n">CombatState</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">case</span> <span class="n">ECombatState</span><span class="o">::</span><span class="nl">ECS_Reloading</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">Character</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">Character</span><span class="o">-&gt;</span><span class="n">IsLocallyControlled</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">            <span class="n">Character</span><span class="o">-&gt;</span><span class="n">PlayReloadMontage</span><span class="p">();</span> <span class="c1">// 只对非本地角色播放，本地已经预测过了
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">break</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">...</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>本地玩家在调用 <code>ServerReload</code> 前就已经在本地 <code>PlayReloadMontage()</code>，<code>OnRep_CombatState</code> 里用 <code>!IsLocallyControlled()</code> 守卫，避免本地玩家重复播放。</p>
+<hr>
+<h3 id="追问动画状态如-bweaponequippedbaiming是怎么传递给-animinstance-的">追问：动画状态（如 <code>bWeaponEquipped</code>、<code>bAiming</code>）是怎么传递给 <code>AnimInstance</code> 的？<a hidden class="anchor" aria-hidden="true" href="#追问动画状态如-bweaponequippedbaiming是怎么传递给-animinstance-的">#</a></h3>
+<p><code>UBlasterAnimInstance</code> 在 <code>NativeUpdateAnimation()</code> 里每帧主动从 Character 和 CombatComponent 读取所需状态：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">UBlasterAnimInstance</span><span class="o">::</span><span class="n">NativeUpdateAnimation</span><span class="p">(</span><span class="kt">float</span> <span class="n">DeltaTime</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">BlasterCharacter</span> <span class="o">=</span> <span class="n">Cast</span><span class="o">&lt;</span><span class="n">ABlasterCharacter</span><span class="o">&gt;</span><span class="p">(</span><span class="n">TryGetPawnOwner</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Speed</span> <span class="o">=</span> <span class="n">BlasterCharacter</span><span class="o">-&gt;</span><span class="n">GetVelocity</span><span class="p">().</span><span class="n">Size2D</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bIsInAir</span> <span class="o">=</span> <span class="n">BlasterCharacter</span><span class="o">-&gt;</span><span class="n">GetCharacterMovement</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">IsFalling</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">bAiming</span> <span class="o">=</span> <span class="n">BlasterCharacter</span><span class="o">-&gt;</span><span class="n">IsAiming</span><span class="p">();</span> <span class="c1">// 读取已复制好的 bAiming
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">...</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这种<strong>轮询读取</strong>而非事件推送的模式，好处是 AnimInstance 不需要感知网络逻辑，只管消费状态；动画状态的同步由 Replication 保证，AnimInstance 读到的永远是最新的复制值。由于 <code>bAiming</code> 已经是 Replicated 变量，所有客户端的 <code>AnimInstance</code> 读到它时都已经是服务器同步过来的权威值。</p>
+<hr>
+<h3 id="追问受击动画hit-react和死亡动画是怎么同步的">追问：受击动画（Hit React）和死亡动画是怎么同步的？<a hidden class="anchor" aria-hidden="true" href="#追问受击动画hit-react和死亡动画是怎么同步的">#</a></h3>
+<p><strong>受击动画</strong>通过 Multicast RPC <code>MulticastHit()</code> 广播，所有客户端收到后播放 <code>HitReactMontage</code>。注意受击动画不做预测——受击是被动事件，本地客户端感知不到&quot;自己被打了&quot;（只有服务器的弹道判定才知道），所以必须等服务器确认后广播，没有预测的必要。</p>
+<p><strong>死亡动画</strong>走的是 <code>bElimmed</code>（<code>ReplicatedUsing = OnRep_ElimAnim</code>）：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">ABlasterCharacter</span><span class="o">::</span><span class="n">OnRep_ElimAnim</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">bElimmed</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">MulticastElim</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span> <span class="c1">// 触发布娃娃物理、播放 ElimMontage
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>死亡时服务器调用 <code>Elim()</code>，设置 <code>bElimmed = true</code>，Replication 触发所有客户端的 <code>OnRep_ElimAnim</code>，进而调用 <code>MulticastElim</code>（这里用 Multicast 而非只依赖 RepNotify，是为了确保服务器本地也能走同一套逻辑）。</p>
+<blockquote>
+<p><strong>更优实现</strong>：对于高频短动画（受击、脚步），频繁的 Multicast RPC 会产生大量小包，带宽开销不可忽视。更优化的做法是使用 <strong><code>FastArraySerializer</code></strong> 记录最近几次受击事件（带时间戳和方向），客户端收到复制后按时间顺序回放动画，将多次 RPC 合并为一次 Replication 更新，同时还能支持因网络抖动而积压的多个受击事件的顺序回放。</p></blockquote>
+<hr>
+<h2 id="问题六rpc-的三种类型有什么区别项目里是怎么选择-reliable-和-unreliable-的">问题六：RPC 的三种类型有什么区别？项目里是怎么选择 Reliable 和 Unreliable 的？<a hidden class="anchor" aria-hidden="true" href="#问题六rpc-的三种类型有什么区别项目里是怎么选择-reliable-和-unreliable-的">#</a></h2>
+<h3 id="整体回答-7">整体回答<a hidden class="anchor" aria-hidden="true" href="#整体回答-7">#</a></h3>
+<p>UE 的 RPC 分三种类型，各有适用场景：</p>
+<p><code>Server</code> RPC 由客户端调用、在服务器执行，用于客户端向服务器上报意图或请求权威操作，如 <code>ServerFire</code>、<code>ServerSetAiming</code>、<code>ServerReload</code>。</p>
+<p><code>Client</code> RPC 由服务器调用、在拥有者客户端执行，用于服务器向特定客户端推送专属信息，如 <code>ClientJoinMidgame</code>、<code>ClientReportServerTime</code>。</p>
+<p><code>Multicast</code> RPC 由服务器调用、在服务器和所有客户端执行，用于广播需要所有人感知的事件，如 <code>MulticastFire</code>、<code>MulticastElim</code>、<code>MulticastHit</code>。</p>
+<p><strong><code>Reliable</code> 与 <code>Unreliable</code> 的选择</strong>是另一个维度：<code>Reliable</code> 保证到达（底层维护重传队列），<code>Unreliable</code> 不保证（发了就忘），两者在项目里的使用逻辑如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="o">//</span> <span class="n">Reliable</span><span class="err">：用于状态变更、一次性重要事件</span>
+</span></span><span class="line"><span class="cl"><span class="n">UFUNCTION</span><span class="p">(</span><span class="n">Server</span><span class="p">,</span> <span class="n">Reliable</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">void</span> <span class="n">ServerFire</span><span class="p">(</span><span class="k">const</span> <span class="n">FVector_NetQuantize</span><span class="o">&amp;</span> <span class="n">TraceHitTarget</span><span class="p">,</span> <span class="ne">float</span> <span class="n">FireDelay</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="o">//</span> <span class="err">原因：开火是触发伤害结算的关键事件，漏掉一次后果严重</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">UFUNCTION</span><span class="p">(</span><span class="n">Client</span><span class="p">,</span> <span class="n">Reliable</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">void</span> <span class="n">ClientJoinMidgame</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="o">//</span> <span class="err">原因：比赛状态初始化只发一次，必须保证到达</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">//</span> <span class="n">Unreliable</span><span class="err">：用于高频、允许丢失的视觉</span><span class="o">/</span><span class="err">音效同步</span>
+</span></span><span class="line"><span class="cl"><span class="n">UFUNCTION</span><span class="p">(</span><span class="n">NetMulticast</span><span class="p">,</span> <span class="n">Unreliable</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">void</span> <span class="n">MulticastHit</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="o">//</span> <span class="err">原因：受击动画只是视觉反馈，偶尔丢失一帧不影响游戏结果，</span>
+</span></span><span class="line"><span class="cl"><span class="o">//</span>       <span class="err">但如果用</span> <span class="n">Reliable</span> <span class="err">则高频受击时重传队列会爆炸式增长</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><hr>
+<h3 id="追问reliable-rpc-有什么风险为什么不把所有-rpc-都设成-reliable">追问：<code>Reliable</code> RPC 有什么风险？为什么不把所有 RPC 都设成 Reliable？<a hidden class="anchor" aria-hidden="true" href="#追问reliable-rpc-有什么风险为什么不把所有-rpc-都设成-reliable">#</a></h3>
+<p><code>Reliable</code> RPC 底层依赖一个有序的重传队列。如果网络持续丢包，未确认的 RPC 会积压在队列中，当队列超过引擎上限（默认约 256 条，由 <code>MaxPacketHandlerCapacity</code> 控制）时，UE 会<strong>强制断开该连接</strong>（<code>Close connection</code>），玩家被踢出游戏。</p>
+<p>因此，把高频调用（每帧或每次开火）的 RPC 设为 <code>Reliable</code> 是非常危险的。以 <code>MulticastHit()</code> 为例：如果一个玩家在 1 秒内被霰弹枪打了 30 次，产生 30 次 <code>Reliable Multicast</code>，在丢包环境下这 30 条全部进入重传队列，极易触发断线保护。</p>
+<p><strong>判断原则</strong>：</p>
+<ul>
+<li>涉及<strong>权威状态变更</strong>（开火、换弹、消除）→ <code>Reliable</code>，因为漏掉会产生逻辑错误</li>
+<li>纯<strong>视觉/音效反馈</strong>（受击动画、击打特效）→ <code>Unreliable</code>，偶尔丢失只是视觉瑕疵，不影响游戏逻辑</li>
+<li>高频连续数据（准星位置、角色旋转）→ <code>Unreliable</code> + 最新值覆盖，因为下一帧的新值会自然纠正旧值</li>
+</ul>
+<blockquote>
+<p><strong>更优实践</strong>：对于既需要可靠性又高频的场景（如技能释放序列），可以考虑用 <strong>Replicated 属性 + RepNotify</strong> 替代 Reliable Multicast RPC。属性复制天然具有可靠性（UE 的属性复制会在连接恢复后补发最新值），且引擎会自动做属性合批（多个属性变化合并进一个数据包），比大量单独的 Reliable RPC 更高效、更安全。</p></blockquote>
+<hr>
+<h3 id="追问fvector_netquantize-和普通-fvector-作为-rpc-参数有什么区别">追问：<code>FVector_NetQuantize</code> 和普通 <code>FVector</code> 作为 RPC 参数有什么区别？<a hidden class="anchor" aria-hidden="true" href="#追问fvector_netquantize-和普通-fvector-作为-rpc-参数有什么区别">#</a></h3>
+<p>项目里 <code>ServerFire</code>、<code>ServerScoreRequest</code> 等 RPC 的位置参数都使用了 <code>FVector_NetQuantize</code> 而非裸 <code>FVector</code>。区别在于序列化精度和带宽：</p>
+<p>普通 <code>FVector</code> 每个分量序列化为 4 字节 <code>float</code>，三个分量共 12 字节，精度为 IEEE 754 单精度。</p>
+<p><code>FVector_NetQuantize</code> 系列是 UE 提供的压缩变体：<code>FVector_NetQuantize</code> 将每个分量量化为整数（精度 1cm），<code>FVector_NetQuantize10</code> 精度 0.1cm，<code>FVector_NetQuantize100</code> 精度 1m，<code>FVector_NetQuantizeNormal</code> 专用于单位向量（3 个分量共 6 字节）。对于射击游戏的命中点坐标，1cm 的精度完全足够，却节省了约 30%-50% 的序列化体积。</p>
+<p>在高频 RPC 的累积效应下，这类压缩对带宽的节省是显著的，也体现了网络编程中&quot;能省则省&quot;的基本原则。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="http://localhost:1313/posts/cheetsheets/editorplugin/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>EditorPlugin</span>
+  </a>
+  <a class="next" href="http://localhost:1313/posts/myworks/uehelper/">
+    <span class="title">Next »</span>
+    <br>
+    <span>UEHelper</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share UEProjects on x"
+            href="https://x.com/intent/tweet/?text=UEProjects&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fueprojects%2f&amp;hashtags=">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share UEProjects on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fueprojects%2f&amp;title=UEProjects&amp;summary=UEProjects&amp;source=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fueprojects%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share UEProjects on reddit"
+            href="https://reddit.com/submit?url=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fueprojects%2f&title=UEProjects">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share UEProjects on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fueprojects%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share UEProjects on whatsapp"
+            href="https://api.whatsapp.com/send?text=UEProjects%20-%20http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fueprojects%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share UEProjects on telegram"
+            href="https://telegram.me/share/url?text=UEProjects&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fueprojects%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share UEProjects on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=UEProjects&u=http%3a%2f%2flocalhost%3a1313%2fposts%2fcheetsheets%2fueprojects%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="http://localhost:1313/">李睿杰的博客</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
